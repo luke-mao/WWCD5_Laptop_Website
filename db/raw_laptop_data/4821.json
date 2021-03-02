@@ -1,0 +1,141 @@
+{
+    "code": 26,
+    "message": "Valid method.",
+    "result": {
+        "0": {
+            "model_info": [
+                {
+                    "id": 4821,
+                    "noteb_name": "Lenovo V14  (ARE) (US)",
+                    "name": "Lenovo V14",
+                    "extra_name": "",
+                    "submodel_info": [
+                        " (ARE)",
+                        "(US)"
+                    ]
+                }
+            ],
+            "config_id": "2809622920818886028",
+            "model_resources": {
+                "thumbnail": "https://noteb.com/res/img/models/thumb/t_2890_1.jpg",
+                "image_1": "https://noteb.com/res/img/models/2890_1.jpg",
+                "image_2": "https://noteb.com/res/img/models/2890_2.jpg",
+                "image_3": "https://noteb.com/res/img/models/2890_3.jpg",
+                "image_4": "https://noteb.com/res/img/models/2890_4.jpg",
+                "official_link": "",
+                "official_link2": null,
+                "launch_date": "2020-07-31",
+                "primary_model": "4821"
+            },
+            "cpu": {
+                "prod": "Amd",
+                "model": "Athlon Gold 3150U",
+                "lithography": "14",
+                "cache": "4",
+                "base_speed": "2.40",
+                "boost_speed": "3.30",
+                "cores": "2",
+                "tdp": "15",
+                "other_info": "SSE4.2,AVX2.0,64-bit,AMD-V,AMD-Vi,AMD TC 3.0,SMT",
+                "rating": "21.1",
+                "integrated_video_id": "554",
+                "integrated_video": "Unknown"
+            },
+            "display": {
+                "size": "14.0",
+                "horizontal_resolution": "1920",
+                "vertical_resolution": "1080",
+                "type": "LED IPS",
+                "sRGB": "60",
+                "touch": "no",
+                "other_info": ""
+            },
+            "memory": {
+                "size": "4",
+                "speed": "2666",
+                "type": "DDR4"
+            },
+            "primary_storage": {
+                "model": "SSD M.2 PCIe",
+                "cap": "128",
+                "rpm": null,
+                "read_speed": "765"
+            },
+            "secondary_storage": {
+                "model": "N/A",
+                "cap": "0",
+                "rpm": null,
+                "read_speed": null
+            },
+            "gpu": {
+                "prod": "Amd",
+                "model": "Radeon RX Vega 3 (Picasso)",
+                "architecture": "GCN 1.4",
+                "lithography": "14",
+                "shaders": "192",
+                "base_speed": "300",
+                "boost_speed": "1000",
+                "shader_speed": "300",
+                "memory_speed": "1200",
+                "memory_bandwidth": "64",
+                "memory_size": "2048",
+                "memory_type": "DDR4",
+                "tdp": "15",
+                "other_info": "AMD FreeSync,AMD PowerTune,AMD ZeroCore,AMD Eyefinity,AMD TressFX,AMD TrueAudio",
+                "rating": "3.0"
+            },
+            "wireless_card": {
+                "model": "802.11 ac",
+                "speed": "867",
+                "other_info": "Bluetooth 4.x,dual band,2 x antennas"
+            },
+            "optical_drive": {
+                "type": "none",
+                "other_info": ""
+            },
+            "motherboard": {
+                "ram_slots": "1",
+                "lan_card": "none",
+                "storage_slots": " 1 X M.2 SATA/PCIe, 1 X SATA 3.0",
+                "other_info": "Dolby Audio"
+            },
+            "chassis": {
+                "height_cm": "1.99",
+                "height_inch": "0.78",
+                "depth_cm": "24.10",
+                "depth_inch": "9.49",
+                "width_cm": "32.71",
+                "width_inch": "12.88",
+                "weight_kg": "1.60",
+                "weight_lb": "3.53",
+                "colors": "Iron grey",
+                "build_materials": "Plastic",
+                "peripheral_interfaces": "2 X USB 3.1,1 X USB 2.0,SD card reader",
+                "video_interfaces": "1 X HDMI",
+                "webcam_mp": "0.920",
+                "keyboard_type": "Chiclet keyboard,Spill resistant",
+                "charger": " 65W (3.34A - 19.5VDC)",
+                "other_info": "2x1.5W speakers,Microphone"
+            },
+            "battery": {
+                "capacity": "35",
+                "cell_type": "Li-Pol",
+                "other_info": ""
+            },
+            "warranty": {
+                "years": "1",
+                "type_short": "Standard",
+                "type_long": "Standard Pick-up & Return"
+            },
+            "operating_system": "Windows Pro 10.00",
+            "config_score": "26.11",
+            "config_price": "400",
+            "config_price_min": "396",
+            "config_price_max": "404",
+            "battery_life_raw": "6.3",
+            "battery_life_hours": "6:20",
+            "total_storage_capacity": "128"
+        }
+    },
+    "daily_hits_left": "206"
+}

@@ -1,0 +1,141 @@
+{
+    "code": 26,
+    "message": "Valid method.",
+    "result": {
+        "0": {
+            "model_info": [
+                {
+                    "id": 4694,
+                    "noteb_name": "Lenovo Thinkpad T14s  Gen 1 (US)",
+                    "name": "Lenovo Thinkpad T14s",
+                    "extra_name": " (AMD)",
+                    "submodel_info": [
+                        " Gen 1",
+                        "(US)"
+                    ]
+                }
+            ],
+            "config_id": "16771476019868999680",
+            "model_resources": {
+                "thumbnail": "https://noteb.com/res/img/models/thumb/t_2776_1.jpg",
+                "image_1": "https://noteb.com/res/img/models/2776_1.jpg",
+                "image_2": "https://noteb.com/res/img/models/2776_2.jpg",
+                "image_3": "https://noteb.com/res/img/models/2776_3.jpg",
+                "image_4": "https://noteb.com/res/img/models/2776_4.jpg",
+                "official_link": "",
+                "official_link2": null,
+                "launch_date": "2020-06-05",
+                "primary_model": "4694"
+            },
+            "cpu": {
+                "prod": "Amd",
+                "model": "Ryzen 5 PRO 4650U",
+                "lithography": "7",
+                "cache": "8",
+                "base_speed": "2.10",
+                "boost_speed": "4.00",
+                "cores": "6",
+                "tdp": "25",
+                "other_info": "SSE4.2,AVX2.0,64-bit,SMT,AMD-V,AMD-Vi,AMD XFR,AMD PRO",
+                "rating": "49.7",
+                "integrated_video_id": "679",
+                "integrated_video": "Unknown"
+            },
+            "display": {
+                "size": "14.0",
+                "horizontal_resolution": "1920",
+                "vertical_resolution": "1080",
+                "type": "LED IPS",
+                "sRGB": "60",
+                "touch": "no",
+                "other_info": ""
+            },
+            "memory": {
+                "size": "8",
+                "speed": "3200",
+                "type": "DDR4"
+            },
+            "primary_storage": {
+                "model": "SSD M.2 PCIe",
+                "cap": "256",
+                "rpm": null,
+                "read_speed": "850"
+            },
+            "secondary_storage": {
+                "model": "N/A",
+                "cap": "0",
+                "rpm": null,
+                "read_speed": null
+            },
+            "gpu": {
+                "prod": "Amd",
+                "model": "Radeon RX Vega 6 (Renoir)",
+                "architecture": "GCN 1.4",
+                "lithography": "7",
+                "shaders": "384",
+                "base_speed": "1100",
+                "boost_speed": "1500",
+                "shader_speed": "1100",
+                "memory_speed": "1200",
+                "memory_bandwidth": "64",
+                "memory_size": "2048",
+                "memory_type": "DDR4",
+                "tdp": "15",
+                "other_info": "AMD FreeSync,AMD PowerTune,AMD ZeroCore,AMD Eyefinity,AMD TressFX,AMD TrueAudio",
+                "rating": "8.3"
+            },
+            "wireless_card": {
+                "model": "Wi-Fi 6 AX200",
+                "speed": "2400",
+                "other_info": "Bluetooth 5.0,dual band,2 x antennas"
+            },
+            "optical_drive": {
+                "type": "none",
+                "other_info": ""
+            },
+            "motherboard": {
+                "ram_slots": "soldered",
+                "lan_card": "none",
+                "storage_slots": " 2 X M.2 SATA/PCIe",
+                "other_info": "Realtek ALC3287 audio"
+            },
+            "chassis": {
+                "height_cm": "1.67",
+                "height_inch": "0.66",
+                "depth_cm": "22.61",
+                "depth_inch": "8.90",
+                "width_cm": "32.90",
+                "width_inch": "12.95",
+                "weight_kg": "1.35",
+                "weight_lb": "2.98",
+                "colors": "Black",
+                "build_materials": "Plastic",
+                "peripheral_interfaces": "2 X USB-C 3.2,2 X USB 3.2,MicroSD card reader",
+                "video_interfaces": "1 X HDMI",
+                "webcam_mp": "0.920",
+                "keyboard_type": "Standard or Backlit Chiclet keyboard,Spill resistant",
+                "charger": "45W (2.31A - 19.5VDC), 65W (3.34A - 19.5VDC),USB-C charger",
+                "other_info": "2X1W speakers,Microphone array,Edgeless display,Fingerprint reader (optional),SIM card (optional),SmartCard (optional),IR camera (optional)"
+            },
+            "battery": {
+                "capacity": "57",
+                "cell_type": "Li-Pol",
+                "other_info": ""
+            },
+            "warranty": {
+                "years": "1",
+                "type_short": "Standard",
+                "type_long": "Standard Pick-up & Return"
+            },
+            "operating_system": "Windows Pro 10.00",
+            "config_score": "38.9",
+            "config_price": "710",
+            "config_price_min": "703",
+            "config_price_max": "717",
+            "battery_life_raw": "8.2",
+            "battery_life_hours": "8:10",
+            "total_storage_capacity": "256"
+        }
+    },
+    "daily_hits_left": "4"
+}

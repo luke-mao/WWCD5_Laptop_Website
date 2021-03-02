@@ -1,0 +1,141 @@
+{
+    "code": 26,
+    "message": "Valid method.",
+    "result": {
+        "0": {
+            "model_info": [
+                {
+                    "id": 5129,
+                    "noteb_name": "Asus TUF A17  FA706. (US)",
+                    "name": "Asus TUF A17",
+                    "extra_name": "",
+                    "submodel_info": [
+                        " FA706.",
+                        "(US)"
+                    ]
+                }
+            ],
+            "config_id": "811234181137399032",
+            "model_resources": {
+                "thumbnail": "https://noteb.com/res/img/models/thumb/t_2390_1.jpg",
+                "image_1": "https://noteb.com/res/img/models/2390_1.jpg",
+                "image_2": "https://noteb.com/res/img/models/2390_2.jpg",
+                "image_3": "https://noteb.com/res/img/models/2390_3.jpg",
+                "image_4": "https://noteb.com/res/img/models/2390_4.jpg",
+                "official_link": "https://www.asus.com/Laptops/ASUS-TUF-Gaming-A17/",
+                "official_link2": null,
+                "launch_date": "2020-01-14",
+                "primary_model": "4100"
+            },
+            "cpu": {
+                "prod": "Amd",
+                "model": "Ryzen 7 4800H",
+                "lithography": "7",
+                "cache": "8",
+                "base_speed": "2.90",
+                "boost_speed": "4.20",
+                "cores": "8",
+                "tdp": "45",
+                "other_info": "SSE4.2,AVX2.0,64-bit,AMD-V,AMD-Vi,SMT,AMD XFR,Precision Boost 2",
+                "rating": "72.3",
+                "integrated_video_id": "665",
+                "integrated_video": "Unknown"
+            },
+            "display": {
+                "size": "17.3",
+                "horizontal_resolution": "1920",
+                "vertical_resolution": "1080",
+                "type": "LED IPS",
+                "sRGB": "60",
+                "touch": "no",
+                "other_info": "BOE NV173FHM-NX1 panel,40% AdobeRGB ,22ms response time,16.7M colors"
+            },
+            "memory": {
+                "size": "16",
+                "speed": "2666",
+                "type": "DDR4"
+            },
+            "primary_storage": {
+                "model": "SSD M.2 PCIe",
+                "cap": "512",
+                "rpm": null,
+                "read_speed": "900"
+            },
+            "secondary_storage": {
+                "model": "HDD",
+                "cap": "1000",
+                "rpm": "5400",
+                "read_speed": "114"
+            },
+            "gpu": {
+                "prod": "Nvidia",
+                "model": "GeForce GTX 1650 GDDR5",
+                "architecture": "Turing",
+                "lithography": "12",
+                "shaders": "896",
+                "base_speed": "1395",
+                "boost_speed": "1560",
+                "shader_speed": "1395",
+                "memory_speed": "2000",
+                "memory_bandwidth": "128",
+                "memory_size": "4096",
+                "memory_type": "GDDR5",
+                "tdp": "55",
+                "other_info": "Nvidia PhysX,Nvidia CUDA,Nvidia BatteryBoost,Optimus,Nvidia MFAA,Nvidia GPU Boost 3.0,G-Sync",
+                "rating": "32.7"
+            },
+            "wireless_card": {
+                "model": "802.11 ac",
+                "speed": "867",
+                "other_info": "Bluetooth 4.x,dual band,2 x antennas"
+            },
+            "optical_drive": {
+                "type": "none",
+                "other_info": ""
+            },
+            "motherboard": {
+                "ram_slots": "2",
+                "lan_card": "OEM 10/100/1000",
+                "storage_slots": " 1 X SATA 3.0, 2 X M.2 SATA/PCIe",
+                "other_info": "HD audio,Optimus"
+            },
+            "chassis": {
+                "height_cm": "2.54",
+                "height_inch": "1.00",
+                "depth_cm": "26.92",
+                "depth_inch": "10.60",
+                "width_cm": "39.88",
+                "width_inch": "15.70",
+                "weight_kg": "2.58",
+                "weight_lb": "5.70",
+                "colors": "Silver",
+                "build_materials": "Plastic",
+                "peripheral_interfaces": "1 X USB-C 3.1,2 X USB 3.1,1 X USB 2.0,1 X LAN",
+                "video_interfaces": "1 X HDMI",
+                "webcam_mp": "0.920",
+                "keyboard_type": "Backlit Chiclet keyboard,RGB LED",
+                "charger": "180W (9A - 20VDC),150W (7.5A - 20VDC)",
+                "other_info": "2 x speakers,Microphone array,Edgeless display"
+            },
+            "battery": {
+                "capacity": "90",
+                "cell_type": "Li-Ion",
+                "other_info": ""
+            },
+            "warranty": {
+                "years": "1",
+                "type_short": "Standard",
+                "type_long": "Standard Pick-up & Return"
+            },
+            "operating_system": "Windows Home 10.00",
+            "config_score": "48.84",
+            "config_price": "1200",
+            "config_price_min": "1188",
+            "config_price_max": "1212",
+            "battery_life_raw": "6.5",
+            "battery_life_hours": "6:30",
+            "total_storage_capacity": "1512"
+        }
+    },
+    "daily_hits_left": "12"
+}

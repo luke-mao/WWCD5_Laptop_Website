@@ -1,0 +1,140 @@
+{
+    "code": 26,
+    "message": "Valid method.",
+    "result": {
+        "0": {
+            "model_info": [
+                {
+                    "id": 5186,
+                    "noteb_name": "Dell Vostro 14 3400 (US)",
+                    "name": "Dell Vostro 14 3400",
+                    "extra_name": "",
+                    "submodel_info": [
+                        "(US)"
+                    ]
+                }
+            ],
+            "config_id": "6993725760779150941",
+            "model_resources": {
+                "thumbnail": "https://noteb.com/res/img/models/thumb/t_3123_1.jpg",
+                "image_1": "https://noteb.com/res/img/models/3123_1.jpg",
+                "image_2": "https://noteb.com/res/img/models/3123_2.jpg",
+                "image_3": "https://noteb.com/res/img/models/3123_3.jpg",
+                "image_4": "https://noteb.com/res/img/models/3123_4.jpg",
+                "official_link": "https://www.dell.com/en-us/work/shop/dell-laptops-and-notebooks/new-vostro-14-3400-laptop/spd/vostro-14-3400-laptop#tabs_section",
+                "official_link2": "14",
+                "launch_date": "2020-11-18",
+                "primary_model": "5186"
+            },
+            "cpu": {
+                "prod": "Intel",
+                "model": "i3-1115G4",
+                "lithography": "10",
+                "cache": "6",
+                "base_speed": "3.00",
+                "boost_speed": "4.10",
+                "cores": "2",
+                "tdp": "28",
+                "other_info": "SSE4.2,AVX2.0,AVX-512,64-bit,HT,VT-x,VT-d,TBT 2.0,Deep Learning Boost,IPU 6.0 optional,Intel GNA 2.0",
+                "rating": "46.9",
+                "integrated_video_id": "687",
+                "integrated_video": "Unknown"
+            },
+            "display": {
+                "size": "14.0",
+                "horizontal_resolution": "1366",
+                "vertical_resolution": "768",
+                "type": "LED TN",
+                "sRGB": "60",
+                "touch": "no",
+                "other_info": ""
+            },
+            "memory": {
+                "size": "4",
+                "speed": "2666",
+                "type": "DDR4"
+            },
+            "primary_storage": {
+                "model": "HDD",
+                "cap": "1000",
+                "rpm": "5400",
+                "read_speed": "114"
+            },
+            "secondary_storage": {
+                "model": "N/A",
+                "cap": "0",
+                "rpm": null,
+                "read_speed": null
+            },
+            "gpu": {
+                "prod": "Intel",
+                "model": "Intel UHD Graphics Xe G4 48 EU",
+                "architecture": "Ice Lake",
+                "lithography": "10",
+                "shaders": "48",
+                "base_speed": "400",
+                "boost_speed": "1250",
+                "shader_speed": "400",
+                "memory_speed": "2133",
+                "memory_bandwidth": "64",
+                "memory_size": "8192",
+                "memory_type": "DDR4",
+                "tdp": "0",
+                "other_info": "QuickSync,HDMI 1.4 (4096x2160 @ 60Hz), DP (7680x4320 @ 60Hz)",
+                "rating": "6.9"
+            },
+            "wireless_card": {
+                "model": "802.11 ac",
+                "speed": "433",
+                "other_info": "Bluetooth 4.x,dual band,1 x antennas"
+            },
+            "optical_drive": {
+                "type": "none",
+                "other_info": ""
+            },
+            "motherboard": {
+                "ram_slots": "2",
+                "lan_card": "Realtek 10/100/1000",
+                "storage_slots": " 1 X M.2 SATA/PCIe, 1 X SATA 3.0",
+                "other_info": "Realtek ALC3204 audio"
+            },
+            "chassis": {
+                "height_cm": "1.99",
+                "height_inch": "0.78",
+                "depth_cm": "23.95",
+                "depth_inch": "9.43",
+                "width_cm": "32.87",
+                "width_inch": "12.94",
+                "weight_kg": "1.64",
+                "weight_lb": "3.62",
+                "colors": "Accent black",
+                "build_materials": "Plastic",
+                "peripheral_interfaces": "2 X USB 3.2,1 X USB 2.0,SD card reader,1 X LAN",
+                "video_interfaces": "1 X HDMI",
+                "webcam_mp": "0.920",
+                "keyboard_type": "Standard or Backlit Chiclet keyboard",
+                "charger": "45W (2.31A - 19.5VDC), 65W (3.34A - 19.5VDC)",
+                "other_info": " 2x2W speakers,Microphone,Fingerprint reader"
+            },
+            "battery": {
+                "capacity": "42",
+                "cell_type": "Li-Pol",
+                "other_info": "300 discharge charge cycles"
+            },
+            "warranty": {
+                "years": "1",
+                "type_short": "On-Site",
+                "type_long": "On-Site Repair"
+            },
+            "operating_system": "Windows Pro 10.00",
+            "config_score": "31.28",
+            "config_price": "469",
+            "config_price_min": "465",
+            "config_price_max": "474",
+            "battery_life_raw": "5.9",
+            "battery_life_hours": "5:50",
+            "total_storage_capacity": "1000"
+        }
+    },
+    "daily_hits_left": "211"
+}

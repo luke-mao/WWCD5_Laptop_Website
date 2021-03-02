@@ -1,0 +1,141 @@
+{
+    "code": 26,
+    "message": "Valid method.",
+    "result": {
+        "0": {
+            "model_info": [
+                {
+                    "id": 5105,
+                    "noteb_name": "Asus ZenBook Flip 13 UX363 EA (US)",
+                    "name": "Asus ZenBook Flip 13 UX363",
+                    "extra_name": "",
+                    "submodel_info": [
+                        "EA",
+                        "(US)"
+                    ]
+                }
+            ],
+            "config_id": "5056085269385992953",
+            "model_resources": {
+                "thumbnail": "https://noteb.com/res/img/models/thumb/t_3053_1.jpg",
+                "image_1": "https://noteb.com/res/img/models/3053_1.jpg",
+                "image_2": "https://noteb.com/res/img/models/3053_2.jpg",
+                "image_3": "https://noteb.com/res/img/models/3053_3.jpg",
+                "image_4": "https://noteb.com/res/img/models/3053_4.jpg",
+                "official_link": "https://www.asus.com/2-in-1-PCs/ASUS-ZenBook-Flip-13-UX363EA/",
+                "official_link2": null,
+                "launch_date": "2020-10-06",
+                "primary_model": "4984"
+            },
+            "cpu": {
+                "prod": "Intel",
+                "model": "i5-1135G7",
+                "lithography": "10",
+                "cache": "8",
+                "base_speed": "2.40",
+                "boost_speed": "4.20",
+                "cores": "4",
+                "tdp": "28",
+                "other_info": "SSE4.2,AVX2.0,AVX-512,64-bit,VT-x,VT-d,TBT 2.0,Deep Learning Boost,IPU 6.0 optional,Intel GNA 2.0",
+                "rating": "52.5",
+                "integrated_video_id": "688",
+                "integrated_video": "Unknown"
+            },
+            "display": {
+                "size": "13.3",
+                "horizontal_resolution": "1920",
+                "vertical_resolution": "1080",
+                "type": "LED IPS",
+                "sRGB": "100",
+                "touch": "no",
+                "other_info": ""
+            },
+            "memory": {
+                "size": "8",
+                "speed": "3733",
+                "type": "DDR4"
+            },
+            "primary_storage": {
+                "model": "SSD M.2 PCIe",
+                "cap": "512",
+                "rpm": null,
+                "read_speed": "900"
+            },
+            "secondary_storage": {
+                "model": "N/A",
+                "cap": "0",
+                "rpm": null,
+                "read_speed": null
+            },
+            "gpu": {
+                "prod": "Intel",
+                "model": "Iris Xe G7 80 EU",
+                "architecture": "Ice Lake",
+                "lithography": "10",
+                "shaders": "80",
+                "base_speed": "400",
+                "boost_speed": "1300",
+                "shader_speed": "400",
+                "memory_speed": "2133",
+                "memory_bandwidth": "64",
+                "memory_size": "8192",
+                "memory_type": "DDR4",
+                "tdp": "0",
+                "other_info": "QuickSync,HDMI 1.4 (4096x2160 @ 60Hz), DP (7680x4320 @ 60Hz)",
+                "rating": "13.1"
+            },
+            "wireless_card": {
+                "model": "802.11 ax",
+                "speed": "2400",
+                "other_info": "Bluetooth 5.0,dual band,2 x antennas"
+            },
+            "optical_drive": {
+                "type": "none",
+                "other_info": ""
+            },
+            "motherboard": {
+                "ram_slots": "soldered",
+                "lan_card": "none",
+                "storage_slots": " 1 X M.2 SATA/PCIe",
+                "other_info": "HD audio"
+            },
+            "chassis": {
+                "height_cm": "1.40",
+                "height_inch": "0.55",
+                "depth_cm": "21.11",
+                "depth_inch": "8.31",
+                "width_cm": "30.50",
+                "width_inch": "12.01",
+                "weight_kg": "1.30",
+                "weight_lb": "2.87",
+                "colors": "Pine grey",
+                "build_materials": "Plastic",
+                "peripheral_interfaces": "2 X USB-C 3.2,1 X USB 3.2,Thunderbolt",
+                "video_interfaces": "1 X HDMI",
+                "webcam_mp": "0.920",
+                "keyboard_type": "Backlit Chiclet keyboard",
+                "charger": "65W (3.42A - 19VDC),USB-C charger",
+                "other_info": "2 x speakers,Harman speakers,Microphone array,Edgeless display,IR camera"
+            },
+            "battery": {
+                "capacity": "67",
+                "cell_type": "Li-Pol",
+                "other_info": ""
+            },
+            "warranty": {
+                "years": "1",
+                "type_short": "Standard",
+                "type_long": "Standard Pick-up & Return"
+            },
+            "operating_system": "Windows Home 10.00",
+            "config_score": "41.42",
+            "config_price": "900",
+            "config_price_min": "891",
+            "config_price_max": "909",
+            "battery_life_raw": "8.6",
+            "battery_life_hours": "8:35",
+            "total_storage_capacity": "512"
+        }
+    },
+    "daily_hits_left": "1"
+}

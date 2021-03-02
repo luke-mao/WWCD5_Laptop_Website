@@ -1,0 +1,140 @@
+{
+    "code": 26,
+    "message": "Valid method.",
+    "result": {
+        "0": {
+            "model_info": [
+                {
+                    "id": 5103,
+                    "noteb_name": "Dell Precision 15 3551 (US)",
+                    "name": "Dell Precision 15 3551",
+                    "extra_name": "",
+                    "submodel_info": [
+                        "(US)"
+                    ]
+                }
+            ],
+            "config_id": "938449278668716580",
+            "model_resources": {
+                "thumbnail": "https://noteb.com/res/img/models/thumb/t_2749_1.jpg",
+                "image_1": "https://noteb.com/res/img/models/2749_1.jpg",
+                "image_2": "https://noteb.com/res/img/models/2749_2.jpg",
+                "image_3": "https://noteb.com/res/img/models/2749_3.jpg",
+                "image_4": "https://noteb.com/res/img/models/2749_4.jpg",
+                "official_link": "https://www.dell.com/en-us/work/shop/laptops-2-in-1-pcs/precision-15-3551-laptop/spd/precision-15-3551-laptop?~ck=bt",
+                "official_link2": "14",
+                "launch_date": "2020-06-02",
+                "primary_model": "4669"
+            },
+            "cpu": {
+                "prod": "Intel",
+                "model": "i5-10400H",
+                "lithography": "14",
+                "cache": "8",
+                "base_speed": "2.60",
+                "boost_speed": "4.60",
+                "cores": "4",
+                "tdp": "45",
+                "other_info": "SSE4.2,AVX2.0,64-bit,HT,VT-d,VT-x,TBT 2.0",
+                "rating": "54.3",
+                "integrated_video_id": "447",
+                "integrated_video": "Unknown"
+            },
+            "display": {
+                "size": "15.6",
+                "horizontal_resolution": "1920",
+                "vertical_resolution": "1080",
+                "type": "LED IPS",
+                "sRGB": "60",
+                "touch": "no",
+                "other_info": ""
+            },
+            "memory": {
+                "size": "16",
+                "speed": "2933",
+                "type": "DDR4"
+            },
+            "primary_storage": {
+                "model": "SSD M.2 PCIe",
+                "cap": "256",
+                "rpm": null,
+                "read_speed": "850"
+            },
+            "secondary_storage": {
+                "model": "N/A",
+                "cap": "0",
+                "rpm": null,
+                "read_speed": null
+            },
+            "gpu": {
+                "prod": "Nvidia",
+                "model": "Quadro P620",
+                "architecture": "Pascal",
+                "lithography": "14",
+                "shaders": "512",
+                "base_speed": "1266",
+                "boost_speed": "1354",
+                "shader_speed": "1266",
+                "memory_speed": "1253",
+                "memory_bandwidth": "128",
+                "memory_size": "4096",
+                "memory_type": "GDDR5",
+                "tdp": "25",
+                "other_info": "Nvidia PhysX,Nvidia CUDA,Nvidia BatteryBoost,Optimus,Nvidia MFAA,Nvidia GPU Boost 3.0",
+                "rating": "14.4"
+            },
+            "wireless_card": {
+                "model": "QCA61x4",
+                "speed": "867",
+                "other_info": "Bluetooth 4.1,dual band,2 x antennas"
+            },
+            "optical_drive": {
+                "type": "none",
+                "other_info": ""
+            },
+            "motherboard": {
+                "ram_slots": "2",
+                "lan_card": "OEM 10/100/1000",
+                "storage_slots": " 2 X M.2 SATA/PCIe, 1 X SATA 3.0",
+                "other_info": "Realtek ALC3204 audio,WWAN card"
+            },
+            "chassis": {
+                "height_cm": "1.50",
+                "height_inch": "0.59",
+                "depth_cm": "23.62",
+                "depth_inch": "9.30",
+                "width_cm": "35.91",
+                "width_inch": "14.14",
+                "weight_kg": "1.89",
+                "weight_lb": "4.17",
+                "colors": "Silver",
+                "build_materials": "Plastic",
+                "peripheral_interfaces": "Thunderbolt,1 X USB-C 3.2,3 X USB 3.2,1 X LAN,MicroSD card reader",
+                "video_interfaces": "1 X HDMI",
+                "webcam_mp": "0.920",
+                "keyboard_type": "Standard or Backlit Chiclet keyboard",
+                "charger": "90W (4.61A - 19.5VDC),130W (6.50A - 20VDC),USB-C optional charger",
+                "other_info": " 2x2W speakers,Microphone array,Edgeless display,Fingerprint reader,SmartCard (optional),SIM card (optional),IR camera (optional)"
+            },
+            "battery": {
+                "capacity": "51",
+                "cell_type": "Li-Ion",
+                "other_info": ""
+            },
+            "warranty": {
+                "years": "2",
+                "type_short": "On-Site",
+                "type_long": "On-Site Repair"
+            },
+            "operating_system": "Windows Pro 10.00",
+            "config_score": "44.73",
+            "config_price": "679",
+            "config_price_min": "673",
+            "config_price_max": "686",
+            "battery_life_raw": "4.3",
+            "battery_life_hours": "4:15",
+            "total_storage_capacity": "256"
+        }
+    },
+    "daily_hits_left": "207"
+}
