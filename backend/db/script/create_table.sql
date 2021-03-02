@@ -52,12 +52,13 @@ CREATE TABLE photo(
 CREATE TABLE orders(
     ord_id INTEGER PRIMARY KEY,
     user_id INTEGER NOT NULL,
-    time TEXT NOT NULL,
+    time INTEGER NOT NULL,
     total_price REAL NOT NULL CHECK (total_price >= 0),
-    address TEXT NOT NULL,
+    address_id INTEGER NOT NULL,
     notes TEXT,
     tracking TEXT,
-    FOREIGN KEY (user_id) REFERENCES user(user_id) 
+    FOREIGN KEY (user_id) REFERENCES user(user_id),
+    FOREIGN KEY (address_id) REFERENCES address(address_id)
 );
 
 
@@ -183,3 +184,12 @@ CREATE TABLE laptop(
     total_storage_capacity TEXT,
     FOREIGN KEY (item_id) REFERENCES item(item_id)
 )
+
+
+CREATE TABLE customer_view(
+    user_id INTEGER NOT NULL,
+    item_id INTEGER NOT NULL,
+    time INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES user(user_id),
+    FOREIGN KEY (item_id) REFERENCES item(item_id)
+);
