@@ -1,5 +1,6 @@
 from flask_restx import Namespace, Resource, fields 
 
+
 api = Namespace(
     'sales',
     description="Admin check sales report. And the public can view the best sell 20 items."

@@ -1,5 +1,7 @@
 from flask_restx import Namespace, Resource, fields 
 
+
+
 api = Namespace(
     'comment',
     description="Get comments about one item. The original user and admin can take actions on comments."

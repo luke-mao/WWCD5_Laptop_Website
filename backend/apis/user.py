@@ -1,5 +1,6 @@
 from flask_restx import Namespace, Resource, fields 
 
+
 api = Namespace(
     'user',
     description="User profile actions, including view history"
