@@ -7,6 +7,8 @@ FILE_LOCATION = "db/data.db"
 # especially, the execution result is in dictionary, easier to use
 
 class DB():
+    # the connection is on once create the instance
+    # the system exits for any error
     def __init__(self):
         self.file = FILE_LOCATION
         self.conn = None 
@@ -26,7 +28,9 @@ class DB():
             exit(0)
 
     
-    def execute(self, sql, parameter=None):
+    # this function is only for "select" statements
+    # since not much error will occur during execution
+    def select(self, sql, parameter=None):
         cur = self.conn.cursor()
 
         if parameter is None:
@@ -54,32 +58,14 @@ class DB():
         return data 
     
 
-    def insert_and_get_id(self, sql, parameter):
+    # for complex sql statement, including some which may arise sql error
+    # return the cursor so the operation can be more flexible
+    def get_conn_and_cursor(self):
         cur = self.conn.cursor()
-        cur.execute(sql, parameter)
-
-        self.conn.commit()
-        
-        return cur.lastrowid
+        return self.conn, cur 
     
-
-    def insert(self, sql, parameter):
-        cur = self.conn.cursor()
-        cur.execute(sql, parameter)
-
-        self.conn.commit()
-
-
+    
     def close(self):
         if self.conn:
             self.conn.close()
-
-
-
-
-
-
-
-
-
 

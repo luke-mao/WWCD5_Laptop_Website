@@ -44,15 +44,15 @@ class Login(Resource):
 
             parameter = (email,)
 
-            result = db.execute(sql, parameter)
+            result = db.select(sql, parameter)
 
             if not result:
-                abort(403, "Invalid email / password")
+                return "Invalid email/password", 403
 
             result = result[0]
 
             if result['password'] != password:
-                abort(403, "Invalid email / password")
+                return "Invalid email/password", 403
 
             # generate token
             T = Token()
@@ -61,8 +61,8 @@ class Login(Resource):
             return {"token": token}, 200
 
         except Exception as e:
-            abort(500, "Internal server error")
-
+            print(e)
+            return "Internal server error", 500
 
 
 @api.route('/signup')
@@ -124,6 +124,7 @@ class Signup(Resource):
             return msg, 400
 
 
+        # create the user and the address
         try:
             sql1 = """
                 INSERT INTO user(role, password, first_name, last_name, email, mobile)
@@ -131,11 +132,12 @@ class Signup(Resource):
             """
 
             values1 = (password, firstname, lastname, email, mobile)
+            
+            conn, cur = DB().get_conn_and_cursor()
 
-            db = DB()
-
-            user_id = db.insert_and_get_id(sql1, values1)
-
+            cur.execute(sql1, values1)
+            user_id = cur.lastrowid
+            
             sql2 = """
                 INSERT INTO customer_address(user_id, unit_number, street_number, street_name, suburb, state, postcode)
                 VALUES(?, ?, ?, ?, ?, ?, ?)
@@ -143,24 +145,21 @@ class Signup(Resource):
 
             values2 = (user_id, unitnumber, streetnumber, streetname, suburb, state, postcode)
 
-            db.insert(sql2, values2)
+            cur.execute(sql2, values2)
 
-            db.close()
+            conn.commit()
+            conn.close()
 
-            # generate token
+            # generate the token 
             T = Token()
             token = T.generate(id=user_id, role=1)
             return {"token": token}, 200
 
         except sqlite3.IntegrityError as e:
-            db.conn.rollback()
             print(e)
-            return "Email address taken already", 409
+            return "Email taken already", 409
+
         except sqlite3.Error as e:
             print(e)
-            abort(500, e)
-        
-
-
-
+            return "Internal server error", 500
 
