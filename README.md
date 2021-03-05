@@ -1,7 +1,7 @@
 # Progress
 
 ## 05/03/2021:
-Finish backend auth module with login and signup functions. 
+Finish backend auth module with login and signup functions, and the user module with get/put/post address sets. 
 
 ## 02/03/2021: 
 Finish database. Total 240 laptop data. Credit to noteb.com 

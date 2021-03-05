@@ -8,7 +8,7 @@ api = Namespace(
 )
 
 
-@api.route('/')
+@api.route('')
 class Comment(Resource):
     def get(self):
         pass 

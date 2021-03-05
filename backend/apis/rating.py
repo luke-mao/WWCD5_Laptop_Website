@@ -7,7 +7,7 @@ api = Namespace(
 )
 
 
-@api.route('/')
+@api.route('')
 class Rating(Resource):
     def get(self):
         pass 

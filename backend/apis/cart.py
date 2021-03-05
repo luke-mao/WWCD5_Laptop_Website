@@ -7,7 +7,11 @@ api = Namespace(
 )
 
 
-@api.route('/')
+# every time get and post, check the validity of all price and quantity of the cart
+# after that, confirm the get request or post request
+
+
+@api.route('')
 class Cart(Resource):
     def get(self):
         pass 

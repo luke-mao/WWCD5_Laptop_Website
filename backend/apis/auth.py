@@ -56,7 +56,7 @@ class Login(Resource):
 
             # generate token
             T = Token()
-            token = T.generate(id=result["user_id"], role=result["role"])
+            token = T.generate(user_id=result["user_id"], role=result["role"])
 
             return {"token": token}, 200
 
@@ -133,7 +133,8 @@ class Signup(Resource):
 
             values1 = (password, firstname, lastname, email, mobile)
             
-            conn, cur = DB().get_conn_and_cursor()
+            db = DB()
+            conn, cur = db.get_conn_and_cursor()
 
             cur.execute(sql1, values1)
             user_id = cur.lastrowid
@@ -148,11 +149,11 @@ class Signup(Resource):
             cur.execute(sql2, values2)
 
             conn.commit()
-            conn.close()
+            db.close()
 
             # generate the token 
             T = Token()
-            token = T.generate(id=user_id, role=1)
+            token = T.generate(user_id=user_id, role=1)
             return {"token": token}, 200
 
         except sqlite3.IntegrityError as e:

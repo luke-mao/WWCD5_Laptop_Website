@@ -18,7 +18,6 @@ class DB():
             print("******Database Error: db file not found******")
             exit(0)
 
-
         try:
             self.conn = sqlite3.connect(self.file)
 
@@ -64,7 +63,26 @@ class DB():
         cur = self.conn.cursor()
         return self.conn, cur 
     
-    
+
+    # for insert query that you sure no problem at all
+    # and if you want to get the new id, 
+    # use this function
+    def insert_and_get_id(self, sql, parameter):
+        cur = self.conn.cursor()
+        cur.execute(sql, parameter)
+        self.conn.commit()
+        return cur.lastrowid
+
+
+    # rowcount should be 1 for successful update
+    def update(self, sql, parameter):
+        cur = self.conn.cursor()
+        cur.execute(sql, parameter)
+        self.conn.commit()
+        return cur.rowcount
+
+
+    # close the connection    
     def close(self):
         if self.conn:
             self.conn.close()

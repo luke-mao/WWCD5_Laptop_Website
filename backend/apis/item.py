@@ -7,7 +7,7 @@ api = Namespace(
 )
 
 
-@api.route('/')
+@api.route('')
 class Item(Resource):
     def get(self):
         pass 

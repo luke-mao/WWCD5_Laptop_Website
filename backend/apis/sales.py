@@ -7,7 +7,7 @@ api = Namespace(
 )
 
 
-@api.route('/')
+@api.route('')
 class Cart(Resource):
     def get(self):
         pass 

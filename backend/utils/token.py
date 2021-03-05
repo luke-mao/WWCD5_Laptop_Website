@@ -11,9 +11,9 @@ class Token():
         self.s = itsdangerous.URLSafeSerializer(SECRET_KEY)
         self.expire = EXPIRE
     
-    def generate(self, id, role):
+    def generate(self, user_id, role):
         info = {
-            'id': id,
+            'user_id': user_id,
             'role': role,
             'expire': round(time.time()) + self.expire
         }
@@ -21,9 +21,15 @@ class Token():
         return self.s.dumps(info)
     
 
-    def check(self, token):
+    # the token format is "token xxxxxxxxxxxxx"
+    def check(self, token_str):
         try:
-            payload = self.s.loads(token)
+            token_str_list = token_str.split(' ')
+
+            if len(token_str_list) != 2 or token_str_list[0] != 'token':
+                Exception("Wrong token format")
+            
+            payload = self.s.loads(token_str_list[1])
 
             if time.time() > payload['expire']:
                 Exception("expired token")

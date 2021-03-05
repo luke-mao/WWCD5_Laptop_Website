@@ -1,6 +1,6 @@
 from apis import api
 from flask import request 
-from flask_restx import fields
+from flask_restx import fields, reqparse
 
 
 # you can use fields.String(required=True) to emphasize the test
@@ -37,7 +37,24 @@ signup = api.model('signup', {
 })
 
 
+# authorization token model
+token_header = reqparse.RequestParser()
+token_header.add_argument(
+    'Authorization',
+    type=str,
+    help="Authorization token in bearer format",
+    location="headers"
+)
 
+
+# address
+address_parser = reqparse.RequestParser()
+address_parser.add_argument(
+    'address_id',
+    type=int,
+    help="user address_id",
+    location="args"
+)
 
 
 
