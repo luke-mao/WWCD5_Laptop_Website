@@ -57,8 +57,60 @@ address_parser.add_argument(
 )
 
 
+# when sending an order, we use id to identify
+order_item = api.model('order_item', {
+    'item_id': fields.Integer,
+    'quantity': fields.Integer,
+    'price': fields.Float
+})
 
 
+order = api.model('order', {
+    'address_id': fields.Integer,
+    'notes': fields.String,
+    'card_last_four': fields.String,
+    'total_price': fields.String,
+    'items': fields.List(fields.Nested(order_item))
+})
 
 
+order_error_no_stock = api.model('order_error_out_of_stock', {
+    'item_id': fields.Integer
+})
+
+order_error_incorrect_price = api.model('order_error_incorrect_price', {
+    'item_id': fields.Integer,
+    'price': fields.Float    
+})
+
+
+order_success = api.model('order_success', {
+    'order_id': fields.Integer,
+    'total_price': fields.Float 
+})
+
+
+# for the order history, we return names instead of id
+order_history_item = api.model('order_history_item',{
+    'name': fields.String,
+    'price': fields.Float,
+    'quantity': fields.Integer,
+    'thumbernail': fields.String
+})
+
+
+order_history = api.model('order_history', {
+    'address': fields.String,     # here give the full address instead of address_id
+    'notes': fields.String,
+    'card_last_four': fields.String,
+    'total_price': fields.String,
+    'time': fields.Integer,     # time in seconds since epoch
+    'tracking': fields.String,
+    'items': fields.List(fields.Nested(order_history_item))
+})
+
+
+order_history_list = api.model('order_history_list', {
+    'orders': fields.List(fields.Nested(order_history))
+})
 
