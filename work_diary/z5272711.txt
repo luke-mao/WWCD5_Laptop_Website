@@ -1,0 +1,12 @@
+Week 1
+Create JIRA Link and add all members in
+Participate in discussion about assigning responsibilities
+
+Week 2
+Discuss group projects and assign tasks(my part is chatbot) to complete user story of proposal
+
+Week 3
+Complete the existing works and analysis and novel feature of proposal(Chatbot), as well as the homepage and chatbot page of interface
+Update the backlog in JIRA and specify the assignee and priority, activate the first sprint
+Update the userstory and project schedule(Add assignee, priority and duration)
+Do some research and preparation for chatbot part
