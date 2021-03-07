@@ -1,0 +1,10 @@
+Week 1
+Form a group
+Participate in discussion about project topic selection.
+
+Week 2
+Discuss group projects(E-commerce website with chatbot and recommendation system) and assign tasks(my part is recommendation system(RS)).
+Start doing some research about RS and did a practise about it with kaggle datasets.
+
+Week 3
+Critical review relavant topic about e-commerce system and finish background of our proposal.
