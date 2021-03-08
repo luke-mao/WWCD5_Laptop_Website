@@ -1,6 +1,8 @@
 from flask import Flask 
-from apis import api
 
+DB_FILE = "data.db"
+
+from apis import api
 
 # start the backend
 app = Flask(__name__)
