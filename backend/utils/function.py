@@ -66,7 +66,7 @@ def check_password(password):
 def check_email(email):
     if re.match("^\S+@\S+$", email) is None:
         return False, "Invalid format of email"
-    return True, None 
+    return True, None
 
 
 if __name__ == '__main__':

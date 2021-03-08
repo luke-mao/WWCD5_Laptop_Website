@@ -69,13 +69,14 @@ order = api.model('order', {
     'address_id': fields.Integer,
     'notes': fields.String,
     'card_last_four': fields.String,
-    'total_price': fields.String,
+    'total_price': fields.Float,
     'items': fields.List(fields.Nested(order_item))
 })
 
-
+# maybe no stock, or the order quantity is too large
 order_error_no_stock = api.model('order_error_out_of_stock', {
-    'item_id': fields.Integer
+    'item_id': fields.Integer,
+    'available_stock': fields.Integer
 })
 
 order_error_incorrect_price = api.model('order_error_incorrect_price', {
@@ -83,9 +84,13 @@ order_error_incorrect_price = api.model('order_error_incorrect_price', {
     'price': fields.Float    
 })
 
+order_error_wrong_total_price = api.model('order_error_wrong_total_price', {
+    'total_price': fields.Float 
+})
+
 
 order_success = api.model('order_success', {
-    'order_id': fields.Integer,
+    'ord_id': fields.Integer,
     'total_price': fields.Float 
 })
 
@@ -113,4 +118,11 @@ order_history = api.model('order_history', {
 order_history_list = api.model('order_history_list', {
     'orders': fields.List(fields.Nested(order_history))
 })
+
+
+
+
+
+
+
 

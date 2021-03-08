@@ -59,10 +59,32 @@ class DB():
 
     # for complex sql statement, including some which may arise sql error
     # return the cursor so the operation can be more flexible
-    def get_conn_and_cursor(self):
+    def get_conn_and_cursor(self, manual_mode=False):
+        if manual_mode:
+            self.conn.isolation_level = None 
+        
         cur = self.conn.cursor()
         return self.conn, cur 
+
+
+    # for normal insert query
+    def insert(self, sql, parameter):
+        cur = self.conn.cursor()
+        cur.execute(sql, parameter)
+        self.conn.commit()
     
+
+    # for normal execute query
+    def execute(self, sql, parameter=None):
+        cur = self.conn.cursor()
+
+        if not parameter:
+            cur.execute(sql)
+        else:
+            cur.execute(sql, parameter)
+        
+        self.conn.commit()
+
 
     # for insert query that you sure no problem at all
     # and if you want to get the new id, 
