@@ -3,3 +3,4 @@ Flask==1.1.2
 itsdangerous==1.1.0
 flask_restx==0.2.0
 pandas==1.1.5
+python-dotenv==0.15.0
