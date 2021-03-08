@@ -8,21 +8,19 @@ api = Api(
 
 
 from .auth import api as auth
-from .cart import api as cart 
-from .comment import api as comment 
 from .item import api as item 
 from .order import api as order 
 from .rating import api as rating 
 from .user import api as user 
 from .sales import api as sales
+from .recommender import api as recommender
 
 
 api.add_namespace(auth)
 api.add_namespace(user)
-api.add_namespace(cart)
 api.add_namespace(order)
-api.add_namespace(comment)
 api.add_namespace(rating)
 api.add_namespace(item)
 api.add_namespace(sales)
+api.add_namespace(recommender)
 

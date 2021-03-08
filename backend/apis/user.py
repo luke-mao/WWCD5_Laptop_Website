@@ -1,11 +1,12 @@
 from flask_restx import Namespace, Resource, fields
 from flask import request, abort
-from db import DB 
+import sqlite3 
+import os 
+
 import models
 from utils.token import Token
 from utils.function import unpack
 from utils.function import check_address, check_mobile, check_name, check_password, check_email
-import sqlite3 
 
 
 api = Namespace(
@@ -28,9 +29,9 @@ class Profile(Resource):
 
 @api.route('/address')
 class Address(Resource):
-    @api.response(200, "OK")
+    @api.response(200, "OK", models.address)        # either a dict, or a list of dict
     @api.response(403, "No authorization token / token invalid / token expired")
-    @api.response(404, "The required address_id is not found")
+    @api.response(404, "Invalid address_id")
     @api.expect(models.token_header, models.address_parser)
     @api.doc(description="The registered user can retrieve all address sets, or a specific address set. The admin can look at all addresses.")
     def get(self):
@@ -80,16 +81,17 @@ class Address(Resource):
             values = (identity['user_id'],)
 
         try:
-            db = DB()
-            result = db.select(sql, values)
+            with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
+                conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
+                cur = conn.cursor()
+                cur.execute(sql, values)
+                result = cur.fetchall()
 
-            # check if no result
-            if not result:
-                return "The required address_id is not found", 404
-            elif len(result) == 1:
-                return result[0], 200
-            else:
-                return result, 200 
+                # check if no result
+                if not result:
+                    return "Invalid address_id", 404
+                else:
+                    return result, 200 
 
         except Exception as e:
             print(e)
@@ -143,11 +145,14 @@ class Address(Resource):
         values = (identity['user_id'], unitnumber, streetnumber, streetname, suburb, state, postcode)
 
         try:
-            db = DB()
-            new_address_id = db.insert_and_get_id(sql, values)
-            
-            db.close()
-            return {"address_id": new_address_id}
+            with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
+                conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
+                cur = conn.cursor()
+
+                cur.execute(sql, values)
+                new_address_id = cur.lastrowid
+                
+                return {"address_id": new_address_id}, 200
         
         except Exception as e:
             print(e)
@@ -157,7 +162,7 @@ class Address(Resource):
     @api.response(200, "OK")
     @api.response(403, "No authorization token / token invalid / token expired")
     @api.response(400, "Malformed request / Wrong data format")
-    @api.response(401, "The user has no relation with the address_id")
+    @api.response(401, "Invalid address_id")
     @api.expect(models.token_header, models.address_parser, models.address)
     @api.doc(description="With the auth token, the user can update his own address sets, one per time. Require the whole set of address data, including not updated one")
     def put(self):
@@ -186,18 +191,24 @@ class Address(Resource):
             return "Address_id should be positive", 400
 
         # check if the token user has the address or not
-        sql = """SELECT * 
+        sql_1 = """
+                SELECT * 
                 FROM customer_address
                 WHERE user_id = ? and address_id = ?
         """
 
-        values = (identity['user_id'], address_id)
+        sql_1_param = (identity['user_id'], address_id)
 
         try:
-            db = DB()
-            result = db.select(sql, values)
-            if not result:
-                return "The user has no relation with the address_id", 401
+            with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
+                conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
+                cur = conn.cursor()
+
+                result = cur.execute(sql_1, sql_1_param)
+
+                if not result:
+                    return "Invalid address_id", 401
+
         except Exception as e:
             print(e)
             return "Internal server error", 500 
@@ -228,7 +239,8 @@ class Address(Resource):
             return msg, 400 
 
         # sql
-        sql = """UPDATE customer_address
+        sql_2 = """
+            UPDATE customer_address
             SET unit_number = ?, 
                 street_number = ?,
                 street_name = ?,
@@ -238,7 +250,7 @@ class Address(Resource):
             WHERE user_id = ? AND address_id = ?
         """
 
-        values = (
+        sql_2_param = (
             unitnumber, 
             streetnumber, 
             streetname, 
@@ -250,15 +262,13 @@ class Address(Resource):
         )
 
         try:
-            db = DB()
-            rowcount = db.update(sql, values)
+            with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
+                conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
+                cur = conn.cursor()
 
-            if rowcount != 1:
-                return 
-
-
-            db.close()
-            return "OK", 200
+                cur.execute(sql_2, sql_2_param)
+                return "OK", 200
+                
         except Exception as e:
             print(e)
             return "Internal server error", 500
