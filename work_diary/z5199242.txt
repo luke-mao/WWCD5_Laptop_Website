@@ -1,0 +1,8 @@
+week 1:
+start discussing with teammates and distrubting the task
+
+week2:
+I have a discussion with group members and assigned to the backend and finishing my proposal's part.
+
+week3:
+In week3, start my api's part which is about user's functions and have an acknowledgement of database.
