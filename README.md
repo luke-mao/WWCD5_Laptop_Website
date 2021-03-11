@@ -1,5 +1,11 @@
 # Progress
 
+## 12/03/2021:
+Zhaoyu Li finish the rating module. 
+
+## 08/03/2021:
+Finish backend order module. And release tasks to team members. 
+
 ## 05/03/2021:
 Finish backend auth module with login and signup functions, and the user module with get/put/post address sets. 
 
