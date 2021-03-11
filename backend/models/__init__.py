@@ -56,6 +56,18 @@ address_parser.add_argument(
     location="args"
 )
 
+# rating
+rating_parser = reqparse.RequestParser()
+rating_parser.add_argument(
+    'item_id',
+    type=int,
+    help="item_id",
+    location="args"
+)
+
+rating = api.model('Rating', {
+    'Rating': fields.Integer,
+})
 
 # when sending an order, we use id to identify
 order_item = api.model('order_item', {
@@ -118,11 +130,3 @@ order_history = api.model('order_history', {
 order_history_list = api.model('order_history_list', {
     'orders': fields.List(fields.Nested(order_history))
 })
-
-
-
-
-
-
-
-
