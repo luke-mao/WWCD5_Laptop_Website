@@ -10,3 +10,7 @@ Complete the existing works and analysis and novel feature of proposal(Chatbot),
 Update the backlog in JIRA and specify the assignee and priority, activate the first sprint
 Update the userstory and project schedule(Add assignee, priority and duration)
 Do some research and preparation for chatbot part
+
+Week 4
+finish backend/rating module
+Continue doing some research and preparation for chatbot part
