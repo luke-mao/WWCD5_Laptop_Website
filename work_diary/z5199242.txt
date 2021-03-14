@@ -6,3 +6,8 @@ I have a discussion with group members and assigned to the backend and finishing
 
 week3:
 In week3, start my api's part which is about user's functions and have an acknowledgement of database.
+ 
+ week4:
+ In this week, i finished 2 functions in backend which is assigned by the group.The first one is to get 
+ user's information according to its user id,which includes address,mobile and postcode. The second function 
+ is to update user's information according to its latest input and it would also be updated in database.
