@@ -17,14 +17,164 @@ api = Namespace(
 
 @api.route('/profile')
 class Profile(Resource):
+    @api.response(200,"OK",models.profile_full)
+    @api.response(403,"No authorization token / token invalid / token expired")
+    @api.response(404, "Invalid user_id")
+    @api.expect(models.token_header)
+    @api.doc(description="The registered user can retrieve all profile sets.")
     def get(self):
-        # get everything in the profile, including address
-        # put the address in a list format
-        pass 
+        auth_header = request.headers.get("Authorization")
+        if not auth_header:
+            return "No authorization token", 403
+
+        T = Token()
+        identity = T.check(auth_header)
+
+        if not identity:
+            return "Wrong token", 403
+        
+        sql1 = """
+            SELECT first_name, last_name, email, mobile
+            FROM user
+            WHERE user_id = ?
+        """
+        
+        sql2 = """
+            SELECT address_id, unit_number, street_number, street_name, suburb, state, postcode
+            FROM customer_address
+            WHERE user_id = ?
+        """
+
+        sql_param = (identity['user_id'],)
+
+        try:
+            with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
+                conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
+
+                cur1 = conn.cursor()
+                cur2 = conn.cursor()
+                
+                r1, r2 = cur1.execute(sql1, sql_param), cur2.execute(sql2, sql_param)
+                
+                result1 = r1.fetchone()
+                result2 = r2.fetchall()
+
+                if not result1:
+                    return "Invalid user_id", 404
+                
+                result1["address"] = result2
+
+                return result1, 200
+
+        except Exception as e:
+            print(e)
+            return "Internal server error", 500
     
+
+    @api.response(200, "OK")
+    @api.response(403, "No authorization token / token invalid / token expired")
+    @api.response(400, "Malformed request / Wrong data format")
+    @api.expect(models.token_header,models.profile_simple)
+    @api.doc(description="""
+        The user can update his/her profile. The user address is updated through PUT /user/address, not here. 
+        Not all attributes need to be exist. Only the modified ones are required to send to the backend.
+    """)
     def put(self):
-        # update all other profiles except address
-        pass
+        auth=request.headers.get("Authorization")
+        if not auth:
+            return "No authorization token",403
+        
+        T=Token()
+        identity=T.check(auth)
+        
+        if not identity:
+            return"Wrong token",403
+        
+        ids = identity['user_id']
+
+        data=request.json
+        
+        if not data:
+            return "Malformed request", 400
+        
+        is_unpack_ok, modified_data = unpack(
+            data,
+            "first_name","last_name","email","mobile","password",
+            required=False
+        )
+
+        if not is_unpack_ok:
+            return "Malformed request", 400
+        
+        f_name, l_name, email, mobile, password = modified_data
+
+        # also prepare the sql for the relevant modified data
+        # one data => one sql => one tuple in the sql_param_list
+        sql_list = []
+        sql_param_list = []
+        
+        if f_name:
+            ok, msg = check_name(f_name)
+            if not ok:
+                return msg, 400
+            
+            sql_list.append("UPDATE user SET first_name = ? WHERE user_id = ?")
+            sql_param_list.append((f_name, ids))
+
+
+        if l_name:
+            ok, msg = check_name(l_name)
+            if not ok:
+                return msg, 400
+
+            sql_list.append("UPDATE user SET last_name = ? WHERE user_id = ?")
+            sql_param_list.append((l_name, ids))       
+            
+
+        if email:
+            ok, msg = check_email(email)
+            if not ok:
+                return msg, 400
+            
+            sql_list.append("UPDATE user SET email = ? WHERE user_id = ?")
+            sql_param_list.append((email, ids))
+
+
+        if mobile:
+            ok, msg = check_mobile(mobile);
+            if not ok:
+                return msg, 400 
+        
+            sql_list.append("UPDATE user SET mobile = ? WHERE user_id = ?")
+            sql_param_list.append((mobile, ids))
+
+
+        if password:
+            ok, msg = check_password(password)
+            if not ok: 
+                return msg, 400 
+
+            sql_list.append("UPDATE user SET password = ? WHERE user_id = ?")
+            sql_param_list.append((password, ids))
+
+        
+        # if nothing update, this is a malformed request
+        if len(sql_list) == 0:
+            return "Malformed request", 400
+
+        try:
+            with sqlite3.connect(os.environ.get("DB_FILE")) as database:
+                database.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
+                db= database.cursor()
+
+                for i in range(len(sql_list)):
+                    db.execute(sql_list[i], sql_param_list[i])
+
+                return "OK", 200
+
+        except Exception as e:
+            print(e)
+            return "Internal server error", 500
 
 
 @api.route('/address')

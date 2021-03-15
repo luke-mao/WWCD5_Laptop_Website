@@ -46,6 +46,24 @@ token_header.add_argument(
     location="headers"
 )
 
+# profile model
+# full for GET profile
+profile_full = api.model('profile',{
+    'first_name': fields.String,
+    'last_name': fields.String,
+    'email': fields.String,
+    'mobile': fields.String,
+    'password': fields.String,
+    'address': fields.List(fields.Nested(address))
+})
+
+# simple for PUT profile (since the address is PUT separately)
+profile_simple = api.model("profile",{'first_name': fields.String,
+    'last_name': fields.String,
+    'email': fields.String,
+    'mobile': fields.String,
+    'password': fields.String
+})
 
 # address
 address_parser = reqparse.RequestParser()
