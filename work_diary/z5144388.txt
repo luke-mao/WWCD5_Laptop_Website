@@ -8,3 +8,7 @@ Week3:
 Designing the user interfaces include Sign in, Register, Cart, Check-out, Product Detail Page, and Administrator Pages.
 Draw the flow chart of the project.
 Modify the proposal according to the tutor's suggestion.
+
+Week5 15/3
+HTML and CSS of login and register pages.
+
