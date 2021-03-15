@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="styles/register.css" />
+    <title>Create Your Account</title>
+  </head>
+  <body>
+    <div id="main-window">
+      <img src="img/Logo_small_size.jpeg" alt="Logo">
+      
+      <h1>Create Your Account</h1>
+      <div class="registerInputBox">
+        <p><span class="redText">*</span>Email:</p> 
+        <input type="text" id="email-register" placeholder="Email">
+      </div>
+      <div class="registerInputBox">
+        <p><span class="redText">*</span>Mobile:</p> 
+        <input type="text" id="mobile-register" placeholder="Mobile"><br>
+      </div>
+      <div class="registerInputBox">
+        <p><span class="redText">*</span>Password:</p> 
+        <div class="row">
+          <input type="password" id="password-register" class="halfInput" placeholder="Password">
+          <input type="password" id="password-confirm-register" class="halfInput" placeholder="Confirm"><br>
+        </div>
+      </div>
+      <div class="registerInputBox">
+        <p>Address:</p> 
+        <div class="row">
+          <input type="text" id="street-register" class="halfInput" placeholder="Street name">
+          <input type="text" id="suburb-register" class="halfInput" placeholder="Suburb"><br>
+        </div>
+        <p>Postcode:</p> 
+        <input type="text" id="postcode-register" placeholder="Postcode" maxlength="4" size="8">
+
+      </div>
+      <div id="submit-button">
+        <button type="button" id="submit-register">Create Account</button>
+      </div>
+      <div id="link-to-login">
+        Already have an account?<a href="login.html"> Sign in</a>
+      </div>
+
+    </div>
+    
+  </body>
+</html>
