@@ -3,6 +3,7 @@ from flask import request, abort
 import sqlite3 
 import os
 import models
+from textdistance import jaro_winkler
 
 api = Namespace(
     'item',
@@ -54,6 +55,14 @@ def get_all_profiles(item_id_list):
         print(e)
         return "Internal server error", 500    
 
+
+def get_max_page_num(total, item_per_page):
+    max_page =  total // item_per_page - 1 
+
+    if total % item_per_page != 0:
+        max_page += 1
+
+    return max_page
 
 
 @api.route('/id/<item_id>')
@@ -169,12 +178,8 @@ class Item_with_page_id(Resource):
                 cur.execute(sql_count)
                 total_items = cur.fetchone()['total']
                 
-                result['max_page'] = total_items // 20 - 1 
-
-                if total_items % 20 != 0:
-                    result['max_page'] += 1
+                result['max_page'] = get_max_page_num(total_items, 20)
                 
-
                 return result, 200 
 
         except Exception as e:
@@ -253,10 +258,7 @@ class Item_with_price_alphabet_order(Resource):
                 cur.execute(sql_count)
                 total_items = cur.fetchone()['total']
                 
-                result['max_page'] = total_items // 20 - 1 
-
-                if total_items % 20 != 0:
-                    result['max_page'] += 1
+                result['max_page'] = get_max_page_num(total_items, 20)
                 
                 return result, 200 
 
@@ -320,14 +322,88 @@ class Item_with_trending_order(Resource):
                 cur.execute(sql_count)
                 total_items = cur.fetchone()['total']
                 
-                result['max_page'] = total_items // 20 - 1 
-
-                if total_items % 20 != 0:
-                    result['max_page'] += 1
+                result['max_page'] = get_max_page_num(total_items, 20)
                 
                 return result, 200 
 
         except Exception as e:
             print(e)
             return "Internal server error", 500     
+
+
+@api.route('/search/<search_str>/<page_id>')
+class Search_str(Resource):
+    @api.response(200, "OK", models.item_profile_list)
+    @api.response(500, "Internal server error")
+    @api.response(400, "Malformed request")
+    @api.doc(description="""
+        User inputs a search string, and the backend returns the items with closest name similarity. 
+        The similarity is measured using Jaro–Winkler distance. 
+        In computer science and statistics, the Jaro–Winkler distance is a string metric measuring an edit distance between two sequences. 
+        It is a variant proposed in 1990 by William E. Winkler of the Jaro distance metric (1989, Matthew A. Jaro).
+        As usual, each page has 20 computers. 
+    """)
+    def get(self, search_str, page_id):
+        # check search_str
+        if not search_str:
+            return "Require the search string input", 400 
+        
+        search_str = search_str.lower()
+
+        # check page_id
+        if not page_id:
+            return "No page_id", 400
+        
+        try:
+            page_id = int(page_id)
+        except ValueError:
+            return "Invalid page_id", 400
+
+        if page_id < 0:
+            return "Invalid page_id", 400
+
+
+        # get all names
+        try:
+            with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
+                conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
+                cur = conn.cursor()
+
+                sql_1 = "SELECT item_id, name FROM item"
+                cur.execute(sql_1)
+
+                id_name_list = cur.fetchall()
+
+                # check the range
+                max_page = get_max_page_num(len(id_name_list), 20)
+
+                if page_id > max_page:
+                    return "No more pages", 404
+
+                # calculate the distance for all
+                for each in id_name_list:
+                    name = each['name'].lower()
+                    each['similarity'] = jaro_winkler.normalized_similarity(search_str, name)
+                
+                # sort the list
+                sorted_id_name_list = sorted(
+                    id_name_list, 
+                    key=lambda x: x['similarity'],
+                    reverse=True
+                )
+
+                result = {
+                    'current_page': page_id,
+                    'max_page': max_page,
+                    'data': get_all_profiles(sorted_id_name_list[page_id * 20 : (page_id+1) * 20])
+                }
+
+                print(sorted_id_name_list[page_id * 20 : (page_id+1) * 20])
+
+                return result, 200
+
+        except Exception as e:
+            print(e)
+            print("fshfsklhfla")
+            return "Internal server error", 500            
 
