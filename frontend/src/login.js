@@ -1,6 +1,6 @@
 document.getElementById('submit-signin').addEventListener('click', ()=>{
   const loginBody = {
-            "username" : document.getElementById('email-signin').value,
+            "email" : document.getElementById('email-signin').value,
             "password" : document.getElementById('password-signin').value
         }; 
   const result = fetch('http://localhost:5000/auth/login',{
@@ -14,12 +14,14 @@ document.getElementById('submit-signin').addEventListener('click', ()=>{
           body: JSON.stringify(loginBody),
       //convert to JSON form
       }).then((data) =>{
+          console.log(loginBody);
         // console.log(data);
         if (data.status === 403){
             alert("Invalid Username/Password");
             //console.log("Invalid Username/Password not fond in db");
         }else if(data.status === 400){
             alert("Missing email / password");
+            console.log();
             //console.log("Missing Username/Password");
         } else if(data.status === 200){
         // console.log('Logged in');
