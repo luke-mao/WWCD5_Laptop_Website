@@ -1,6 +1,6 @@
-requests==2.25.1
-Flask==1.1.2
-itsdangerous==1.1.0
+textdistance==4.2.1
 flask_restx==0.2.0
-pandas==1.1.5
-python-dotenv==0.15.0
+Flask==1.0.2
+itsdangerous==0.24
+Werkzeug==0.14.1
+Flask_Cors==3.0.6

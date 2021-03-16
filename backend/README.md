@@ -6,7 +6,7 @@
 ```
 # Make sure you are in the `backend` folder
 
-pip install -r requirement.txt
+pip install -r requirements.txt
 python app.py
 ```
 
