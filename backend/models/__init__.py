@@ -176,7 +176,7 @@ item_profile = api.model('item_profile',{
 
 item_profile_list = api.model('item_profile_list', {
     'current_page': fields.Integer,
-    'total_page': fields.Integer,
+    'max_page': fields.Integer,
     'data': fields.List(fields.Nested(item_profile))
 })
 
