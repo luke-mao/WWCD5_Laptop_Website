@@ -83,7 +83,7 @@ rating_parser.add_argument(
     location="args"
 )
 
-rating = api.model('Rating', {
+rating = api.model('rating', {
     'Rating': fields.Integer,
 })
 
@@ -148,3 +148,41 @@ order_history = api.model('order_history', {
 order_history_list = api.model('order_history_list', {
     'orders': fields.List(fields.Nested(order_history))
 })
+
+
+# item module
+# the data contains two keys: simple and detail
+item_simple_profile = api.model('item_simple_profile', {
+    'item_id': fields.Integer,
+    'name': fields.String,
+    'price': fields.Float,
+    'stock_number': fields.Integer,
+    'status': fields.Integer,
+    'warranty': fields.String,
+    'view': fields.Integer,
+    'thumbnail': fields.String
+})
+
+item_detail_profile = api.model('item_detail_profile', {
+    'many_many_attributes': fields.String,
+    'many_many_attributes': fields.String
+})
+
+item_profile = api.model('item_profile',{
+    'simple': fields.Nested(item_simple_profile),
+    'detail': fields.Nested(item_detail_profile),
+    'photos': fields.List(fields.String)
+})
+
+item_profile_list = api.model('item_profile_list', {
+    'current_page': fields.Integer,
+    'total_page': fields.Integer,
+    'data': fields.List(fields.Nested(item_profile))
+})
+
+
+
+
+
+
+
