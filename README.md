@@ -1,5 +1,8 @@
 # Progress
 
+# 16/03/2021:
+Finish backend item module and the item-backend module. 
+
 # 15/03/2021:
 Dongzi Kai and Gaoxiang Ren work push to the user module.
 

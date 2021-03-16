@@ -181,6 +181,30 @@ item_profile_list = api.model('item_profile_list', {
 })
 
 
+# admin update the model
+item_profile_update = api.model('item_update', {
+    'attributeA': fields.String,
+    'attributeB': fields.String,
+    'attributeC': fields.String,
+    'many_many_attributes': fields.String
+})
+
+
+# admin upload a new model
+new_item = api.model('new_item', {
+    "name": fields.String,
+    "price": fields.String,
+    "stock_number": fields.String,
+    "status": fields.String,
+    "warranty": fields.String,
+    "thumbnail": fields.String,
+    'other_attribute': fields.String,
+    'other_other_attribute': fields.String
+})
+
+
+
+
 
 
 

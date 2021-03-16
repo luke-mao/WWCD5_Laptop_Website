@@ -14,6 +14,7 @@ from .rating import api as rating
 from .user import api as user 
 from .sales import api as sales
 from .recommender import api as recommender
+from .item_backend import api as item_backend
 
 
 api.add_namespace(auth)
@@ -23,4 +24,5 @@ api.add_namespace(rating)
 api.add_namespace(item)
 api.add_namespace(sales)
 api.add_namespace(recommender)
+api.add_namespace(item_backend)
 

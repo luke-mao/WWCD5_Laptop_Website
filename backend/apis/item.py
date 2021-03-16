@@ -53,7 +53,7 @@ def get_all_profiles(item_id_list):
 
     except Exception as e:
         print(e)
-        return "Internal server error", 500    
+        return abort(500, "Internal server error")
 
 
 def get_max_page_num(total, item_per_page):
@@ -139,6 +139,7 @@ class Item_with_page_id(Resource):
         Return a list of items, order = ascending order of item_id.
         Each page returns 20 laptops. Currently we support around 12 pages, so the range = 0 to 11.
         If page_id is not found, default page = 0.
+        The item must have status = 1. 
     """)
     def get(self, page_id):
         if not page_id:
@@ -158,7 +159,7 @@ class Item_with_page_id(Resource):
                 conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
                 cur = conn.cursor()
 
-                sql = """SELECT item_id FROM item LIMIT ?, ?"""
+                sql = """SELECT item_id FROM item WHERE status = 1 LIMIT ?, ?"""
                 sql_param = (page_id * 20, (page_id+1) * 20)
 
                 cur.execute(sql, sql_param)
@@ -228,6 +229,7 @@ class Item_with_price_alphabet_order(Resource):
                     sql = """
                         SELECT item_id 
                         FROM item 
+                        WHERE status = 1
                         ORDER BY price {}
                         LIMIT ?, ?
                     """.format(order)
@@ -235,6 +237,7 @@ class Item_with_price_alphabet_order(Resource):
                     sql = """
                         SELECT item_id 
                         FROM item 
+                        WHERE status = 1
                         ORDER BY name {}
                         LIMIT ?, ?
                     """.format(order)
@@ -254,7 +257,7 @@ class Item_with_price_alphabet_order(Resource):
                 }
 
                 # get max page count
-                sql_count = """SELECT count(*) AS total FROM item"""
+                sql_count = """SELECT count(*) AS total FROM item WHERE status = 1"""
                 cur.execute(sql_count)
                 total_items = cur.fetchone()['total']
                 
@@ -299,6 +302,7 @@ class Item_with_trending_order(Resource):
                 sql = """
                     SELECT item_id 
                     FROM item 
+                    WHERE status = 1
                     ORDER BY view DESC
                     LIMIT ?, ?
                 """
@@ -318,7 +322,7 @@ class Item_with_trending_order(Resource):
                 }
 
                 # get max page count
-                sql_count = """SELECT count(*) AS total FROM item"""
+                sql_count = """SELECT count(*) AS total FROM item WHERE status = 1"""
                 cur.execute(sql_count)
                 total_items = cur.fetchone()['total']
                 
@@ -369,7 +373,7 @@ class Search_str(Resource):
                 conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
                 cur = conn.cursor()
 
-                sql_1 = "SELECT item_id, name FROM item"
+                sql_1 = "SELECT item_id, name FROM item WHERE status = 1"
                 cur.execute(sql_1)
 
                 id_name_list = cur.fetchall()

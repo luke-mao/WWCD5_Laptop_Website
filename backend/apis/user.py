@@ -163,9 +163,9 @@ class Profile(Resource):
             return "Malformed request", 400
 
         try:
-            with sqlite3.connect(os.environ.get("DB_FILE")) as database:
-                database.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
-                db= database.cursor()
+            with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
+                conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
+                cur = conn.cursor()
 
                 for i in range(len(sql_list)):
                     db.execute(sql_list[i], sql_param_list[i])
@@ -234,6 +234,7 @@ class Address(Resource):
             with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
                 conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
                 cur = conn.cursor()
+                
                 cur.execute(sql, values)
                 result = cur.fetchall()
 
