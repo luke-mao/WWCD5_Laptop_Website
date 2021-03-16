@@ -1,5 +1,8 @@
 # Progress
 
+# 15/03/2021:
+Dongzi Kai and Gaoxiang Ren work push to the user module.
+
 ## 12/03/2021:
 Zhaoyu Li finish the rating module. 
 
