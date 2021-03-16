@@ -17,6 +17,13 @@
       
       <h1>Create Your Account</h1>
       <div class="registerInputBox">
+        <p><span class="redText">*</span>Name:</p> 
+        <div class="row">
+          <input type="text" id="firstname-register" class="halfInput" placeholder="First Name">
+          <input type="text" id="lastname-register" class="halfInput" placeholder="Last Name"><br>
+        </div>
+      </div>
+      <div class="registerInputBox">
         <p><span class="redText">*</span>Email:</p> 
         <input type="text" id="email-register" placeholder="Email">
       </div>
@@ -34,9 +41,26 @@
       <div class="registerInputBox">
         <p>Address:</p> 
         <div class="row">
+          <input type="text" id="unitNumber-register" class="halfInput" placeholder="Unit number">
+          <input type="text" id="streetNumber-register" class="halfInput" placeholder="Street number">
+          
+        </div>
+        <div class="row">
           <input type="text" id="street-register" class="halfInput" placeholder="Street name">
           <input type="text" id="suburb-register" class="halfInput" placeholder="Suburb"><br>
         </div>
+        <p>State:</p> 
+        <select id="state-register">
+          <option value="" selected>Select your state</option>
+          <option value="NSW">NSW</option>
+          <option value="QLD">QLD</option>
+          <option value="VIC">VIC</option>
+          <option value="TAS">TAS</option>
+          <option value="ACT">ACT</option>
+          <option value="NT">NT</option>
+          <option value="SA">SA</option>
+          <option value="WA">WA</option>
+        </select>
         <p>Postcode:</p> 
         <input type="text" id="postcode-register" placeholder="Postcode" maxlength="4" size="8">
 
@@ -49,6 +73,6 @@
       </div>
 
     </div>
-    
+    <script type="module" src="src/register.js"></script>
   </body>
 </html>
