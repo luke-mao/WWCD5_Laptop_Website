@@ -181,7 +181,7 @@ class NewItem(Resource):
     @api.response(500, "Internal server error")
     @api.response(403, "No authorization token / token invalid / token expired / not admin")
     @api.expect(models.token_header, models.new_item)
-    @api.doc("""
+    @api.doc(description="""
         The admin can upload a new item.
         The admin must provide all attributs in ["name", "price", "stock_number", "status", "warranty"].
         The thumbnail will be set as null, if not given for now

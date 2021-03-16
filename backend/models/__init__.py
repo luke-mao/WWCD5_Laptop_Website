@@ -13,7 +13,8 @@ login = api.model('login', {
 
 
 token = api.model('token', {
-    'token': fields.String
+    'token': fields.String,
+    'role': fields.Integer
 })
 
 

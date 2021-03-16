@@ -40,7 +40,7 @@ class Login(Resource):
                 cur = conn.cursor()
 
                 sql = """
-                        SELECT user.user_id, user.role, user.password
+                        SELECT user_id, role, password
                         FROM user 
                         WHERE email = ?
                     """
@@ -59,7 +59,12 @@ class Login(Resource):
                 T = Token()
                 token = T.generate(user_id=result["user_id"], role=result["role"])
 
-                return {"token": token}, 200
+                return_value = {
+                    'token': token,
+                    'role': result['role']
+                }
+
+                return return_value, 200
 
         except Exception as e:
             print(e)
@@ -152,7 +157,13 @@ class Signup(Resource):
                 # generate the token 
                 T = Token()
                 token = T.generate(user_id=user_id, role=1)
-                return {"token": token}, 200
+
+                return_value = {
+                    'token': token,
+                    'role': 1
+                }
+
+                return return_value, 200
 
         except sqlite3.IntegrityError as e:
             print(e)
