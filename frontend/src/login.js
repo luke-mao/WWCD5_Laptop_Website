@@ -30,13 +30,11 @@ document.getElementById('submit-signin').addEventListener('click', ()=>{
             data.json().then(result => {
                 // document.getElementById('token').innerHTML = result.token;
                 console.log(result.token);
-                // console.log(result);
-                // console.log(result.token);
-                // document.getElementById('login-page').style.display = "none";
-                // document.getElementById('feed-page').style.display = "inline";
-                // getFeed(result.token);
-            })
+                window.location.href = "admin.html";
+            });
         }
 
+    }).catch((error)=>{
+        console.log('Error:  ',error);
     });
 });

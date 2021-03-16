@@ -1,0 +1,33 @@
+.banner {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color:white;
+  min-height: 60px;
+  border-bottom: 1px solid rgba(0,0,0,.0975);
+}
+#username{
+  color: blue;
+}
+.laptop{
+  background-color: gray;
+  display: flex;
+  margin: 5%;
+}
+.productsImg{
+  flex: 2;
+  width: 200px;
+  height: 150px;
+
+}
+
+.productsDetails{
+  flex: 1;
+}
+img{
+  height: 100%;
+  width: auto;
+}

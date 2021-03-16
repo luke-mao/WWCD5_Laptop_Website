@@ -74,6 +74,7 @@ document.getElementById('submit-register').addEventListener('click',() =>{
              // document.getElementById('token').innerHTML = result.token;
                   console.log(result);
                   console.log(result.token);
+                  window.location.href = "admin.html";
               });
           }
       }).catch((error)=>{
