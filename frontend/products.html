@@ -1,32 +1,32 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    
-    <meta name="description" content="admin-page">
-    <meta name="author" content="Yanchao Liu">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <link rel="stylesheet" type="text/css" href="styles/products.css" />
-    <link rel="stylesheet" type="text/css" href="styles/navbar.css"/>
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-  </head>
-  <body>
-    <header class="banner">
-      <img src="img/Logo_small_size.jpeg" alt="Logo">
-      <h1>Admin Page</h1>
-      <p id="username">Hi! Administrator</p>
-    
-    </header>
-    <main>
-      <div id="productsPage">
-        
-      </div>
-    </main>
-    <footer>
-      <p>&copy; Laptop</p>
-    </footer>
-    <script type="module" src="src/products.js"></script>
-  </body>
+        <meta name="description" content="admin-page">
+        <meta name="author" content="Yanchao Liu">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" type="text/css" href="styles/products.css" />
+        <link rel="stylesheet" type="text/css" href="styles/navbar.css"/>
+
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    </head>
+
+    <body>
+        <nav class="navbar"></nav>
+
+        <main>
+            <div class="filters"></div>
+            <div class="shelves">
+                <select class="dropdown"></select>
+                <div class="products"></div>
+                <div class="pages"></div>
+            </div>
+        </main>
+
+        <script type="module" src="src/products.js"></script>
+    </body>
 </html>

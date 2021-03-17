@@ -175,7 +175,7 @@ class Item_with_page_id(Resource):
                 }
                 
                 # get max page count
-                sql_count = """SELECT count(*) AS total FROM item"""
+                sql_count = """SELECT count(*) AS total FROM item WHERE status = 1"""
                 cur.execute(sql_count)
                 total_items = cur.fetchone()['total']
                 

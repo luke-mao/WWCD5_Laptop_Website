@@ -1,33 +1,156 @@
-.banner {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  background-color:white;
-  min-height: 60px;
-  border-bottom: 1px solid rgba(0,0,0,.0975);
-}
-#username{
-  color: blue;
-}
-.laptop{
-  background-color: gray;
-  display: flex;
-  margin: 5%;
-}
-.productsImg{
-  flex: 2;
-  width: 200px;
-  height: 150px;
-
+main {
+    width: 100%;
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 10px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
 }
 
-.productsDetails{
-  flex: 1;
+.filters {
+    width: 20%;
+    height: 500px;
+    background-color: rgb(66, 93, 94);
 }
-img{
-  height: 100%;
-  width: auto;
+
+.shelves {
+    width: 80%;
+    min-width: 380px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    padding-left: 30px;
+    padding-top: 10px;
+    padding-right: 5px;
+}
+
+.shelves .dropdown {
+    text-align: right;
+    width: fit-content;
+    padding: 8px;
+    font-size: 17px;
+    line-height: 1.3;
+    margin-left: 10px;
+}
+
+.shelves .products {
+    width: 100%;
+    padding-top: 10px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    align-content: flex-start;
+}
+
+.shelves .products .product {
+    width: 360px;
+    height: 330px;
+    margin: 10px;
+    border: 1px solid #ccc;
+    perspective: 1000px;
+}
+
+.product .inner{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.7s;
+    transform-style: preserve-3d;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+.product:hover .inner{
+    transform: rotateY(180deg);
+}
+
+.inner .front,
+.inner .back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+
+.inner .front {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    align-content: space-between;
+}
+
+.inner .front .name {
+    font-size: 24px;
+    font-weight: bold;
+    padding-bottom: 8px;
+}
+
+.inner .front .date {
+    font-size: 18px;
+    font-weight: normal;
+    padding-bottom: 5px;
+}
+
+.inner .front img {
+    width: 250px;
+    height: 150px;
+    object-fit: contain;
+    padding-top: 20px;
+    padding-bottom: 10px;
+}
+
+.inner .front .price{
+    font-size: 25px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.inner .back {
+    font-size: 20px;
+    transform: rotateY(180deg);
+}
+
+.back tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+
+.product:hover{
+    cursor: pointer;
+}
+
+.shelves .pages {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
+    display: flex;
+    flex-flow: row, nowrap;
+    justify-content: space-between;
+}
+
+.shelves .pages .page-btn{
+    font-size: 20px;
+    font-weight: normal;
+    padding: 10px;
+}
+
+.shelves .pages .page-btn.current {
+    font-weight: bolder;
+}
+
+.shelves .pages .page-btn:hover{
+    cursor: pointer;
 }
