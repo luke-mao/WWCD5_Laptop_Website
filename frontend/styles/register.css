@@ -1,4 +1,3 @@
-
 #main-window{
   font-family:'Arial Light', sans-serif;
   height: auto;
@@ -9,25 +8,30 @@
   justify-content: center;
   padding-top: 1%;
 }
+
 input{
   font-size: 1.5em;
   box-sizing: border-box;
   width: 100%;
   padding: 1%;
 }
+
 h1{
   margin:1%;
   font-weight: normal;
 }
+
 a{
   font-size: 1.3em;
 }
 /* img{
  
 } */
+
 p{
   margin: 0;
 }
+
 button{
   background-color: #4287f5;
   border: none;
@@ -42,39 +46,55 @@ button{
   cursor: pointer;
 
 }
+
 .registerInputBox{
   width: 50%;
   margin-top: 1%;
 }
+
 #submit-button{
   width: 50%;
   text-align: right;
   margin-top: 3%;
 }
+
 #link-to-login{
   width: 50%;
   text-align: left;
 
 }
+
 .redText{
   color: red;
 }
+
 .halfInput{
   flex: 1;
   
 }
+
 .row{
   display: flex;
 }
-#postcode-register{
-width: 50%;
+
+.row input {
+  padding-left: 10px;
+  padding-right: 10px;
 }
+
+
+#postcode-register{
+  width: 50%;
+}
+
 button:hover{
   opacity: 70%;
 }
+
 a:hover{
   opacity: 70%;
 }
+
 select{
   font-size: 1.5em;
 }
