@@ -1,37 +1,39 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <head>
+        <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <meta name="description" content="login-page">
-    <meta name="author" content="Yanchao Liu">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    
-    <link rel="stylesheet" type="text/css" href="styles/login.css" />
-    <title>Sign in</title>
-  </head>
-  <body>
-    <div id="main-window">
-      <img src="img/Logo_small_size.jpeg" alt="Logo">
-      
-      <h1>Sign in</h1>
-      <div class="loginInputBox">
-        <p>Email address:</p> 
-        <input type="text" id="email-signin" placeholder="Email">
-      </div>
-      <div class="loginInputBox">
-        <p>Password:</p> 
-        <input type="password" id="password-signin" placeholder="Password"><br>
-      </div>
-      <div id="submit-button">
-        <button type="button" id="submit-signin">Sign in</button>
-      </div>
-      <div id="link-to-register">
-        <a href="register.html">Create Account</a>
-      </div>
+        <meta name="description" content="login-page">
+        <meta name="author" content="Yanchao Liu">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    </div>
-  <script type="module" src="src/login.js"></script>
-  </body>
+        <link rel="stylesheet" type="text/css" href="styles/login.css" />
+        <title>Sign in</title>
+    </head>
+    <body>
+        <nav class="navbar"></nav>
+
+        <div id="main-window">
+            <img src="img/Logo_small_size.jpeg" alt="Logo">
+            
+            <h1>Sign in</h1>
+            <div class="loginInputBox">
+            <p>Email address:</p> 
+            <input type="text" id="email-signin" placeholder="Email">
+            </div>
+            <div class="loginInputBox">
+            <p>Password:</p> 
+            <input type="password" id="password-signin" placeholder="Password"><br>
+            </div>
+            <div id="submit-button">
+            <button type="button" id="submit-signin">Sign in</button>
+            </div>
+            <div id="link-to-register">
+            <a href="register.html">Create Account</a>
+            </div>
+        </div>
+
+        <script type="module" src="src/login.js"></script>
+    </body>
 </html>

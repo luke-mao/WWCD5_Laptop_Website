@@ -1,40 +1,63 @@
-document.getElementById('submit-signin').addEventListener('click', ()=>{
-  const loginBody = {
-            "email" : document.getElementById('email-signin').value,
-            "password" : document.getElementById('password-signin').value
-        }; 
-  const result = fetch('http://localhost:5000/auth/login',{
-          method: 'POST',
-          headers: {
-          //fetch javascript add json body
-              'Accept':'application/json',
-              'Content-Type': 'application/json' 
-  
-          },
-          body: JSON.stringify(loginBody),
-      //convert to JSON form
-      }).then((data) =>{
-          console.log(loginBody);
-        // console.log(data);
-        if (data.status === 403){
-            alert("Invalid Username/Password");
-            //console.log("Invalid Username/Password not fond in db");
-        }else if(data.status === 400){
-            alert("Missing email / password");
-            console.log();
-            //console.log("Missing Username/Password");
-        } else if(data.status === 200){
-        // console.log('Logged in');
-        //javascript fetch get body response
-        //result = return from last promise
-            data.json().then(result => {
-                // document.getElementById('token').innerHTML = result.token;
-                console.log(result.token);
-                window.location.href = "admin.html";
-            });
-        }
+import * as util from "./util.js";
+import {navbar_set_up} from "./navbar.js";
 
-    }).catch((error)=>{
-        console.log('Error:  ',error);
-    });
+
+util.addLoadEvent(navbar_set_up)
+
+
+document.getElementById('submit-signin').addEventListener('click', async ()=>{
+    let email = document.getElementById('email-signin').value;
+    let password = document.getElementById('password-signin').value;
+
+    if (email == "" || password == ""){
+        alert("Please fill both fields. ");
+        return;
+    }
+
+    let loginBody = {
+        "email" : email,
+        "password" : password
+    }; 
+
+    let url = "http://localhost:5000/auth/login";
+    
+    let init = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify(loginBody)
+    };
+
+    try{
+        let response = await fetch(url, init);
+
+        if (response.ok){
+            let data = await response.json();
+
+            sessionStorage.setItem("token", data['token']);
+            sessionStorage.setItem("role", data['role']);
+            
+            if (data['role'] == 1){
+                alert("Welcome back customer !!");
+            }
+            else{
+                alert("Welcome back admin !!");
+            }
+
+            window.location.href = "index.html";
+        }
+        else if (response.status == 403){
+            alert("Log in fail. Please double check your email and password.");
+        }
+    }
+    catch (e){
+        alert("error");
+        console.log(e);
+    }
+
+    return;
+
 });
+
