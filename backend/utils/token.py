@@ -3,7 +3,7 @@ import itsdangerous
 
 
 SECRET_KEY = "uRCIwNMvFQY0PRVqE4TKwoehqkYPpWJi"
-EXPIRE = 7200       # 2 hour to expire
+EXPIRE = 24 * 3600       # 2 hour to expire
 
 
 class Token():

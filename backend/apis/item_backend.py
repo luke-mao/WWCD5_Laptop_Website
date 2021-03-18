@@ -62,8 +62,14 @@ class Item(Resource):
         The admin is free to update everything from price, stock to the computer specifications.
     """)
     def put(self, item_id):
-        identity = check_admin_identity()
-        item_id = check_item_id(item_id)
+        identity, msg, code = check_admin_identity()
+        item_id, msg2, code2 = check_item_id(item_id)
+
+        if not identity:
+            return msg, code
+
+        if not item_id:
+            return msg2, code2
 
         # now unpack the data to json
         data = request.json
@@ -100,6 +106,7 @@ class Item(Resource):
                         sql_2 = "UPDATE laptop SET {} = ? WHERE item_id = ?".format(key)
                     
                     param_2 = (data[key], item_id)
+
                     cur.execute(sql_2, param_2)
 
                 return "OK", 200

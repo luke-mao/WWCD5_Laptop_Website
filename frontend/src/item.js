@@ -1,5 +1,6 @@
 import * as util from "./util.js";
 import {navbar_set_up} from "./navbar.js";
+import * as modal from "./modal.js";
 
 
 util.addLoadEvent(navbar_set_up);
@@ -135,7 +136,17 @@ function put_specification(data, div){
         btn_edit.textContent = "Edit";
 
         btn_edit.addEventListener("click", async function(){
-            alert("Not yet finish");
+            let mw = modal.create_simple_modal_with_text(
+                "Edit Help",
+                "Click on the row to edit..",
+                "OK"
+            );
+
+            mw['footer_btn'].addEventListener("click", function(){
+                util.removeSelf(mw['modal']);
+                return;
+            })
+
             return;
         })
 
@@ -409,14 +420,14 @@ function put_specification(data, div){
     ];
 
     for (let i = 0; i < datas.length; i++){
-        specs.appendChild(create_table_with_input(datas[i]));
+        specs.appendChild(create_table_with_input(data['simple']['item_id'],datas[i]));
     }
 
     return;
 }
 
 
-function create_table_with_input(data){
+function create_table_with_input(item_id, data){
     let div = document.createElement("div");
     div.classList.add("spec");
 
@@ -437,7 +448,7 @@ function create_table_with_input(data){
         let values_list = data['specs'][key];
 
         let tr = document.createElement("tr");
-
+        
         let td1 = document.createElement("td");
         td1.textContent = key;
 
@@ -447,6 +458,183 @@ function create_table_with_input(data){
         // link
         table.appendChild(tr);
         util.appendListChild(tr, [td1, td2]);
+
+        // add double click event listener
+        // but dblclick is not working, change to single click 
+        // click on the row, pop up the modal window with all attributes
+        tr.addEventListener("click", async function(){
+            let mw = modal.create_complex_modal_with_text(
+                "Edit Window",
+                "Attributes related to this row:",
+                "Submit", 
+                "Cancel"
+            );
+
+            // close button
+            mw['footer_btn_2'].addEventListener("click", function(){
+                util.removeSelf(mw['modal']);
+                return;
+            });
+
+            // list all attributes associated with this row
+            // create a table
+            // 3 columns: Attribute, Original Value, New Value
+            let attributes = values_list[1];
+            
+            let att_table = document.createElement("table");
+            mw['body'].appendChild(att_table);
+
+            let tr2 = document.createElement("tr");
+            att_table.appendChild(tr2);
+
+            let th1 = document.createElement("th");
+            th1.textContent = "Attribute Name";
+
+            let th2 = document.createElement("th");
+            th2.textContent = "Old Value";
+
+            let th3 = document.createElement("th");
+            th3.textContent = "New Value";
+
+            util.appendListChild(tr2, [th1, th2, th3]);
+
+            for (let key2 in attributes){
+                let tr3 = document.createElement("tr");
+                att_table.appendChild(tr3);
+
+                // 3 columns
+                let td3 = document.createElement("td");
+                td3.textContent = key2;
+
+                let td4 = document.createElement("td");
+                td4.textContent = attributes[key2];
+
+                let td5 = document.createElement("td");
+                // add an input box into it
+                let td5_input = document.createElement("input");
+                td5_input.type = "text";
+                td5_input.value = attributes[key2];
+                td5.appendChild(td5_input);
+
+                util.appendListChild(tr3, [td3, td4, td5]);
+            }
+
+            // click on the submit button
+            mw['footer_btn_1'].addEventListener("click", async function(){
+                // check which is changed
+                let changed_attributes = {};
+
+                let all_rows = att_table.childNodes;
+                for (let i = 1; i < all_rows.length; i++){
+                    let r = all_rows[i];
+                    let r_childs = r.childNodes;
+
+                    // check the second child and the third child child input value
+                    if (r_childs[1].textContent != r_childs[2].firstChild.value){
+                        changed_attributes[r_childs[0].textContent] = r_childs[2].firstChild.value;
+                    }
+                }
+
+                // check if nothing changed
+                if (Object.keys(changed_attributes).length === 0){
+                    util.removeSelf(mw['modal']);
+
+                    // create another model window
+                    let mw2 = modal.create_simple_modal_with_text(
+                        "Edit Error",
+                        "Please update the value before submit..",
+                        "OK"
+                    );
+
+                    mw2['modal'].style.zindex = "2";
+
+                    mw2['footer_btn'].addEventListener("click", function(){
+                        util.removeSelf(mw2['modal']);
+                        tr.click(); // reopen the previous modal window
+                        return;
+                    })
+
+                    return;
+                }
+
+                // new updates: post
+                let url = "http://localhost:5000/item-backend/" + item_id;
+                let init = {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'token ' + sessionStorage.getItem("token"),
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify(changed_attributes),
+                };
+
+                console.log(init);
+
+                try{
+                    let response = await fetch(url, init);
+
+                    if (response.ok){
+                        util.removeSelf(mw['modal']);
+
+                        // success update, reload the page
+                        let mw3 = modal.create_simple_modal_with_text(
+                            "Edit Status", 
+                            "Successful edit !!",
+                            "OK"
+                        );
+
+                        mw3['footer_btn'].addEventListener("click", function(){
+                            util.removeSelf(mw3['modal']);
+                            window.location.reload();
+                        })
+                        
+                        return;
+                    }
+                    else if (response.status == 403){
+                        util.removeSelf(mw['modal']);
+
+                        // success update, reload the page
+                        let mw3 = modal.create_simple_modal_with_text(
+                            "Authentication Error", 
+                            "Sorry. Please log in again to ensure your account security..",
+                            "OK"
+                        );
+
+                        mw3['footer_btn'].addEventListener("click", function(){
+                            util.removeSelf(mw3['modal']);
+
+                            sessionStorage.clear();
+                            window.location.href = "login.html";
+                        })
+                        
+                        return;                        
+                    }
+                    else{
+                        util.removeSelf(mw['modal']);
+
+                        // success update, reload the page
+                        let mw3 = modal.create_simple_modal_with_text(
+                            "System Error", 
+                            "Sorry. Something wrong with the database. Please try again later..",
+                            "OK"
+                        );
+
+                        mw3['footer_btn'].addEventListener("click", function(){
+                            util.removeSelf(mw3['modal']);
+                            window.location.reload();
+                            return;
+                        })
+                        
+                        return;  
+                    }
+                }
+                catch(err){
+                    alert("error");
+                    console.log(err);
+                }
+            });
+        });
     }
 
     return div;
@@ -454,8 +642,6 @@ function create_table_with_input(data){
 
 
 function put_photos(photos, div){
-    console.log(photos);
-
     let img = document.createElement("img");
     img.alt = "No image available..";
     div.appendChild(img);

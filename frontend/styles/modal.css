@@ -1,0 +1,118 @@
+.modal {
+    position: fixed;
+    z-index: 1; 
+    padding-top: 100px;     left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.4); 
+}
+
+.modal-content {
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    min-width: 350px;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: auto;
+    background-color: white;
+    border: 1px solid rgb(33, 145, 135);
+    border-radius: 5px;
+    padding-top: 20px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.modal-content .header {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.modal-content .header .header-title{
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.modal-content .body {
+    padding-top: 30px;
+    padding-bottom: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.modal-content .body .p{
+    font-size: 25px;
+    font-weight: normal;
+}
+
+.modal-content .body table {
+    width: 100%;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-size: 25px;
+    text-align: center;
+}
+
+.modal-content .body table tr {
+    line-height: 1.6;
+    width: fit-content;
+}
+
+.modal-content .body table td{
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.modal-content .body table tr input{
+    font-size: 25px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 8px;
+    width: 280px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-top: 10px;
+}
+
+
+.modal-content .footer {
+    padding-top: 20px;
+    padding-bottom: 10px;
+    text-align: right;
+}
+
+.modal-content .footer button {
+    margin-right: 15px;
+    margin-left: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-radius: 5px;
+    border: 1px solid rgb(190, 178, 178);
+    font-size: 25px;
+}
+
+.modal-content .footer button:hover{
+    cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+  

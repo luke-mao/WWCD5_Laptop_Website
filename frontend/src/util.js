@@ -51,3 +51,21 @@ export function check_admin(){
     return sessionStorage.getItem("token") && (sessionStorage.getItem("role") == 0);
 }
 
+
+export function removeSelf(node){
+    if (node === null){
+        alert("Wrong input");
+        return;
+    }
+
+    node.parentNode.removeChild(node);
+    return;
+}
+
+
+
+
+
+
+
+
