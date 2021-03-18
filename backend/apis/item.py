@@ -159,8 +159,9 @@ class Item_with_page_id(Resource):
                 conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
                 cur = conn.cursor()
 
-                sql = """SELECT item_id FROM item WHERE status = 1 LIMIT ?, ?"""
-                sql_param = (page_id * 20, (page_id+1) * 20)
+                # LIMIT row_count, offset
+                sql = """SELECT item_id FROM item WHERE status = 1 LIMIT ? OFFSET ?"""
+                sql_param = (20, page_id * 20)
 
                 cur.execute(sql, sql_param)
                 item_id_list = cur.fetchall()
@@ -231,7 +232,7 @@ class Item_with_price_alphabet_order(Resource):
                         FROM item 
                         WHERE status = 1
                         ORDER BY price {}
-                        LIMIT ?, ?
+                        LIMIT ? OFFSET ?
                     """.format(order)
                 else:
                     sql = """
@@ -239,10 +240,10 @@ class Item_with_price_alphabet_order(Resource):
                         FROM item 
                         WHERE status = 1
                         ORDER BY name {}
-                        LIMIT ?, ?
+                        LIMIT ? OFFSET ?
                     """.format(order)
 
-                sql_param = (page_id * 20, (page_id+1) * 20)
+                sql_param = (20, page_id * 20)
 
                 cur.execute(sql, sql_param)
                 item_id_list = cur.fetchall()
@@ -304,10 +305,10 @@ class Item_with_trending_order(Resource):
                     FROM item 
                     WHERE status = 1
                     ORDER BY view DESC
-                    LIMIT ?, ?
+                    LIMIT ? OFFSET ?
                 """
 
-                sql_param = (page_id * 20, (page_id+1) * 20)
+                sql_param = (20, page_id * 20)
 
                 cur.execute(sql, sql_param)
                 item_id_list = cur.fetchall()
@@ -378,12 +379,6 @@ class Search_str(Resource):
 
                 id_name_list = cur.fetchall()
 
-                # check the range
-                max_page = get_max_page_num(len(id_name_list), 20)
-
-                if page_id > max_page:
-                    return "No more pages", 404
-
                 # calculate the distance for all
                 for each in id_name_list:
                     name = each['name'].lower()
@@ -396,18 +391,30 @@ class Search_str(Resource):
                     reverse=True
                 )
 
-                result = {
-                    'current_page': page_id,
-                    'max_page': max_page,
-                    'data': get_all_profiles(sorted_id_name_list[page_id * 20 : (page_id+1) * 20])
-                }
+                # similarity threshold 0.55
+                THRESHOLD = 0.6
+                selected_id_name_list = []
 
-                print(sorted_id_name_list[page_id * 20 : (page_id+1) * 20])
+                for each in sorted_id_name_list:
+                    if each['similarity'] > THRESHOLD:
+                        selected_id_name_list.append(each)
+                    else:
+                        break
+        
+                # each page has 20 items, check length
+                if (len(selected_id_name_list) > page_id * 20):
+                    result = {
+                        'current_page': page_id,
+                        'max_page': get_max_page_num(len(selected_id_name_list), 20),
+                        'data': get_all_profiles(sorted_id_name_list[page_id * 20 : (page_id+1) * 20])
+                    }
 
-                return result, 200
+                    return result, 200
+
+                else:
+                    return "No more pages", 200
 
         except Exception as e:
             print(e)
-            print("fshfsklhfla")
             return "Internal server error", 500            
 

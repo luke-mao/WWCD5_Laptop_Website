@@ -3,15 +3,16 @@ import * as util from './util.js';
 // create a navigation bar from the html nav tag
 // or use class navbar to locate this tag
 
-// for non-login user: 
-//      show: (logo, home, products) on the left
+// for everyone:
+//      show: (logo, home, products, search) on the left
+
+// for non-login user:       
 //      show: (login, register) on the right
 
 // for login user:
-//      show: (my account, cart, logout) on the left
+//      show: (my account, cart, logout) on the right
 
 // for admin:
-//      show (logo, home, products) on the left
 //      show (customers, orders, stocks, reports, logout) on the right
 
 
@@ -27,7 +28,7 @@ export function navbar_set_up(){
 
     util.appendListChild(navbar, [navbar_left, navbar_right]);
 
-    // left side is always the same: logo, home, products
+    // left side is always the same: logo, home, products, search
     let logo = document.createElement("img");
     logo.src = "img/Logo_small_size.jpeg";
     logo.alt = "Laptop website logo";
@@ -48,7 +49,43 @@ export function navbar_set_up(){
         return;
     })
 
-    util.appendListChild(navbar_left, [logo, home, products]);
+    let search = document.createElement("div");
+    search.classList.add("search");
+
+    let search_icon = document.createElement("i");
+    search_icon.classList.add("material-icons");
+    search_icon.textContent = "search";
+
+    let search_input = document.createElement("input");
+    search_input.type = "text";
+    search_input.placeholder = "Search";
+
+    // listen to the ENTER key
+    search_input.addEventListener("keydown", function(e){
+        if (e.keyCode !== 13){
+            return;
+        }
+
+        if (e.target.value == ""){
+            alert("Please input name and press enter !!");
+            return;
+        }
+
+        let str_query = e.target.value;
+        let re_query = /^[a-zA-Z0-9 ]+$/;
+        if (! re_query.test(str_query)){
+            alert("Invalid letters in search. Allow alphabet, numbers and spaces only");
+            return;
+        }
+
+        alert("Not yet implemented");
+        window.location.href = "products.html" + "?query=" + encodeURIComponent(str_query.trim());
+        return;
+    });
+
+    util.appendListChild(search, [search_icon, search_input]);
+
+    util.appendListChild(navbar_left, [logo, home, products, search]);
 
     // the right side, check the sessionStorage first
     if (sessionStorage.getItem("token")){

@@ -43,7 +43,7 @@ main {
     flex-wrap: wrap;
     justify-content: flex-start;
     align-items: flex-start;
-    align-content: flex-start;
+    align-content: space-between;
 }
 
 .shelves .products .product {
@@ -144,7 +144,11 @@ main {
 .shelves .pages .page-btn{
     font-size: 20px;
     font-weight: normal;
-    padding: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 12px;
+    padding-right: 12px;
+    border: 1px solid rgb(187, 185, 185);
 }
 
 .shelves .pages .page-btn.current {

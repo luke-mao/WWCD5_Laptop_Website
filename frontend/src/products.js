@@ -6,6 +6,7 @@ util.addLoadEvent(navbar_set_up)
 util.addLoadEvent(product_page_set_up)
 
 // the url default is localhost:8000/products.html
+// if there is a search string, 
 
 async function product_page_set_up(){
     let main = document.getElementsByTagName("main")[0];
@@ -113,8 +114,10 @@ function drop_down_menu_set_up(dropdown){
             let main = document.getElementsByTagName("main")[0];
             let shelves = main.getElementsByClassName("shelves")[0];
             let products = shelves.getElementsByClassName("products")[0];
-            products_on_shelf(products, data['data']);
+            let pages = shelves.getElementsByClassName("pages")[0];
 
+            products_on_shelf(products, data['data']);
+            pages_set_up(pages, data['current_page'], data['max_page']);            
         }
         catch(err){
             alert("error");
@@ -230,80 +233,96 @@ function products_on_shelf(products, data){
 function pages_set_up(pages, current_page, max_page){
     util.removeAllChild(pages);
 
-    console.log("input max page = ", max_page);
-
     // parse Int
     current_page = parseInt(current_page);
     max_page = parseInt(max_page);
 
-    // << < digit1 digit2 digit3 > >>
-    // total 7 buttons
-    let num_btn = 7
-    for (let i = 0; i < num_btn; i++){
-        let div = document.createElement("div");
-        div.classList.add("page-btn");
-        pages.appendChild(div);
-    }
-
-    // deal with first and last button
-    let btns = pages.childNodes;
-    
-    btns[0].textContent = "<<";
-    btns[0].setAttribute("page_id", "0");
-
-    btns[num_btn-1].textContent = ">>";
-    btns[num_btn-1].setAttribute("page_id", max_page);
-
-    // deal with second and second-last button
-    btns[1].textContent = "<";
-    btns[1].setAttribute("page_id", current_page == 0 ? 0 : current_page - 1);
-
-    btns[num_btn-2].textContent = ">";
-    btns[num_btn-2].setAttribute("page_id", current_page == max_page ? max_page : current_page + 1);
-
-    // deal with btns[2, 3, 4]
-    if (current_page == 0){
-        btns[2].textContent = "1";
-        btns[2].classList.add("current");
-        btns[2].setAttribute("page_id", 0);
-
-        btns[3].textContent = "2";
-        btns[3].setAttribute("page_id", 1);
-
-        btns[4].textContent = "3";
-        btns[4].setAttribute("page_id", 2);
-    }
-    else if (current_page == max_page){
-        btns[4].textContent = max_page + 1;
-        btns[4].classList.add("current");
-        btns[4].setAttribute("page_id", max_page);
-
-        btns[3].textContent = max_page;
-        btns[3].setAttribute("page_id", max_page-1);
-        
-        btns[2].textContent = max_page - 1;
-        btns[2].setAttribute("page_id", max_page-2);
+    // consider different options: 
+    // if max_page < 5: display all buttons at once
+    // else: display 5 buttons together
+    if (max_page < 5){
+        for (let i = 1; i < max_page+1; i++){
+            let div = document.createElement("div");
+            div.classList.add("page-btn");
+            div.textContent = i;
+            div.setAttribute("page_id", i-1);
+            pages.appendChild(div);          
+            
+            if (current_page == i - 1){
+                div.classList.add("current");
+            }
+        }
     }
     else{
-        btns[2].textContent = current_page ;
-        btns[2].setAttribute("page_id", current_page-1);
+        // many pages: display all 9 buttons
+        // << < xx xx xx xx xx > >>
+        // total 9 page buttons
+        let num_btn = 9;
 
-        btns[3].textContent = current_page + 1;
-        btns[3].classList.add("current");
-        btns[3].setAttribute("page_id", current_page);
+        for (let i = 0; i < num_btn; i++){
+            let div = document.createElement("div");
+            div.classList.add("page-btn");
+            pages.appendChild(div);
+        }
 
-        btns[4].textContent = current_page + 2;
-        btns[4].setAttribute("page_id", current_page + 1);
+        // deal with first and last button
+        let btns = pages.childNodes;
+
+        btns[0].textContent = "<<";
+        btns[0].setAttribute("page_id", "0");
+
+        btns[num_btn-1].textContent = ">>";
+        btns[num_btn-1].setAttribute("page_id", max_page);
+
+        // deal with second and second-last button
+        btns[1].textContent = "<";
+        btns[1].setAttribute("page_id", current_page == 0 ? 0 : current_page - 1);
+
+        btns[num_btn-2].textContent = ">";
+        btns[num_btn-2].setAttribute("page_id", current_page == max_page ? max_page : current_page + 1);
+
+        // page range: [lower_limit, upper_limit)
+        let lower_limit = null;
+        let upper_limit = null;
+
+        // deal with btns[2, 3, 4, 5, 6]
+        if (current_page < 3){
+            lower_limit = 0;
+            upper_limit = num_btn - 4;
+        }
+        else if (current_page > max_page - 3){
+            lower_limit = max_page - 4;
+            upper_limit = max_page + 1;
+        }
+        else{
+            // current page in the middle
+            lower_limit = current_page - 2;
+            upper_limit = current_page + 3;
+        }
+
+        let j = 2;
+        for (let i = lower_limit; i < upper_limit; i++){
+            btns[j].textContent = i + 1;
+            btns[j].setAttribute("page_id", i);
+
+            if (current_page == i){
+                btns[j].classList.add("current");
+            }    
+
+            j += 1;
+        }
     }
-    
-    
+
+
     // click event
-    for (let i = 0; i < num_btn; i++){
-        btns[i].addEventListener("click", async function(){
+    let all_btns = pages.childNodes;
+
+    for (let i = 0; i < all_btns.length; i++){
+        all_btns[i].addEventListener("click", async function(){
             // get current order
             let select = document.getElementsByClassName("dropdown")[0];
 
-            let url = "http://localhost:5000/item/" + select.value + btns[i].getAttribute("page_id");
+            let url = "http://localhost:5000/item/" + select.value + all_btns[i].getAttribute("page_id");
             
             let init = {
                 method: 'GET',
