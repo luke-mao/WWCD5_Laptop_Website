@@ -46,5 +46,8 @@ export function addLoadEvent(new_load_func){
 }
 
 
-
+// check admin
+export function check_admin(){
+    return sessionStorage.getItem("token") && (sessionStorage.getItem("role") == 0);
+}
 

@@ -86,66 +86,370 @@ function put_item_on_page(data){
 
     // left: 4 images
     put_photos(data['photos'], simple_left);
+    put_profile(data, simple_right);
 
-    // right: small profile
-    let name = document.createElement("div");
-    name.classList.add("name");
-    name.textContent = data['simple']['name'];
+    // for detail: provide specifications. 
+    put_specification(data, div_detail);
 
-    let price = document.createElement("div");
-    price.classList.add("price");
-    price.textContent = "$ " + data['simple']['price'];
-
-    let list = document.createElement("ul");
-    list.classList.add("list");
-
-    // link
-    util.appendListChild(simple_right, [name, price, list]);
-
-    // fill the list
-    let li_display = document.createElement("li");
-    li_display.textContent = data['detail']['display_size'] + "\""
-        + " " + data['detail']['display_horizontal_resolution'] + " x " 
-        + data['detail']['display_vertical_resolution']
-        + " screen"
-    ;
-
-    let li_cpu = document.createElement("li");
-    li_cpu.textContent = data['detail']['cpu_prod'] 
-        + " " + data['detail']['cpu_model']
-        + " boost up to " + data['detail']['cpu_boost_speed'] + " GHz"
-    ;
-
-    let li_gpu = document.createElement("li");
-    li_gpu.textContent = data['detail']['gpu_prod'] 
-        + " " + data['detail']['gpu_model']
-    ;
-
-    let li_memory = document.createElement("li");
-    li_memory.textContent = data['detail']['memory_size'] + " GB"
-        + " " + data['detail']['memory_type']
-        + " " + data['detail']['memory_speed'] + " MHz"
-    ;
-
-    let li_storage = document.createElement("li");
-    li_storage.textContent = data['detail']['primary_storage_cap'] + " GB"
-        + " " + data['detail']['primary_storage_model']
-    ;
-
-    util.appendListChild(list, [
-        li_display, li_cpu, li_gpu, li_memory, li_storage
-    ])
+    return;
+}
 
 
+function put_specification(data, div){
+    // give a header
+    let header = document.createElement("div");
+    header.classList.add("header");
+    
+    // give a body
+    let specs = document.createElement("div");
+    specs.classList.add("specs");
+
+    // link header and body
+    util.appendListChild(div, [header, specs]);
+
+    // header incudes: title
+    //    for admin: also has two buttons: delete / re-create, edti
+    let title = document.createElement("div");
+    title.classList.add("title");
+    title.textContent = "Technical Specification";
+    header.appendChild(title);
+
+    if (util.check_admin()){
+        let btn_status = document.createElement("button");
+        btn_status.classList.add("btn-status");
+        
+        if (data['simple']['status'] == 1){
+            btn_status.textContent = "Remove from shelf";
+        }
+        else{
+            btn_status.textContent = "Continue on shelf";
+        }
+
+        btn_status.addEventListener("click", async function(){
+            alert("Not yet finish");
+            return;
+        });
+
+        let btn_edit = document.createElement("button");
+        btn_edit.classList.add("btn-edit");
+        btn_edit.textContent = "Edit";
+
+        btn_edit.addEventListener("click", async function(){
+            alert("Not yet finish");
+            return;
+        })
+
+        // link
+        util.appendListChild(header, [btn_status, btn_edit]);
+    }
+       
+    
+    // the table: several sections: 
+    //      processor, memory, video card, display, storage
+    //      (chassis, wireless card, battery, os, warranty)
+    let details = data['detail'];
+
+    // key value pair:
+    //      each value is a list:
+    //      the first value in list = value to display
+    //      second value is also a dict: they are the original attribute names and the original value
+
+    let data_table_cpu = {
+        'title': "Processor",
+        'specs': {
+            'Model': [
+                details['cpu_prod'] + " " + details['cpu_model'],
+                {
+                    'cpu_prod': details['cpu_prod'], 
+                    'cpu_model': details['cpu_model'],
+                },
+            ],
+            'Technology': [
+                details['cpu_lithography'] + " nm",
+                {
+                    'cpu_lithography': details['cpu_lithography'],
+                },
+            ],
+            'Cache': [
+                details['cpu_cache'] + " MB",
+                {
+                    'cpu_cache': details['cpu_cache']
+                },
+            ],
+            'Base Speed': [
+                details['cpu_base_speed'] + " GHz",
+                {
+                    'cpu_base_speed': details['cpu_base_speed']
+                },
+            ],
+            'Max Speed': [
+                details['cpu_boost_speed'] + " GHz",
+                {
+                    'cpu_boost_speed': details['cpu_boost_speed'],
+                },
+            ],
+            'Number of Cores': [
+                details['cpu_cores'],
+                {
+                    'cpu_cores': details['cpu_cores'],
+                },
+            ],
+            'TDP': [
+                details['cpu_tdp'] + " W",
+                {
+                    'cpu_tdp': details['cpu_tdp']
+                }
+            ],
+        },
+    };
+
+    let data_table_gpu = {
+        'title': 'Graphic Card',
+        'specs': {
+            'Model': [
+                details['gpu_prod'] + " " + details['gpu_model'],
+                {
+                    'gpu_prod': details['gpu_prod'],
+                    'gpu_model': details['gpu_model'],
+                }
+            ],
+            'Architecture': [
+                details['gpu_architecture'],
+                {
+                    'gpu_architecture': details['gpu_architecture'],
+                }
+            ],
+            'Technology': [
+                details['gpu_lithography'] + " nm",
+                {
+                    'gpu_lithography': details['gpu_lithography'],
+                }
+            ],
+            'Base Speed': [
+                details['gpu_base_speed'] + " MHz",
+                {
+                    'gpu_base_speed': details['gpu_base_speed'],
+                }
+            ],
+            "Boost Speed": [
+                details['gpu_boost_speed'] + " MHz",
+                {
+                    'gpu_boost_speed': details['gpu_boost_speed'],
+                }
+            ],
+            'Memory Speed': [
+                details['gpu_memory_speed'] + " MHz",
+                {
+                    'gpu_memory_speed': details['gpu_memory_speed'],
+                }
+            ],
+            "Memory Bandwidth": [
+                details['gpu_memory_bandwidth'] + " bit",
+                {
+                    'gpu_memory_bandwidth': details['gpu_memory_bandwidth']
+                }
+            ],
+            "Memory Size": [
+                details['gpu_memory_size'] + " MB",
+                {
+                    'gpu_memory_size': details['gpu_memory_size'],
+                }
+            ],
+            "TDP": [
+                details['gpu_tdp'] + " W",
+                {
+                    'gpu_tdp': details['gpu_tdp'],
+                }
+            ],
+        },
+    };
+
+    let data_table_memory = {
+        'title': "Memory",
+        'specs': {
+            'Memory Size': [
+                details['memory_size'] + " GB",
+                {
+                    'memory_size': details['memory_size'],
+                }
+            ],
+            'Memory Speed': [
+                details['memory_speed'] + " MHz",
+                {
+                    'memory_speed': details['memory_speed'],
+                }
+            ],
+            'Memory Type': [
+                details['memory_type'],
+                {
+                    'memory_type': details['memory_type'],
+                },
+            ],
+        },
+    };
+
+    let data_table_display = {
+        'title': "Display",
+        'specs': {
+            'Model': [
+                details['display_type'],
+                {
+                    'display_type': details['display_type'],
+                }
+            ],
+            'Size': [
+                details['display_size'] + " Inch",
+                {
+                    'display_size': details['display_size'],
+                }
+            ],
+            'Resolution': [
+                details['display_horizontal_resolution'] + " x " + details['display_vertical_resolution'],
+                {
+                    'display_horizontal_resolution': details['display_horizontal_resolution'],
+                    'display_vertical_resolution': details['display_vertical_resolution'],
+                },
+            ],
+            'Touch Screen': [
+                details['display_touch'].toUpperCase(),
+                {
+                    'display_touch': details['display_touch'],
+                }
+            ],
+        },
+    };
+    
+    // ignore the secondary storage
+    let data_table_storage = {
+        'title': 'Storage',
+        'specs': {
+            'Model': [
+                details['primary_storage_model'],
+                {
+                    'primary_storage_model': details['primary_storage_model'],
+                }
+            ],
+            'Size': [
+                details['primary_storage_cap'] + " GB",
+                {
+                    'primary_storage_cap': details['primary_storage_cap'],
+                }
+            ],
+            'Read Speed': [
+                details['primary_storage_read_speed'] + " MB/s",
+                {
+                    'primary_storage_read_speed': details['primary_storage_read_speed'],
+                }
+            ],
+        }
+    }
+    
+    let data_table_other = {
+        'title': 'Miscellaneous',
+        'specs': {
+            'Operating System': [
+                details['operating_system'],
+                {
+                    'operating_system': details['operating_system'],
+                }
+            ],
+            'WiFi Card': [
+                details['wireless_card_model'],
+                {
+                    'wireless_card_model': details['wireless_card_model'],
+                }
+            ],
+            'WiFi Speed': [
+                details['wireless_card_speed'] + " Mbps",
+                {
+                    'wireless_card_speed': details['wireless_card_speed'],
+                }
+            ],
+            'Warranty': [
+                details['warranty_years'] + " Years" + details['warranty_type_long'],
+                {
+                    'warranty_years': details['warranty_years'],
+                    'warranty_type_long': details['warranty_type_long'],
+                }
+            ],
+            'Dimension (W cm x D cm x H cm)': [
+                details['chassis_width_cm'] 
+                    + " x " + details['chassis_depth_cm']
+                    + " x " + details['chassis_height_cm']
+                ,
+                {
+                    'chassis_width_cm': details['chassis_width_cm'],
+                    'chassis_depth_cm': details['chassis_depth_cm'],
+                    'chassis_height_cm': details['chassis_height_cm'],
+                }
+            ],
+            'Weight': [
+                details['chassis_weight_kg'] + " kg",
+                {
+                    'chassis_weight_kg': details['chassis_weight_kg'],
+                }
+            ],
+            'Battery Capacity': [
+                details['battery_capacity'] + " WHr",
+                {
+                    'battery_capacity': details['battery_capacity'],
+                }
+            ],
+        },
+    };
+
+    // build tables
+    let datas = [
+        data_table_cpu, 
+        data_table_gpu,
+        data_table_memory,
+        data_table_display,
+        data_table_storage,
+        data_table_other
+    ];
+
+    for (let i = 0; i < datas.length; i++){
+        specs.appendChild(create_table_with_input(datas[i]));
+    }
+
+    return;
+}
 
 
+function create_table_with_input(data){
+    let div = document.createElement("div");
+    div.classList.add("spec");
 
+    let title = document.createElement("div");
+    title.textContent = data['title'];
+    title.classList.add("spec-title");
 
+    let table = document.createElement("table");
+    table.classList.add("spec-table");
+    
+    util.appendListChild(div, [title, table]);
 
+    // fill the table
+    for (let key in data['specs']){
+        // there are two values in the values_list
+        // first element is the display value
+        // second element is the dict {original_key : original_vlaue}
+        let values_list = data['specs'][key];
 
+        let tr = document.createElement("tr");
 
+        let td1 = document.createElement("td");
+        td1.textContent = key;
 
+        let td2 = document.createElement("td");
+        td2.textContent = values_list[0] == null ? "N.A." : values_list[0];
 
+        // link
+        table.appendChild(tr);
+        util.appendListChild(tr, [td1, td2]);
+    }
+
+    return div;
 }
 
 
@@ -165,13 +469,15 @@ function put_photos(photos, div){
         arrows.classList.add("arrows");
         div.appendChild(arrows);
 
-        let img_left = document.createElement("div");
+        let img_left = document.createElement("i");
         img_left.classList.add("arrow-left");
-        img_left.textContent = "<";
+        img_left.classList.add("material-icons");
+        img_left.textContent = "keyboard_arrow_left";
 
-        let img_right = document.createElement("div");
+        let img_right = document.createElement("i");
         img_right.classList.add("arrow-right")
-        img_right.textContent = ">";
+        img_right.classList.add("material-icons");
+        img_right.textContent = "keyboard_arrow_right";
 
         util.appendListChild(arrows, [img_left, img_right]);
 
@@ -207,5 +513,60 @@ function put_photos(photos, div){
 
     return;
 }
+
+
+function put_profile(data, div){
+    // right: small profile
+    let name = document.createElement("div");
+    name.classList.add("name");
+    name.textContent = data['simple']['name'];
+
+    let price = document.createElement("div");
+    price.classList.add("price");
+    price.textContent = "$ " + data['simple']['price'];
+
+    let list = document.createElement("ul");
+    list.classList.add("list");
+
+    // link
+    util.appendListChild(div, [name, price, list]);
+
+    // fill the list
+    let li_display = document.createElement("li");
+    li_display.textContent = data['detail']['display_size'] + "\""
+        + " " + data['detail']['display_horizontal_resolution'] + " x " 
+        + data['detail']['display_vertical_resolution']
+        + " screen"
+    ;
+
+    let li_cpu = document.createElement("li");
+    li_cpu.textContent = data['detail']['cpu_prod'] 
+        + " " + data['detail']['cpu_model']
+        + " boost up to " + data['detail']['cpu_boost_speed'] + " GHz"
+    ;
+
+    let li_gpu = document.createElement("li");
+    li_gpu.textContent = data['detail']['gpu_prod'] 
+        + " " + data['detail']['gpu_model']
+    ;
+
+    let li_memory = document.createElement("li");
+    li_memory.textContent = data['detail']['memory_size'] + " GB"
+        + " " + data['detail']['memory_type']
+        + " " + data['detail']['memory_speed'] + " MHz"
+    ;
+
+    let li_storage = document.createElement("li");
+    li_storage.textContent = data['detail']['primary_storage_cap'] + " GB"
+        + " " + data['detail']['primary_storage_model']
+    ;
+
+    util.appendListChild(list, [
+        li_display, li_cpu, li_gpu, li_memory, li_storage
+    ])
+
+    return;
+}
+
 
 
