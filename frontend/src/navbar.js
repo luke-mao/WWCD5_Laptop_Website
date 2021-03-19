@@ -1,4 +1,5 @@
 import * as util from './util.js';
+import * as modal from "./modal.js";
 
 // create a navigation bar from the html nav tag
 // or use class navbar to locate this tag
@@ -23,33 +24,39 @@ export function navbar_set_up(){
     let navbar_left = document.createElement("div");
     navbar_left.classList.add("left");
 
-    let navbar_right = document.createElement("div");
+    // right is all buttons, change to ul
+    let navbar_right = document.createElement("ul");
     navbar_right.classList.add("right");
 
     util.appendListChild(navbar, [navbar_left, navbar_right]);
 
     // left side is always the same: logo, home, products, search
     let logo = document.createElement("img");
-    logo.src = "img/Logo_small_size.jpeg";
+    logo.src = "img/logo_ppt_4_nobg.png";
     logo.alt = "Laptop website logo";
 
-    let home = document.createElement("div");
-    home.classList.add("navbar-button");
+    let nav_bar_left_ul = document.createElement("ul");
+    
+    util.appendListChild(navbar_left, [logo, nav_bar_left_ul]);
+
+    // inside the ul, some buttons
+    let home = document.createElement("li");
+    home.classList.add("navbar-btn");
     home.textContent = "Home";
     home.addEventListener("click", function(){
         window.location.href = "index.html";
         return;
     });
 
-    let products = document.createElement("div");
-    products.classList.add("navbar-button");
+    let products = document.createElement("li");
+    products.classList.add("navbar-btn");
     products.textContent = "Products";
     products.addEventListener("click", function(){
         window.location.href = "products.html";
         return;
     })
 
-    let search = document.createElement("div");
+    let search = document.createElement("li");
     search.classList.add("search");
 
     let search_icon = document.createElement("i");
@@ -82,9 +89,10 @@ export function navbar_set_up(){
         return;
     });
 
+    // link
     util.appendListChild(search, [search_icon, search_input]);
+    util.appendListChild(nav_bar_left_ul, [home, products, search]);
 
-    util.appendListChild(navbar_left, [logo, home, products, search]);
 
     // the right side, check the sessionStorage first
     if (sessionStorage.getItem("token")){
@@ -98,24 +106,24 @@ export function navbar_set_up(){
             //     return;
             // })
 
-            let orders = document.createElement("div");
-            orders.classList.add("navbar-button");
+            let orders = document.createElement("li");
+            orders.classList.add("navbar-btn");
             orders.textContent = "Orders";
             orders.addEventListener("click", function(){
                 window.location.href = "orders.html";
                 return;
             })
             
-            let stocks = document.createElement("div");
-            stocks.classList.add("navbar-button");
+            let stocks = document.createElement("li");
+            stocks.classList.add("navbar-btn");
             stocks.textContent = "Stocks";
             stocks.addEventListener("click", function(){
                 window.location.href = "stocks.html";
                 return;
             })
 
-            let reports = document.createElement("div");
-            reports.classList.add("navbar-button");
+            let reports = document.createElement("li");
+            reports.classList.add("navbar-btn");
             reports.textContent = "Reports";
             reports.addEventListener("click", function(){
                 window.location.href = "reports.html";
@@ -128,8 +136,8 @@ export function navbar_set_up(){
         }
         else{
             // user
-            let myaccount = document.createElement("div");
-            myaccount.classList.add("navbar-button");
+            let myaccount = document.createElement("li");
+            myaccount.classList.add("navbar-btn");
             myaccount.textContent = "My Account";
             myaccount.addEventListener("click", function(){
                 window.location.href = "account.html";
@@ -137,8 +145,8 @@ export function navbar_set_up(){
             })
             
 
-            let mycart = document.createElement("div");
-            mycart.classList.add("navbar-button");
+            let mycart = document.createElement("li");
+            mycart.classList.add("navbar-btn");
             mycart.textContent = "My Cart";
             mycart.addEventListener("click", function(){
                 window.location.href = "cart.html";
@@ -151,13 +159,30 @@ export function navbar_set_up(){
         }
 
         // common logout button
-        let logout = document.createElement("div");
-        logout.classList.add("navbar-button");
+        let logout = document.createElement("li");
+        logout.classList.add("navbar-btn");
         logout.textContent = "Log Out";
         logout.addEventListener("click", function(){
-            sessionStorage.clear();
-            window.location.href = "index.html";
-            alert("Log out successful !!");
+            let mw = modal.create_complex_modal_with_text(
+                "Confirm Log Out",
+                "Are you sure to log out?",
+                "Yes", 
+                "No"
+            );
+
+            mw['footer_btn_1'].addEventListener("click", function(){
+                sessionStorage.clear();
+                util.removeSelf(mw['modal']);
+
+                window.location.href = "index.html";
+                return;
+            });
+
+            mw['footer_btn_2'].addEventListener("click", function(){
+                util.removeSelf(mw['modal']);
+                return;
+            });
+
             return;
         })
 
@@ -165,16 +190,16 @@ export function navbar_set_up(){
     }
     else{
         // non-registered user
-        let login = document.createElement("div");
-        login.classList.add("navbar-button");
+        let login = document.createElement("li");
+        login.classList.add("navbar-btn");
         login.textContent = "Login";
         login.addEventListener("click", function(){
             window.location.href = "login.html";
             return;
         })
 
-        let register = document.createElement("div");
-        register.classList.add("navbar-button");
+        let register = document.createElement("li");
+        register.classList.add("navbar-btn");
         register.textContent = "Register";
         register.addEventListener("click", function(){
             window.location.href = "register.html";

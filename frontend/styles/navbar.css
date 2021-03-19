@@ -6,6 +6,93 @@
 
 .navbar {
     display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    min-height: 60px;
+    width: 100%;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    background: linear-gradient(white, #f5f4f4);
+    font-family: 'nav-font', serif;
+    color: rgb(61, 61, 61);
+}
+
+.navbar .left,
+.navbar .right {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.navbar .left img {
+    padding-top: 2px;
+    padding-bottom: 0px;
+    padding-left: 10px;
+    padding-right: 10px;
+    width: auto;
+    height: 80px;
+    object-fit: contain;
+}
+
+.navbar ul {
+    padding-left: 10px;
+    padding-right: 20px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    list-style: none;
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.navbar ul li {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-size: 35px;
+}
+
+.navbar ul li.navbar-btn:hover {
+    cursor: pointer;
+    background-color: #ffe084;
+    border-radius: 5px;
+}
+
+.navbar ul li.search{
+    display: inline-block;
+}
+
+.navbar ul li.search i{
+    float:left;
+    font-size: 40px;
+    font-weight: normal;
+    padding-top: 5px;
+    padding-right: 5px;
+}
+
+.navbar ul li.search input {
+    float: right;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 3px;
+    width: 200px;
+    border: none;
+    font-size: 28px;
+    border-bottom: 1px solid black;
+    background-color: transparent;
+}
+
+.navbar ul li.search input:focus{
+    outline: none;
+}
+
+
+
+/* .navbar {
+    display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -81,7 +168,7 @@
 .navbar .search input:focus{
     border: none;
     outline: none;
-}
+} */
 
 
 

@@ -1,6 +1,6 @@
 import * as util from "./util.js";
 import {navbar_set_up} from "./navbar.js";
-
+import * as modal from "./modal.js";
 
 util.addLoadEvent(navbar_set_up)
 
@@ -39,17 +39,40 @@ document.getElementById('submit-signin').addEventListener('click', async ()=>{
             sessionStorage.setItem("token", data['token']);
             sessionStorage.setItem("role", data['role']);
             
+            let mw = modal.create_simple_modal_with_text(
+                "Login Success",
+                "",
+                "OK"
+            );
+
             if (data['role'] == 1){
-                alert("Welcome back customer !!");
+                mw['body_text'].textContent = "Welcome back customer !!";
             }
             else{
-                alert("Welcome back admin !!");
+                mw['body_text'].textContent = "Welcome back admin !!";
             }
 
-            window.location.href = "index.html";
+            mw['footer_btn'].addEventListener("click", function(){
+                util.removeSelf(mw['modal']);
+                window.location.href = "index.html";
+                return;
+            })
+
+            return;
         }
         else if (response.status == 403){
-            alert("Log in fail. Please double check your email and password.");
+            let mw = modal.create_simple_modal_with_text(
+                "Login Fail",
+                "Please double check your email and password..",
+                "OK"
+            );
+
+            mw['footer_btn'].addEventListener("click", function(){
+                util.removeSelf(mw['modal']);
+                return;
+            });
+
+            return;
         }
     }
     catch (e){
