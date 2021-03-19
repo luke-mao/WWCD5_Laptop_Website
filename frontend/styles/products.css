@@ -7,6 +7,10 @@ main {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    background-image: url(../img/many_laptops_opa_7.jpg);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
 }
 
 .filters {
@@ -52,6 +56,7 @@ main {
     margin: 10px;
     border: 1px solid #ccc;
     perspective: 1000px;
+    background-color: rgba(255, 255, 255, 0.65);
 }
 
 .product .inner{
@@ -61,6 +66,7 @@ main {
     text-align: center;
     transition: transform 0.7s;
     transform-style: preserve-3d;
+    padding-top: 5px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
 }
 
@@ -119,12 +125,12 @@ main {
 .inner .back {
     font-size: 20px;
     transform: rotateY(180deg);
+    border-collapse: collapse;
 }
 
 .back tr:nth-child(even) {
-    background-color: #f2f2f2;
+    background-color: rgb(214, 213, 213);
 }
-
 
 .product:hover{
     cursor: pointer;
@@ -149,10 +155,11 @@ main {
     padding-left: 12px;
     padding-right: 12px;
     border: 1px solid rgb(187, 185, 185);
+    background-color: white;
 }
 
 .shelves .pages .page-btn.current {
-    font-weight: bolder;
+    font-weight: 900;
 }
 
 .shelves .pages .page-btn:hover{

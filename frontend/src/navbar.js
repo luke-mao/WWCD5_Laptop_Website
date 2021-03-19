@@ -78,7 +78,6 @@ export function navbar_set_up(){
             return;
         }
 
-        alert("Not yet implemented");
         window.location.href = "products.html" + "?query=" + encodeURIComponent(str_query.trim());
         return;
     });
@@ -91,13 +90,13 @@ export function navbar_set_up(){
     if (sessionStorage.getItem("token")){
         if (sessionStorage.getItem("role") == 0){
             // admin
-            let customers = document.createElement("div");
-            customers.classList.add("navbar-button");
-            customers.textContent = "Customers";
-            customers.addEventListener("click", function(){
-                window.location.href = "customers.html";
-                return;
-            })
+            // let customers = document.createElement("div");
+            // customers.classList.add("navbar-button");
+            // customers.textContent = "Customers";
+            // customers.addEventListener("click", function(){
+            //     window.location.href = "customers.html";
+            //     return;
+            // })
 
             let orders = document.createElement("div");
             orders.classList.add("navbar-button");
@@ -124,7 +123,7 @@ export function navbar_set_up(){
             })
 
             util.appendListChild(navbar_right,[
-                customers, orders, stocks, reports
+                orders, stocks, reports
             ]);
         }
         else{

@@ -15,9 +15,19 @@ async function product_page_set_up(){
     filters_set_up(filters);
 
     let shelves = main.getElementsByClassName("shelves")[0];
+
+    // check if there is query search
+    let url = "http://localhost:5000/item/";
+    let query = get_query_search(window.location.search);
+
+    if (query !== null){
+        url += "search/" + query + "/0";
+    }
+    else{
+        url += "page/0";
+    }
     
     // fetch for data
-    let url = "http://localhost:5000/item/page/0";
     let init = {
         method: "GET",
         headers: {
@@ -36,6 +46,25 @@ async function product_page_set_up(){
         console.log(err);
     }
 }
+
+
+function get_query_search(str){
+    if (str == ""){
+        return null;
+    }
+
+    str = str.substring(1,);
+    let param_pair = str.split("&")[0];
+    let param_pair_split = param_pair.split("=");
+
+    if (param_pair_split[0] !== 'query'){
+        return null;
+    }
+
+    return param_pair_split[1];
+}
+
+
 
 
 async function filters_set_up(div_filters){
@@ -323,7 +352,12 @@ function pages_set_up(pages, current_page, max_page){
             let select = document.getElementsByClassName("dropdown")[0];
 
             let url = "http://localhost:5000/item/" + select.value + all_btns[i].getAttribute("page_id");
-            
+
+            // here not finished !!!!!!! combine the query search and other things xxxxxx
+            ////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////
+
+
             let init = {
                 method: 'GET',
                 headers: {
