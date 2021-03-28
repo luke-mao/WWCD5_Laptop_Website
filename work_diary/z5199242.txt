@@ -11,3 +11,6 @@ In week3, start my api's part which is about user's functions and have an acknow
  In this week, i finished 2 functions in backend which is assigned by the group.The first one is to get 
  user's information according to its user id,which includes address,mobile and postcode. The second function 
  is to update user's information according to its latest input and it would also be updated in database.
+
+week5:
+In this week, i finish the view history api function
