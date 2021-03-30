@@ -14,3 +14,6 @@ Do some research and preparation for chatbot part
 Week 4
 finish backend/rating module
 Continue doing some research and preparation for chatbot part
+
+Week 5
+complete RetrospectiveA report
