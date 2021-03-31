@@ -204,10 +204,61 @@ new_item = api.model('new_item', {
 })
 
 
+# when the customer browsing the webpage
+# there are some filters to add, but they are optional
+filter_item = api.model('filter_item', {
+    "order_method": fields.String,  # view, name, price, (single choice only)
+    "order": fields.String,         # asc, desc          (single choice only)
+    "price_min": fields.Float,      
+    "price_max": fields.Float,  
+    "cpu": fields.List(fields.String),           # only two options: Intel, Amd  (multiple choice)
+    "storage_size": fields.List(fields.String),  # <= 256, 256 to 512, 512 to 1T, 1T upwards (multiple choice)
+    "memory_size": fields.List(fields.String),   # <= 8, 8 to 16, 16 upwards  (multiple choice)
+    "graphic_model": fields.List(fields.String), # RTX 10 series, RTX 20 series, RTX 30 series, Intel core graphics, Radeon graphics, Quadro graphics (multiple choice)
+    "screen_size": fields.List(fields.String),  # < 13.3, 13.3 to 15.6, 15.6 to 17.3 17.3 upwards (multiple choice)
+    "keyword": fields.String,                     # keyword
+});
 
+# rating
+rating_parser = reqparse.RequestParser()
+rating_parser.add_argument(
+    'item_id',
+    type=int,
+    help="item_id",
+    location="args"
+)
 
+# filter item: we provide filters among many ways
+filter = reqparse.RequestParser()
 
+filter.add_argument("order_method", type=str, help="view, name, price (single choice only)", location="args")
+filter.add_argument("order", type=str, help="asc, desc, (single choice only)", location="args")
+filter.add_argument("price_min", type=float, location="args")
+filter.add_argument("price_max", type=float, location="args")
+filter.add_argument("cpu", type=int, help="0=Intel, 1=Amd (multiple choice)", action="append", location="args")
+filter.add_argument("keyword", type=str, help="string, use %20 to replace the space", location="args")
 
+filter.add_argument(
+    "storage", type=int, 
+    help="0: <= 256GB, 1: from 256 <= 512 GB, 2: from 512 <= 1TB, 3: 1TB up (multiple choice)", 
+    action="append", location="args"
+)
 
+filter.add_argument(
+    "memory", type=int, 
+    help="0: <= 8GB, 1: 8GB to <=16GB, 2: 16 GB up (multiple choice)", 
+    action="append", location="args"
+)
 
+filter.add_argument(
+    "graphic", type=int, 
+    help="0: RTX 10 series, 1: RTX 20 series, 2: RTX 30 series (multiple choice)",
+    action="append", location="args"
+)
+
+filter.add_argument(
+    "screen", type=int,
+    help="0: <= 13.3, 1: from 13.3 to 15.6, 2: 15.6  up (multiple choice)", 
+    action="append", location="args"
+)
 

@@ -65,6 +65,59 @@ def get_max_page_num(total, item_per_page):
     return max_page
 
 
+# the page_id must be positive, usually around max 10 pages
+def filter_page_id(page_id):
+    if not page_id:
+        abort(400, "No page_id")
+    
+    try:
+        page_id = int(page_id)
+    except ValueError:
+        abort(400, "Invalid page_id")
+
+    if page_id < 0:
+        abort(400, "Invalid page_id")
+    
+    return page_id
+
+
+def filter_price(price, default_price):
+    if price is None:
+        return default_price
+
+    try:
+        price_2 = float(price)
+    except ValueError:
+        abort(400, "Price is not a float")
+    
+    if price_2 < 0:
+        abort(400, "Invalid price < 0")
+    
+    return price 
+
+
+def filter_param(param, default_list):
+    if param is not None:
+        param = list(set(param))
+        param = [i for i in param if i in default_list]
+
+    return param 
+
+
+def configure_conds(params, conds):
+    if params is None:
+        return None 
+    
+    result = "({}".format(conds[int(params[0])])
+
+    for i in params[1:]:
+        result += " OR {}".format(conds[int(i)])
+    
+    result += ")"
+
+    return result
+
+
 @api.route('/id/<item_id>')
 class Item_with_id(Resource):
     @api.response(200, "OK", models.item_profile)
@@ -126,295 +179,127 @@ class Item_with_id(Resource):
 
         except Exception as e:
             print(e)
-            return "Internal server error", 500     
+            return "Internal server error", 500              
 
 
-@api.route('/page/<page_id>')
-class Item_with_page_id(Resource):
-    @api.response(200, "OK", models.item_profile_list)
-    @api.response(500, "Internal server error")
-    @api.response(400, "Invalid page id")
-    @api.response(404, "No more pages.")
-    @api.doc(description="""
-        Return a list of items, order = ascending order of item_id.
-        Each page returns 20 laptops. Currently we support around 12 pages, so the range = 0 to 11.
-        If page_id is not found, default page = 0.
-        The item must have status = 1. 
-    """)
-    def get(self, page_id):
-        if not page_id:
-            page_id = 0
-        
-        try:
-            page_id = int(page_id)
-        except ValueError:
-            return "page_id must be an integer", 400 
-        
-        if page_id < 0:
-            return "Page_id must be a positive integer", 400 
-        
-
-        try:
-            with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
-                conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
-                cur = conn.cursor()
-
-                # LIMIT row_count, offset
-                sql = """SELECT item_id FROM item WHERE status = 1 LIMIT ? OFFSET ?"""
-                sql_param = (20, page_id * 20)
-
-                cur.execute(sql, sql_param)
-                item_id_list = cur.fetchall()
-
-                if not item_id_list:
-                    return "No more pages", 404
-
-                result = {
-                    'current_page': page_id,
-                    'max_page': None,
-                    'data': get_all_profiles(item_id_list)
-                }
-                
-                # get max page count
-                sql_count = """SELECT count(*) AS total FROM item WHERE status = 1"""
-                cur.execute(sql_count)
-                total_items = cur.fetchone()['total']
-                
-                result['max_page'] = get_max_page_num(total_items, 20)
-                
-                return result, 200 
-
-        except Exception as e:
-            print(e)
-            return "Internal server error", 500             
-
-
-@api.route('/order/price/<order>/<page_id>')
-@api.route('/order/alphabet/<order>/<page_id>')
-class Item_with_price_alphabet_order(Resource):
-    @api.response(200, "OK", models.item_profile_list)
-    @api.response(500, "Internal server error")
-    @api.response(400, "Invalid page id / price order")
-    @api.response(404, "No more pages.")
-    @api.doc(description="""
-        Get items with price / alphabet order asc or desc. Put the page id and order type in the header.
-        Currently we have around 12 pages, with each page containing 20 laptops.
-    """)
-    def get(self, order, page_id):
-        if not order:
-            return "No order", 400
-        
-        if order != "asc" and order != "desc":
-            return "Invalid order", 400
-
-        if not page_id:
-            return "No page_id", 400
-        
-        try:
-            page_id = int(page_id)
-        except ValueError:
-            return "Invalid page_id", 400
-
-        if page_id < 0:
-            return "Invalid page_id", 400
-        
-
-        try:
-            with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
-                conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
-                cur = conn.cursor()
-
-                sql = None 
-
-                if "price" in request.path:
-                    sql = """
-                        SELECT item_id 
-                        FROM item 
-                        WHERE status = 1
-                        ORDER BY price {}
-                        LIMIT ? OFFSET ?
-                    """.format(order)
-                else:
-                    sql = """
-                        SELECT item_id 
-                        FROM item 
-                        WHERE status = 1
-                        ORDER BY name {}
-                        LIMIT ? OFFSET ?
-                    """.format(order)
-
-                sql_param = (20, page_id * 20)
-
-                cur.execute(sql, sql_param)
-                item_id_list = cur.fetchall()
-
-                if not item_id_list:
-                    return "No more pages", 404
-
-                result = {
-                    'current_page': page_id,
-                    'max_page': None,
-                    'data': get_all_profiles(item_id_list)
-                }
-
-                # get max page count
-                sql_count = """SELECT count(*) AS total FROM item WHERE status = 1"""
-                cur.execute(sql_count)
-                total_items = cur.fetchone()['total']
-                
-                result['max_page'] = get_max_page_num(total_items, 20)
-                
-                return result, 200 
-
-        except Exception as e:
-            print(e)
-            return "Internal server error", 500     
-
-
-@api.route('/order/trending/<page_id>')
-class Item_with_trending_order(Resource):
-    @api.response(200, "OK", models.item_profile_list)
-    @api.response(500, "Internal server error")
-    @api.response(400, "Invalid page id")
-    @api.response(404, "No more pages.")
-    @api.doc(description="""
-        Get items with descending trending order. Put the page id in the header.
-        Currently we have around 12 pages, with each page containing 20 laptops.
-        Trending is determined using the "view" attribute in the simple profile.
-    """)
-    def get(self, page_id):
-        if not page_id:
-            return "No page_id", 400
-        
-        try:
-            page_id = int(page_id)
-        except ValueError:
-            return "Invalid page_id", 400
-
-        if page_id < 0:
-            return "Invalid page_id", 400
-        
-
-        try:
-            with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
-                conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
-                cur = conn.cursor()
-
-                sql = """
-                    SELECT item_id 
-                    FROM item 
-                    WHERE status = 1
-                    ORDER BY view DESC
-                    LIMIT ? OFFSET ?
-                """
-
-                sql_param = (20, page_id * 20)
-
-                cur.execute(sql, sql_param)
-                item_id_list = cur.fetchall()
-
-                if not item_id_list:
-                    return "No more pages", 404
-
-                result = {
-                    'current_page': page_id,
-                    'max_page': None,
-                    'data': get_all_profiles(item_id_list)
-                }
-
-                # get max page count
-                sql_count = """SELECT count(*) AS total FROM item WHERE status = 1"""
-                cur.execute(sql_count)
-                total_items = cur.fetchone()['total']
-                
-                result['max_page'] = get_max_page_num(total_items, 20)
-                
-                return result, 200 
-
-        except Exception as e:
-            print(e)
-            return "Internal server error", 500     
-
-
-@api.route('/search/<search_str>/<page_id>')
-class Search_str(Resource):
+@api.route('/search/<page_id>')
+class Search(Resource):
     @api.response(200, "OK", models.item_profile_list)
     @api.response(500, "Internal server error")
     @api.response(400, "Malformed request")
+    @api.expect(models.filter)
     @api.doc(description="""
-        User inputs a search string, and the backend returns the items with closest name similarity. 
-        The similarity is measured using Jaro–Winkler distance. 
-        In computer science and statistics, the Jaro–Winkler distance is a string metric measuring an edit distance between two sequences. 
-        It is a variant proposed in 1990 by William E. Winkler of the Jaro distance metric (1989, Matthew A. Jaro).
-        As usual, each page has 20 computers. 
+        We provide an extensive search method for the user to filter items and obtain what he wishes to see. 
+        Filters include: order, price, cpu model, memory size, storage size, graphic model, screen size, 
+        and keyword search. These filters have a specified range of values, for simplicity, we will ignore all invalid values,
+        and replace with our default values to carry on. 
+        Currently we have around 240 computers in the dataset. 
     """)
-    def get(self, search_str, page_id):
-        # check search_str
-        if not search_str:
-            return "Require the search string input", 400 
+    def get(self, page_id):
+        # deal with the page_id first
+        page_id = filter_page_id(page_id)
+
+        # deal with all values
+        order_method = "view"
+        if request.args.get("order_method") in ["view", "name", "price"]:
+            order_method = request.args.get("order_method")
         
-        search_str = search_str.lower()
-
-        # check page_id
-        if not page_id:
-            return "No page_id", 400
+        order = "asc"
+        if request.args.get("order") in ["asc", "desc"]:
+            order = request.args.get("order")
         
-        try:
-            page_id = int(page_id)
-        except ValueError:
-            return "Invalid page_id", 400
+        price_min = filter_price(request.args.get("price_min"), 0)
+        price_max = filter_price(request.args.get("price_max"), 10000)
 
-        if page_id < 0:
-            return "Invalid page_id", 400
+        if price_max < price_min:
+            abort(400, "Price max should > price min")
 
+        # variable to store all conditions
+        conds = []
+        conds.append("(item.price >= {} AND item.price <= {})".format(price_min, price_max))
 
-        # get all names
+        # keyword, the %20 symbol is removed automatically
+        keyword = request.args.get("keyword")
+
+        # multi-valued attributes
+        cpu = filter_param(request.args.get("cpu"), ["0", "1"])
+        storage = filter_param(request.args.get("storage"), ["0", "1", "2", "3"])
+        memory = filter_param(request.args.get("memory"), ["0", "1", "2"])
+        graphic = filter_param(request.args.get("graphic"), ["0", "1", "2"])
+        screen = filter_param(request.args.get("screen"), ["0", "1", "2", "3"])
+
+        cpu_conds = [
+            "lower(laptop.cpu_prod) LIKE '%intel%'", 
+            "lower(laptop.cpu_prod) LIKE '%amd%'",
+        ]
+
+        storage_conds = [
+            "CAST(laptop.primary_storage_cap AS INTEGER) <= 256",
+            "(CAST(laptop.primary_storage_cap AS INTEGER) > 256 AND CAST(laptop.primary_storage_cap AS INTEGER) <= 512)",
+            "(CAST(laptop.primary_storage_cap AS INTEGER) > 512 AND CAST(laptop.primary_storage_cap AS INTEGER) <= 1024)",
+            "CAST(laptop.primary_storage_cap AS INTEGER) > 1024",
+        ]
+
+        memory_conds = [
+            "CAST(laptop.memory_size AS INTEGER) <= 8",
+            "(CAST(laptop.memory_size AS INTEGER) > 8 AND CAST(laptop.memory_size AS INTEGER) <= 16)",
+            "CAST(laptop.memory_size AS INTEGER) > 16",
+        ]
+
+        graphic_conds = [
+            "laptop.gpu_model LIKE '%GTX 1%'",
+            "laptop.gpu_model LIKE '%RTX 2%'",
+            "laptop.gpu_model LIKE '%RTX 3%'",
+        ]
+
+        screen_conds = [
+            "CAST(laptop.display_size AS REAL) <= 13.3",
+            "(CAST(laptop.display_size AS REAL) > 13.3 AND CAST(laptop.display_size AS REAL) <= 15.6)",
+            "CAST(laptop.display_size AS REAL) > 15.6",
+        ]
+
+            
+        # for each variable list, if one condition, use AND to join, if multiple condition
+        # bracket them, and inside use OR to join
+        conds.append(configure_conds(cpu, cpu_conds))
+        conds.append(configure_conds(storage, storage_conds))
+        conds.append(configure_conds(memory, memory_conds))
+        conds.append(configure_conds(graphic, graphic_conds))
+        conds.append(configure_conds(screen, screen_conds))
+
+        # remove all None
+        conds = [cond for cond in conds if cond is not None]
+        
+
         try:
             with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
                 conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
                 cur = conn.cursor()
 
-                sql_1 = "SELECT item_id, name FROM item WHERE status = 1"
-                cur.execute(sql_1)
+                sql = "SELECT item.item_id FROM item, laptop WHERE item.item_id = laptop.item_id "
 
-                id_name_list = cur.fetchall()
-
-                # calculate the distance for all
-                for each in id_name_list:
-                    name = each['name'].lower()
-                    each['similarity'] = jaro_winkler.normalized_similarity(search_str, name)
+                for cond in conds:
+                    sql += "AND {} \n".format(cond)
                 
-                # sort the list
-                sorted_id_name_list = sorted(
-                    id_name_list, 
-                    key=lambda x: x['similarity'],
-                    reverse=True
-                )
+                sql += "ORDER BY {} {}".format(order_method, order)
+                
+                cur.execute(sql)
+                item_id_list = cur.fetchall()
 
-                # similarity threshold 0.55
-                THRESHOLD = 0.6
-                selected_id_name_list = []
+                # if no result, or the id list does not reach this page id
+                if (not item_id_list) or (len(item_id_list) < page_id * 20):
+                    abort(404, "No more pages")
 
-                for each in sorted_id_name_list:
-                    if each['similarity'] > THRESHOLD:
-                        selected_id_name_list.append(each)
-                    else:
-                        break
-        
-                # each page has 20 items, check length
-                if (len(selected_id_name_list) > page_id * 20):
-                    result = {
-                        'current_page': page_id,
-                        'max_page': get_max_page_num(len(selected_id_name_list), 20),
-                        'data': get_all_profiles(sorted_id_name_list[page_id * 20 : (page_id+1) * 20])
-                    }
+                result = {
+                    'current_page': page_id,
+                    'max_page': get_max_page_num(len(item_id_list), 20),
+                    'data': get_all_profiles(item_id_list)
+                }
 
-                    return result, 200
+                return result, 200 
 
-                else:
-                    return "No more pages", 200
 
         except Exception as e:
             print(e)
-            return "Internal server error", 500            
+            abort(500, "Internal server error")     
 
