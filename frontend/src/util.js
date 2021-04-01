@@ -165,7 +165,7 @@ export function cartRemoveItem(item_id){
     let cart = getCart();
 
     if (item_id in cart){
-        delete cart['item_id'];
+        delete cart[item_id];
         saveToCart(cart);
     }
     else{

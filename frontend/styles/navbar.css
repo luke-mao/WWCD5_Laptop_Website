@@ -63,3 +63,8 @@
     border-radius: 5px;
 }
 
+.navbar ul li i {
+    color: rgb(197, 100, 87);
+    font-size: 20px;
+}
+

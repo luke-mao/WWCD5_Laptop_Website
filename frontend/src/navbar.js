@@ -123,9 +123,18 @@ export function navbar_set_up(){
             mycart.textContent = "shopping_cart";
             mycart.title = "Shopping Cart";
             mycart.addEventListener("click", function(){
-                window.location.href = "cart.html";
+                window.location.href = "checkout.html";
                 return;
             })
+
+            // if something in cart, add a symbol
+            if (! util.isCartEmpty()){
+                let snooze = document.createElement("i");
+                snooze.classList.add("material-icons");
+                snooze.textContent = "snooze";
+                mycart.appendChild(snooze);
+            }
+
 
             util.appendListChild(navbar_right, [
                 myaccount, mycart
