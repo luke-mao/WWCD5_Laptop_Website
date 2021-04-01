@@ -66,5 +66,8 @@
 .navbar ul li i {
     color: rgb(197, 100, 87);
     font-size: 20px;
+    position: relative;
+    top: -20px;
+    right: 0px;
 }
 

@@ -41,19 +41,47 @@ function load_cart(){
         return;
     }
 
+    // get cart, and display
     let cart_data = util.getCart();
-    
-    console.log(cart_data);
-    
     let div_cart = document.getElementsByClassName("cart")[0];
-    let div_checkout = document.getElementsByClassName("checkout")[0];
 
     let cart_table = document.createElement("table");
     fill_cart_table(cart_table, cart_data);
     div_cart.appendChild(cart_table);
 
+    // below the cart table, two buttons: checkout, go back shopping
+    let div_below_cart = document.createElement("div");
+    div_below_cart.classList.add("btns-below-cart");
+
+    let btn_back = document.createElement("button");
+    btn_back.textContent = "Go Back";
+
+    let btn_open_checkout = document.createElement("button");
+    btn_open_checkout.textContent = "Checkout";
+
+    // link
+    div_cart.appendChild(div_below_cart);
+    util.appendListChild(div_below_cart, [btn_back, btn_open_checkout]);
+
+    // event listener
+    btn_back.addEventListener("click", function(){
+        // go back
+        history.back();
+        return;
+    });
 
 
+    // for the checkout
+    let div_checkout = document.getElementsByClassName("checkout")[0];
+    prepare_checkout(div_checkout);
+
+    btn_open_checkout.addEventListener("click", function(){
+        div_checkout.style.display = "block";
+        div_checkout.scrollIntoView();
+        return;
+    });
+
+    return;
 }
 
 
@@ -74,8 +102,17 @@ function fill_cart_table(table, cart_data){
     table.appendChild(tr);
     util.appendListChild(tr, [th1, th3, th4]);
 
+    // prepare the last line, for the total
+    let td_total_amount = document.createElement("td");
+    td_total_amount.textContent = `$ ${util.cartGetTotal()}`;
+
+
     // now loop the cart
     for (let item_id in cart_data){
+        if (item_id == 'total'){
+            continue;   
+        }
+
         let tr2 = document.createElement("tr");
 
         // image
@@ -88,24 +125,33 @@ function fill_cart_table(table, cart_data){
         // item name
         let td2 = document.createElement("td");
         td2.textContent = cart_data[item_id]['name'];
+        td2.classList.add("name");
+        td2.addEventListener("click", function(){
+            window.location.href = "item.html?item_id=" + item_id;
+            return;
+        });
 
         // quantity: minus btn, figure, plus btn, remove button
         let td3 = document.createElement("td");
+
+        let div_td3 = document.createElement("div");
+        div_td3.classList.add("adjust");
         
         let minus = document.createElement("div");
-        minus.classList.add("adjust");
-        minus.textContent = "-";
+        minus.classList.add("material-icons");
+        minus.textContent = "remove_circle_outline";
         
         let fig = document.createElement("div");
-        fig.classList.add("quantity-figure");
+        fig.classList.add("quantity");
         fig.textContent = cart_data[item_id]['quantity'];
 
         let plus = document.createElement("div");
-        plus.classList.add("adjust");
-        plus.textContent = "+";
+        plus.classList.add("material-icons");
+        plus.textContent = "add_circle_outline";
 
         let remove = document.createElement("div");
         remove.classList.add("material-icons");
+        remove.classList.add("remove");
         remove.textContent = "delete";
         remove.title = "Remove Item";
 
@@ -117,7 +163,8 @@ function fill_cart_table(table, cart_data){
         table.appendChild(tr2);
         util.appendListChild(tr2, [td1, td2, td3, td4]);
         td1.appendChild(img);
-        util.appendListChild(td3, [minus, fig, plus, remove]);
+        td3.appendChild(div_td3);
+        util.appendListChild(div_td3, [minus, fig, plus, remove]);
 
         // adjust plus and minus, or click remove
         remove.addEventListener("click", function(){
@@ -163,6 +210,7 @@ function fill_cart_table(table, cart_data){
             util.cartAddQuantity(item_id);
             
             fig.textContent = parseInt(fig.textContent) + 1;
+            td_total_amount.textContent = `$ ${util.cartGetTotal()}`;
 
             return;
         });
@@ -177,14 +225,42 @@ function fill_cart_table(table, cart_data){
 
             util.cartReduceQuantity(item_id);
             fig.textContent = parseInt(fig.textContent) - 1;
+            td_total_amount.textContent = `$ ${util.cartGetTotal()}`;
 
             return;
         });
     }
+
+    // the last line: skip the first two columns
+    // 3rd col = Total, 4th col = amount
+    let tr_last = document.createElement("tr");
+    tr_last.classList.add("last-row");
+
+    let td_empty = document.createElement("td");
+
+    let td_total = document.createElement("td");
+    td_total.textContent = "Total";
+
+    table.appendChild(tr_last);
+    util.appendListChild(
+        tr_last, 
+        [td_empty, td_empty.cloneNode(true), td_total, td_total_amount]
+    );
 }
 
 
+function prepare_checkout(div){
+    // create the payment platform in the div
+    return;
 
+
+
+
+
+
+
+
+}
 
 
 

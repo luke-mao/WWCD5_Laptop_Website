@@ -78,7 +78,7 @@ export function addToCart(item_id, item_name, src, price){
     let cart = getCart();
 
     if (cart == null){
-        cart = {};
+        cart = {'total': 0};
     }
 
     if (item_id in cart){
@@ -94,7 +94,11 @@ export function addToCart(item_id, item_name, src, price){
         };
     }
 
+    cart['total'] = parseFloat(cart['total']) + parseFloat(cart[item_id]['price']);
+    cart['total'] = Math.round(cart['total'] * 100) / 100;
+
     saveToCart(cart);
+
     return;
 }
 
@@ -116,6 +120,10 @@ export function cartAddQuantity(item_id){
         }
 
         cart[item_id]['quantity'] += 1;
+        
+        cart['total'] = parseFloat(cart['total']) + parseFloat(cart[item_id]['price']);
+        cart['total'] = Math.round(cart['total'] * 100) / 100;
+
         saveToCart(cart);
     }
     else{
@@ -136,6 +144,9 @@ export function cartReduceQuantity(item_id){
     let cart = getCart();
 
     if (item_id in cart){
+        cart['total'] = parseFloat(cart['total']) - parseFloat(cart[item_id]['price']);
+        cart['total'] = Math.round(cart['total'] * 100) / 100;
+
         // the frontend should preven the quantity go over 10
         if (cart[item_id]['quantity'] == 1){
             delete cart['item_id'];
@@ -165,6 +176,9 @@ export function cartRemoveItem(item_id){
     let cart = getCart();
 
     if (item_id in cart){
+        cart['total'] = parseFloat(cart['total']) - parseInt(cart[item_id]['quantity']) * parseFloat(cart[item_id]['price']);
+        cart['total'] = Math.round(cart['total'] * 100) / 100;
+
         delete cart[item_id];
         saveToCart(cart);
     }
@@ -186,5 +200,18 @@ export function isCartEmpty(){
     let cart = getCart();
     return cart == null;
 }
+
+export function cartGetTotal(){
+    if (isCartEmpty()){
+        alert("error");
+        console.log(`Cart Error: cart is empty for the cart get total function`);
+        return;
+    }
+
+    let cart = getCart();
+    return cart['total'];
+}
+
+
 
 

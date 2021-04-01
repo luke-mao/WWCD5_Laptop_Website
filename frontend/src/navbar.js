@@ -111,7 +111,7 @@ export function navbar_set_up(){
             let myaccount = document.createElement("li");
             myaccount.classList.add("material-icons");
             myaccount.textContent = "account_box";
-            myaccount.title = "My Profile";
+            myaccount.title = "My Account";
             myaccount.addEventListener("click", function(){
                 window.location.href = "account.html";
                 return;
