@@ -77,7 +77,6 @@ main {
     padding-left: 25px;
     padding-top: 30px;
     padding-bottom: 20px;
-    text-align: left;
 }
 
 .simple .simple-profile .name{
@@ -100,6 +99,32 @@ main {
     font-size: 28px;
     padding-top: 3px;
     padding-bottom: 3px;
+}
+
+.simple .simple-profile button {
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    font-size: 28px;
+    font-weight: normal;
+    margin-top: 40px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.simple .simple-profile button:hover {
+    cursor: pointer;
+}
+
+.simple .simple-profile .add-to-cart {
+    background-color: #f3ce73;
+}
+
+.simple .simple-profile .add-to-cart.in-cart {
+    background-color: #d3806c;
 }
 
 

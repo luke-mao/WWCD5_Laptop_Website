@@ -114,45 +114,6 @@ function put_specification(data, div){
     title.classList.add("title");
     title.textContent = "Technical Specification";
     header.appendChild(title);
-
-    if (util.check_admin()){
-        let btn_status = document.createElement("button");
-        btn_status.classList.add("btn-status");
-        
-        if (data['simple']['status'] == 1){
-            btn_status.textContent = "Remove from shelf";
-        }
-        else{
-            btn_status.textContent = "Continue on shelf";
-        }
-
-        btn_status.addEventListener("click", async function(){
-            alert("Not yet finish");
-            return;
-        });
-
-        let btn_edit = document.createElement("button");
-        btn_edit.classList.add("btn-edit");
-        btn_edit.textContent = "Edit";
-
-        btn_edit.addEventListener("click", async function(){
-            let mw = modal.create_simple_modal_with_text(
-                "Edit Help",
-                "Click on the row to edit..",
-                "OK"
-            );
-
-            mw['footer_btn'].addEventListener("click", function(){
-                util.removeSelf(mw['modal']);
-                return;
-            })
-
-            return;
-        })
-
-        // link
-        util.appendListChild(header, [btn_status, btn_edit]);
-    }
        
     
     // the table: several sections: 
@@ -458,186 +419,6 @@ function create_table_with_input(item_id, data){
         // link
         table.appendChild(tr);
         util.appendListChild(tr, [td1, td2]);
-
-        // add double click event listener
-        // but dblclick is not working, change to single click 
-        // click on the row, pop up the modal window with all attributes
-        if (sessionStorage.getItem("role") == 0){
-            tr.addEventListener("click", async function(){
-                let mw = modal.create_complex_modal_with_text(
-                    "Edit Window",
-                    "Attributes related to this row:",
-                    "Submit", 
-                    "Cancel"
-                );
-    
-                // close button
-                mw['footer_btn_2'].addEventListener("click", function(){
-                    util.removeSelf(mw['modal']);
-                    return;
-                });
-    
-                // list all attributes associated with this row
-                // create a table
-                // 3 columns: Attribute, Original Value, New Value
-                let attributes = values_list[1];
-                
-                let att_table = document.createElement("table");
-                mw['body'].appendChild(att_table);
-    
-                let tr2 = document.createElement("tr");
-                att_table.appendChild(tr2);
-    
-                let th1 = document.createElement("th");
-                th1.textContent = "Attribute Name";
-    
-                let th2 = document.createElement("th");
-                th2.textContent = "Old Value";
-    
-                let th3 = document.createElement("th");
-                th3.textContent = "New Value";
-    
-                util.appendListChild(tr2, [th1, th2, th3]);
-    
-                for (let key2 in attributes){
-                    let tr3 = document.createElement("tr");
-                    att_table.appendChild(tr3);
-    
-                    // 3 columns
-                    let td3 = document.createElement("td");
-                    td3.textContent = key2;
-    
-                    let td4 = document.createElement("td");
-                    td4.textContent = attributes[key2];
-    
-                    let td5 = document.createElement("td");
-                    // add an input box into it
-                    let td5_input = document.createElement("input");
-                    td5_input.type = "text";
-                    td5_input.value = attributes[key2];
-                    td5.appendChild(td5_input);
-    
-                    util.appendListChild(tr3, [td3, td4, td5]);
-                }
-    
-                // click on the submit button
-                mw['footer_btn_1'].addEventListener("click", async function(){
-                    // check which is changed
-                    let changed_attributes = {};
-    
-                    let all_rows = att_table.childNodes;
-                    for (let i = 1; i < all_rows.length; i++){
-                        let r = all_rows[i];
-                        let r_childs = r.childNodes;
-    
-                        // check the second child and the third child child input value
-                        if (r_childs[1].textContent != r_childs[2].firstChild.value){
-                            changed_attributes[r_childs[0].textContent] = r_childs[2].firstChild.value;
-                        }
-                    }
-    
-                    // check if nothing changed
-                    if (Object.keys(changed_attributes).length === 0){
-                        util.removeSelf(mw['modal']);
-    
-                        // create another model window
-                        let mw2 = modal.create_simple_modal_with_text(
-                            "Edit Error",
-                            "Please update the value before submit..",
-                            "OK"
-                        );
-    
-                        mw2['modal'].style.zindex = "2";
-    
-                        mw2['footer_btn'].addEventListener("click", function(){
-                            util.removeSelf(mw2['modal']);
-                            tr.click(); // reopen the previous modal window
-                            return;
-                        })
-    
-                        return;
-                    }
-    
-                    // new updates: post
-                    let url = "http://localhost:5000/item-backend/" + item_id;
-                    let init = {
-                        method: 'PUT',
-                        headers: {
-                            'Authorization': 'token ' + sessionStorage.getItem("token"),
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                        },
-                        body: JSON.stringify(changed_attributes),
-                    };
-    
-                    console.log(init);
-    
-                    try{
-                        let response = await fetch(url, init);
-    
-                        if (response.ok){
-                            util.removeSelf(mw['modal']);
-    
-                            // success update, reload the page
-                            let mw3 = modal.create_simple_modal_with_text(
-                                "Edit Status", 
-                                "Successful edit !!",
-                                "OK"
-                            );
-    
-                            mw3['footer_btn'].addEventListener("click", function(){
-                                util.removeSelf(mw3['modal']);
-                                window.location.reload();
-                            })
-                            
-                            return;
-                        }
-                        else if (response.status == 403){
-                            util.removeSelf(mw['modal']);
-    
-                            // success update, reload the page
-                            let mw3 = modal.create_simple_modal_with_text(
-                                "Authentication Error", 
-                                "Sorry. Please log in again to ensure your account security..",
-                                "OK"
-                            );
-    
-                            mw3['footer_btn'].addEventListener("click", function(){
-                                util.removeSelf(mw3['modal']);
-    
-                                sessionStorage.clear();
-                                window.location.href = "login.html";
-                            })
-                            
-                            return;                        
-                        }
-                        else{
-                            util.removeSelf(mw['modal']);
-    
-                            // success update, reload the page
-                            let mw3 = modal.create_simple_modal_with_text(
-                                "System Error", 
-                                "Sorry. Something wrong with the database. Please try again later..",
-                                "OK"
-                            );
-    
-                            mw3['footer_btn'].addEventListener("click", function(){
-                                util.removeSelf(mw3['modal']);
-                                window.location.reload();
-                                return;
-                            })
-                            
-                            return;  
-                        }
-                    }
-                    catch(err){
-                        alert("error");
-                        console.log(err);
-                    }
-                });
-            });
-        }
-
     }
 
     return div;
@@ -753,6 +534,62 @@ function put_profile(data, div){
     util.appendListChild(list, [
         li_display, li_cpu, li_gpu, li_memory, li_storage
     ])
+
+
+    // for customer, add the "purchase button"
+    if (sessionStorage.getItem("role") == 1){
+        let purchase = document.createElement("button");
+        purchase.classList.add("add-to-cart");
+        purchase.setAttribute("item_id", data['simple']['item_id']);
+    
+        if (util.isItemInCart(data['simple']['item_id'])){
+            purchase.textContent = "Added To Cart";
+            purchase.classList.add("in-cart");
+        }
+        else{
+            purchase.textContent = "Add To Cart";
+        }
+
+        // purchase onclick
+        purchase.addEventListener("click", function(){
+            if (purchase.classList.contains("in-cart")){
+                // already in cart
+                let mw = modal.create_complex_modal_with_text(
+                    "Item Already In Cart",
+                    "Dear Customer. The item is in your cart already.",
+                    "View Cart", 
+                    "Close",
+                );
+
+                mw['footer_btn_1'].addEventListener("click", function(){
+                    window.location.href = "checkout.html";
+                    return;
+                })
+
+                mw['footer_btn_2'].addEventListener("click", function(){
+                    util.removeSelf(mw['modal']);
+                    return;
+                })
+
+                return;
+            }
+
+            // add to cart
+            util.addToCart(
+                data['simple']['item_id'], 
+                data['simple']['name'], 
+                data['photos'][0],
+                data['simple']['price'],
+            );
+
+            purchase.classList.add("in-cart");
+            purchase.textContent = "Added To Cart";
+
+            return;
+        });
+
+        div.appendChild(purchase);
+    }
 
     return;
 }

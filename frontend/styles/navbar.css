@@ -50,11 +50,11 @@
 .navbar ul li {
     margin-left: 5px;
     margin-right: 5px;
-    padding-left: 15px;
-    padding-right: 15px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    font-size: 35px;
+    padding-left: 13px;
+    padding-right: 13px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    font-size: 40px;
 }
 
 .navbar ul li:hover {
