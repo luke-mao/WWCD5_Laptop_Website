@@ -5,7 +5,7 @@ import * as modal from "./modal.js";
 // or use class navbar to locate this tag
 
 // for everyone:
-//      show: (logo, home, products, search) on the left
+//      show: (logo, home, products) on the left
 
 // for non-login user:       
 //      show: (login, register) on the right
@@ -41,104 +41,77 @@ export function navbar_set_up(){
 
     // inside the ul, some buttons
     let home = document.createElement("li");
-    home.classList.add("navbar-btn");
-    home.textContent = "Home";
+    home.classList.add("material-icons");
+    home.textContent = "home";
+    home.title = "Homepage";
     home.addEventListener("click", function(){
         window.location.href = "index.html";
         return;
     });
 
     let products = document.createElement("li");
-    products.classList.add("navbar-btn");
-    products.textContent = "Products";
+    products.classList.add("material-icons");
+    products.textContent = "important_devices";
+    products.title = "Product List";
     products.addEventListener("click", function(){
         window.location.href = "products.html";
         return;
     })
 
-    let search = document.createElement("li");
-    search.classList.add("search");
-
-    let search_icon = document.createElement("i");
-    search_icon.classList.add("material-icons");
-    search_icon.textContent = "search";
-
-    let search_input = document.createElement("input");
-    search_input.type = "text";
-    search_input.placeholder = "Search";
-
-    // listen to the ENTER key
-    search_input.addEventListener("keydown", function(e){
-        if (e.keyCode !== 13){
-            return;
-        }
-
-        if (e.target.value == ""){
-            alert("Please input name and press enter !!");
-            return;
-        }
-
-        let str_query = e.target.value;
-        let re_query = /^[a-zA-Z0-9 ]+$/;
-        if (! re_query.test(str_query)){
-            alert("Invalid letters in search. Allow alphabet, numbers and spaces only");
-            return;
-        }
-
-        window.location.href = "products.html" + "?query=" + encodeURIComponent(str_query.trim());
-        return;
-    });
-
     // link
-    util.appendListChild(search, [search_icon, search_input]);
-    util.appendListChild(nav_bar_left_ul, [home, products, search]);
+    util.appendListChild(nav_bar_left_ul, [home, products]);
 
 
     // the right side, check the sessionStorage first
     if (sessionStorage.getItem("token")){
         if (sessionStorage.getItem("role") == 0){
             // admin
-            // let customers = document.createElement("div");
-            // customers.classList.add("navbar-button");
-            // customers.textContent = "Customers";
-            // customers.addEventListener("click", function(){
-            //     window.location.href = "customers.html";
-            //     return;
-            // })
+            let customers = document.createElement("li");
+            customers.classList.add("material-icons");
+            customers.textContent = "people";
+            customers.title = "Customer Profiles";
+            customers.addEventListener("click", function(){
+                window.location.href = "customers.html";
+                return;
+            })
 
             let orders = document.createElement("li");
-            orders.classList.add("navbar-btn");
-            orders.textContent = "Orders";
+            orders.classList.add("material-icons");
+            orders.textContent = "request_quote";
+            orders.title = "Orders";
             orders.addEventListener("click", function(){
                 window.location.href = "orders.html";
                 return;
             })
-            
-            let stocks = document.createElement("li");
-            stocks.classList.add("navbar-btn");
-            stocks.textContent = "Stocks";
-            stocks.addEventListener("click", function(){
-                window.location.href = "stocks.html";
-                return;
-            })
 
             let reports = document.createElement("li");
-            reports.classList.add("navbar-btn");
-            reports.textContent = "Reports";
+            reports.classList.add("material-icons");
+            reports.textContent = "summarize";
+            reports.title = "Sale Reports";
             reports.addEventListener("click", function(){
                 window.location.href = "reports.html";
                 return;
             })
 
+            let myaccount = document.createElement("li");
+            myaccount.classList.add("material-icons");
+            myaccount.textContent = "account_box";
+            myaccount.title = "My Profile";
+            myaccount.addEventListener("click", function(){
+                window.location.href = "account.html";
+                return;
+            })
+
             util.appendListChild(navbar_right,[
-                orders, stocks, reports
+                orders, reports, customers, myaccount
             ]);
         }
         else{
             // user
             let myaccount = document.createElement("li");
-            myaccount.classList.add("navbar-btn");
-            myaccount.textContent = "My Account";
+            myaccount.classList.add("material-icons");
+            myaccount.textContent = "account_box";
+            myaccount.title = "My Profile";
             myaccount.addEventListener("click", function(){
                 window.location.href = "account.html";
                 return;
@@ -146,8 +119,9 @@ export function navbar_set_up(){
             
 
             let mycart = document.createElement("li");
-            mycart.classList.add("navbar-btn");
-            mycart.textContent = "My Cart";
+            mycart.classList.add("material-icons");
+            mycart.textContent = "shopping_cart";
+            mycart.title = "Shopping Cart";
             mycart.addEventListener("click", function(){
                 window.location.href = "cart.html";
                 return;
@@ -160,8 +134,9 @@ export function navbar_set_up(){
 
         // common logout button
         let logout = document.createElement("li");
-        logout.classList.add("navbar-btn");
-        logout.textContent = "Log Out";
+        logout.classList.add("material-icons");
+        logout.textContent = "logout";
+        logout.title = "Log Out";
         logout.addEventListener("click", function(){
             let mw = modal.create_complex_modal_with_text(
                 "Confirm Log Out",
@@ -191,16 +166,18 @@ export function navbar_set_up(){
     else{
         // non-registered user
         let login = document.createElement("li");
-        login.classList.add("navbar-btn");
-        login.textContent = "Login";
+        login.classList.add("material-icons");
+        login.textContent = "login";
+        login.title = "Log In";
         login.addEventListener("click", function(){
             window.location.href = "login.html";
             return;
         })
 
         let register = document.createElement("li");
-        register.classList.add("navbar-btn");
-        register.textContent = "Register";
+        register.classList.add("material-icons");
+        register.textContent = "person_add";
+        register.title = "Sign Up";
         register.addEventListener("click", function(){
             window.location.href = "register.html";
             return;

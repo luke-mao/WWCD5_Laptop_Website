@@ -19,7 +19,7 @@ main {
     background-color: rgb(66, 93, 94);
 }
 
-.shelves {
+.shelf {
     width: 80%;
     min-width: 380px;
     display: flex;
@@ -30,7 +30,7 @@ main {
     padding-right: 5px;
 }
 
-.shelves .dropdown {
+.shelf .dropdown {
     text-align: right;
     width: fit-content;
     padding: 8px;
@@ -39,7 +39,7 @@ main {
     margin-left: 10px;
 }
 
-.shelves .products {
+.shelf .products {
     width: 100%;
     padding-top: 10px;
     display: flex;
@@ -50,11 +50,12 @@ main {
     align-content: space-between;
 }
 
-.shelves .products .product {
+.shelf .products .product {
     width: 360px;
     height: 330px;
     margin: 10px;
     border: 1px solid #ccc;
+    border-radius: 5px;
     perspective: 1000px;
     background-color: rgba(255, 255, 255, 0.65);
 }
@@ -136,7 +137,7 @@ main {
     cursor: pointer;
 }
 
-.shelves .pages {
+.shelf .pages {
     padding-top: 20px;
     padding-bottom: 20px;
     margin-left: auto;
@@ -147,7 +148,7 @@ main {
     justify-content: space-between;
 }
 
-.shelves .pages .page-btn{
+.shelf .pages .page-btn{
     font-size: 20px;
     font-weight: normal;
     padding-top: 10px;
@@ -158,10 +159,10 @@ main {
     background-color: white;
 }
 
-.shelves .pages .page-btn.current {
+.shelf .pages .page-btn.current {
     font-weight: 900;
 }
 
-.shelves .pages .page-btn:hover{
+.shelf .pages .page-btn:hover{
     cursor: pointer;
 }

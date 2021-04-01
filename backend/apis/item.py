@@ -56,13 +56,8 @@ def get_all_profiles(item_id_list):
         return abort(500, "Internal server error")
 
 
-def get_max_page_num(total, item_per_page):
-    max_page =  total // item_per_page - 1 
-
-    if total % item_per_page != 0:
-        max_page += 1
-
-    return max_page
+def get_page_count(total, item_per_page):
+    return (total + item_per_page - 1) // item_per_page
 
 
 # the page_id must be positive, usually around max 10 pages
@@ -105,8 +100,8 @@ def filter_param(param, default_list):
 
 
 def configure_conds(params, conds):
-    if params is None:
-        return None 
+    if (params is None) or (len(params) == 0):
+        return None
     
     result = "({}".format(conds[int(params[0])])
 
@@ -292,8 +287,8 @@ class Search(Resource):
 
                 result = {
                     'current_page': page_id,
-                    'max_page': get_max_page_num(len(item_id_list), 20),
-                    'data': get_all_profiles(item_id_list)
+                    'page_count': get_page_count(len(item_id_list), 20),
+                    'data': get_all_profiles(item_id_list[page_id*20 : (page_id+1) * 20])
                 }
 
                 return result, 200 

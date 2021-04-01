@@ -14,18 +14,12 @@ async function product_page_set_up(){
     let filters = main.getElementsByClassName("filters")[0];
     filters_set_up(filters);
 
-    let shelves = main.getElementsByClassName("shelves")[0];
+    let shelf = main.getElementsByClassName("shelf")[0];
+    let dropdown = shelf.getElementsByClassName("dropdown")[0];
+    dropdown_set_up(dropdown);
 
-    // check if there is query search
-    let url = "http://localhost:5000/item/";
-    let query = get_query_search(window.location.search);
-
-    if (query !== null){
-        url += "search/" + query + "/0";
-    }
-    else{
-        url += "page/0";
-    }
+    // default is ordered by popularity descending
+    let url = "http://localhost:5000/item/search/0";
     
     // fetch for data
     let init = {
@@ -39,7 +33,7 @@ async function product_page_set_up(){
         let response = await fetch(url, init);
         let data = await response.json();
 
-        shelves_set_up(shelves, data);
+        fill_shelf(shelf, data);
     }
     catch(err){
         alert("error");
@@ -48,117 +42,277 @@ async function product_page_set_up(){
 }
 
 
-function get_query_search(str){
-    if (str == ""){
-        return null;
-    }
+function filters_set_up(filters){
+    let title = document.createElement("div");
+    title.classList.add("big-title");
+    title.textContent = "Filters";
+    filters.appendChild(title);
 
-    str = str.substring(1,);
-    let param_pair = str.split("&")[0];
-    let param_pair_split = param_pair.split("=");
+    // first section: price
+    let div_price = document.createElement("div");
+    div_price.classList.add("filter");
 
-    if (param_pair_split[0] !== 'query'){
-        return null;
-    }
+    let div_price_title = document.createElement("div");
+    div_price_title.classList.add("title");
+    div_price_title.textContent = "Price";
 
-    return param_pair_split[1];
-}
+    // the price has from and two inputs
+    let div_price_part = document.createElement("div");
+    div_price_part.classList.add("horizontal");
 
+    let price_symbol = document.createElement("div");
+    price_symbol.classList.add("price-symbol");
+    price_symbol.textContent = "$";
 
+    let price_min_input = document.createElement("input");
+    price_min_input.type = "text";
+    price_min_input.name = "price_min";
+    price_min_input.value = "0";
+    price_min_input.addEventListener("change", ()=>filter_and_page_change_update());
 
+    let price_to_desc = document.createElement("div");
+    price_to_desc.classList.add("desc");
+    price_to_desc.textContent = "to";
 
-async function filters_set_up(div_filters){
+    let price_max_input = document.createElement("input");
+    price_max_input.type = "text";
+    price_max_input.name = "price_max";
+    price_max_input.value = "10000";
+    price_max_input.addEventListener("change", ()=>filter_and_page_change_update());
 
+    // link the price filters (top down)
+    filters.appendChild(div_price);
+    util.appendListChild(div_price, [div_price_title, div_price_part]);
+    util.appendListChild(div_price_part, 
+        [price_symbol, price_min_input, price_to_desc, price_symbol.cloneNode(true), price_max_input]
+    );
 
-
-}
-
-
-async function shelves_set_up(shelves, data){
-    // shelves have 3 parts: dropdown, products, pages
-    let dropdown = shelves.getElementsByClassName("dropdown")[0];
-    let products = shelves.getElementsByClassName("products")[0];
-    let pages = shelves.getElementsByClassName("pages")[0];
-
-    drop_down_menu_set_up(dropdown);
-
-    products_on_shelf(products, data['data']);
     
-    pages_set_up(pages, data['current_page'], data['max_page']);
-    
+    // second section: cpu: intel or amd, 2 checkbox
+    let cpu = create_filter_with_multiple_checkbox(
+        "CPU", "cpu", filter_and_page_change_update, [
+            {"value": 0, "label": "Intel"},
+            {"value": 1, "label": "AMD"}
+        ]
+    );
+
+    // 3rd: storage
+    let storage = create_filter_with_multiple_checkbox(
+        "Storage", "storage", filter_and_page_change_update, [
+            {"value": 0, "label": "Up to 256GB"},
+            {"value": 1, "label": "From 256 up to 512GB"},
+            {"value": 2, "label": "From 512 up to 1TB"},
+            {"value": 3, "label": "More than 1TB"},
+        ],
+    );
+
+    // filter: memory
+    let memory = create_filter_with_multiple_checkbox(
+        "Memory", "memory", filter_and_page_change_update, [
+            {"value": 0, "label": "Up to 8GB"},
+            {"value": 1, "label": "From 8GB up to 16GB"},
+            {"value": 2, "label": "More than 16 GB"},
+        ]
+    );
+
+    // filter: graphic
+    let graphic  = create_filter_with_multiple_checkbox(
+        "Graphic Card", "graphic", filter_and_page_change_update, [
+            {"value": 0, "label": "RTX 10 Series"},
+            {"value": 1, "label": "RTX 20 Series"},
+            {"value": 2, "label": "RTX 30 Series"},
+        ]
+    );
+
+    // filter: screen
+    let screen = create_filter_with_multiple_checkbox(
+        "Screen Size", "screen", filter_and_page_change_update, [
+            {"value": 0, "label": "Up to 13.3 inch"},
+            {"value": 1, "label": "From 13.3 inch up to 15.6 inch"},
+            {"value": 2, "label": "More than 15.6 inch"},
+        ]
+    );
+
+    util.appendListChild(filters, [cpu, storage, memory, graphic, screen]);
     return;
 }
 
 
-function drop_down_menu_set_up(dropdown){
+async function filter_and_page_change_update(page_id){
+    let filters = document.getElementsByClassName("filters")[0];
+    let dropdown = document.getElementsByClassName("dropdown")[0];
+    let shelf = document.getElementsByClassName("shelf")[0];
+
+    // for anything change upon the filters or dropdown menu
+    // we always go to the first page
+    // the ? symbol is added already
+    page_id = page_id == null ? 0 : page_id;
+
+    let url = `http://localhost:5000/item/search/${page_id}?`;
+
+    url = add_checked_url_param(
+        filters, 
+        ["cpu", "storage", "memory", "graphic", "screen"], 
+        url
+    );
+
+    // also get the value from the dropdown list
+    let order_choice = JSON.parse(dropdown.value);
+    
+    for (let key in order_choice){
+        url = add_url_param(key, order_choice[key], url);
+    }
+
+    console.log(url);
+
+    let init = {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    };
+
+    try{
+        let response = await fetch(url, init);
+        let new_data = await response.json();
+
+        fill_shelf(shelf, new_data);
+    }
+    catch(err){
+        alert("error");
+        console.log(err)
+    }
+}
+
+
+function add_url_param(key, value, old_url){
+    let new_url = old_url;
+
+    if (old_url.slice(-1) !== "?"){
+        new_url += "&";
+    }
+
+    new_url += `${key}=${value}`;
+    return new_url;
+}
+
+
+
+function add_checked_url_param(div, checkbox_name_list, old_url){
+    let new_url = old_url;
+
+    for (let i = 0; i < checkbox_name_list.length; i++){
+        let name = checkbox_name_list[i];
+
+        let checked = div.querySelectorAll(`input[name=${name}]:checked`);
+
+        for (let i = 0; i < checked.length; i++){
+            new_url = add_url_param(name, checked[i].value, new_url);
+        }
+    }
+
+    return new_url;
+}
+
+
+function create_filter_with_multiple_checkbox(str_title, checkbox_name, event_handler, attributes){
+    let filter = document.createElement("div");
+    filter.classList.add("filter");
+
+    let title = document.createElement("div");
+    title.classList.add("title");
+    title.textContent = str_title;
+    filter.appendChild(title);
+
+    for (let i = 0; i < attributes.length; i++){
+        let div_checkbox = document.createElement("div");
+        div_checkbox.classList.add("check");
+        
+        let input = document.createElement("input");
+        input.type = "checkbox";
+        input.name = checkbox_name;
+        input.value = attributes[i]["value"];
+        input.addEventListener("change", () => event_handler());
+
+        let label = document.createElement("label");
+        label.for = "checkbox description";
+        label.textContent = attributes[i]["label"];
+
+        // connect
+        filter.appendChild(div_checkbox);
+        util.appendListChild(div_checkbox, [input, label]);
+    }
+    
+    return filter;
+}
+
+
+function dropdown_set_up(dropdown){
     util.removeAllChild(dropdown);
 
     // add options
-    let op_default = document.createElement("option");
-    op_default.textContent = "Default";
-    op_default.value = "page/";
+    let op_trending = document.createElement("option");
+    op_trending.textContent = "Popularity";
+    op_trending.value = JSON.stringify({
+        "order_method": "view",
+        "order": "desc",
+    });
 
     let op_price_asc = document.createElement("option");
     op_price_asc.textContent = "Price: Low - High";
-    op_price_asc.value = "order/price/asc/";
+    op_price_asc.value = JSON.stringify({
+        "order_method": "price",
+        "order": "asc",
+    });
 
     let op_price_desc = document.createElement("option");
     op_price_desc.textContent = "Price: High - Low";
-    op_price_desc.value = "order/price/desc/";
+    op_price_desc.value = JSON.stringify({
+        "order_method": "price",
+        "order": "desc",
+    });
 
     let op_alp_asc = document.createElement("option");
     op_alp_asc.textContent = "Title: A - Z";
-    op_alp_asc.value = "order/alphabet/asc/";
+    op_alp_asc.value = JSON.stringify({
+        "order_method": "name",
+        "order": "asc",
+    });
 
     let op_alp_desc = document.createElement("option");
     op_alp_desc.textContent = "Title: Z - A";
-    op_alp_desc.value = "order/alphabet/desc/";
+    op_alp_desc.value = JSON.stringify({
+        "order_method": "name",
+        "order": "desc",
+    });
 
-    let op_trending = document.createElement("option");
-    op_trending.textContent = "Popular";
-    op_trending.value = "order/trending/";
 
     util.appendListChild(dropdown,[
-        op_default, op_trending, op_price_asc, op_price_desc, op_alp_asc, op_alp_desc
+        op_trending, op_price_asc, op_price_desc, op_alp_asc, op_alp_desc
     ]);
 
-    // dropdown menu add onchange listener
-    dropdown.addEventListener("change", async function(){
-        // when dropdown is changed, start from page 0
 
-        let partial_url = dropdown.value;
-        let url = "http://localhost:5000/item/" + partial_url + "0";
-
-        let init = {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json'
-            }
-        };
-
-        try{
-            let response = await fetch(url, init);
-            let data = await response.json();
-
-            let main = document.getElementsByTagName("main")[0];
-            let shelves = main.getElementsByClassName("shelves")[0];
-            let products = shelves.getElementsByClassName("products")[0];
-            let pages = shelves.getElementsByClassName("pages")[0];
-
-            products_on_shelf(products, data['data']);
-            pages_set_up(pages, data['current_page'], data['max_page']);            
-        }
-        catch(err){
-            alert("error");
-            console.log(err);
-        }
-    });
+    // bind change listener
+    dropdown.addEventListener("change", () => filter_and_page_change_update());
 
     return dropdown;
 }
 
 
-function products_on_shelf(products, data){
+function fill_shelf(shelf, data){
+    // shelves have 3 parts: dropdown, products, pages
+    let products = shelf.getElementsByClassName("products")[0];
+    let pages = shelf.getElementsByClassName("pages")[0];
+
+    put_products_on_shelf(products, data['data']);
+    
+    pages_set_up(pages, data['current_page'], data['page_count']);
+    
+    return;
+}
+
+
+function put_products_on_shelf(products, data){
     util.removeAllChild(products);
 
     // add product
@@ -259,25 +413,27 @@ function products_on_shelf(products, data){
 }
 
 
-function pages_set_up(pages, current_page, max_page){
+// current page starts from 0
+// page count starts from 1
+function pages_set_up(pages, current_page, page_count){
     util.removeAllChild(pages);
 
     // parse Int
     current_page = parseInt(current_page);
-    max_page = parseInt(max_page);
+    page_count = parseInt(page_count);
 
-    // consider different options: 
-    // if max_page < 5: display all buttons at once
-    // else: display 5 buttons together
-    if (max_page < 5){
-        for (let i = 1; i < max_page+1; i++){
+    console.log(`current_page = ${current_page}, page_count = ${page_count}`);
+
+    // if less than 6 pages, display all 6
+    if (page_count < 6){
+        for (let i = 0; i < page_count; i++){
             let div = document.createElement("div");
             div.classList.add("page-btn");
-            div.textContent = i;
-            div.setAttribute("page_id", i-1);
+            div.textContent = i+1;
+            div.setAttribute("page_id", i);
             pages.appendChild(div);          
             
-            if (current_page == i - 1){
+            if (current_page == i){
                 div.classList.add("current");
             }
         }
@@ -301,14 +457,14 @@ function pages_set_up(pages, current_page, max_page){
         btns[0].setAttribute("page_id", "0");
 
         btns[num_btn-1].textContent = ">>";
-        btns[num_btn-1].setAttribute("page_id", max_page);
+        btns[num_btn-1].setAttribute("page_id", page_count - 1);
 
         // deal with second and second-last button
         btns[1].textContent = "<";
         btns[1].setAttribute("page_id", current_page == 0 ? 0 : current_page - 1);
 
         btns[num_btn-2].textContent = ">";
-        btns[num_btn-2].setAttribute("page_id", current_page == max_page ? max_page : current_page + 1);
+        btns[num_btn-2].setAttribute("page_id", current_page == page_count - 1 ? page_count - 1 : current_page + 1);
 
         // page range: [lower_limit, upper_limit)
         let lower_limit = null;
@@ -319,9 +475,9 @@ function pages_set_up(pages, current_page, max_page){
             lower_limit = 0;
             upper_limit = num_btn - 4;
         }
-        else if (current_page > max_page - 3){
-            lower_limit = max_page - 4;
-            upper_limit = max_page + 1;
+        else if (current_page > page_count - (num_btn - 4)){
+            lower_limit = page_count - (num_btn - 4);
+            upper_limit = page_count;
         }
         else{
             // current page in the middle
@@ -348,42 +504,8 @@ function pages_set_up(pages, current_page, max_page){
 
     for (let i = 0; i < all_btns.length; i++){
         all_btns[i].addEventListener("click", async function(){
-            // get current order
-            let select = document.getElementsByClassName("dropdown")[0];
-
-            let url = "http://localhost:5000/item/" + select.value + all_btns[i].getAttribute("page_id");
-
-            // here not finished !!!!!!! combine the query search and other things xxxxxx
-            ////////////////////////////////////////////////////////
-            ////////////////////////////////////////////////////////
-
-
-            let init = {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json'
-                }
-            };
-
-            try{
-                let response = await fetch(url, init);
-                let data = await response.json();
-
-                let products = document.getElementsByClassName("products")[0];
-
-                console.log(data);
-                console.log(response);
-
-                products_on_shelf(products, data['data']);
-                pages_set_up(pages, data['current_page'], data['max_page']);
-
-                document.body.scrollTop = 0;
-                document.documentElement.scrollTop = 0;
-            }
-            catch(err){
-                alert("error");
-                console.log(err);
-            }
+            filter_and_page_change_update(all_btns[i].getAttribute("page_id"));
+            return;
         });
     }
 
