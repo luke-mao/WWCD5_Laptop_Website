@@ -84,11 +84,11 @@ def filter_price(price, default_price):
         price_2 = float(price)
     except ValueError:
         abort(400, "Price is not a float")
-    
+
     if price_2 < 0:
         abort(400, "Invalid price < 0")
     
-    return price 
+    return price_2
 
 
 def filter_param(param, default_list):
@@ -217,11 +217,11 @@ class Search(Resource):
         keyword = request.args.get("keyword")
 
         # multi-valued attributes
-        cpu = filter_param(request.args.get("cpu"), ["0", "1"])
-        storage = filter_param(request.args.get("storage"), ["0", "1", "2", "3"])
-        memory = filter_param(request.args.get("memory"), ["0", "1", "2"])
-        graphic = filter_param(request.args.get("graphic"), ["0", "1", "2"])
-        screen = filter_param(request.args.get("screen"), ["0", "1", "2", "3"])
+        cpu = filter_param(request.args.getlist("cpu"), ["0", "1"])
+        storage = filter_param(request.args.getlist("storage"), ["0", "1", "2", "3"])
+        memory = filter_param(request.args.getlist("memory"), ["0", "1", "2"])
+        graphic = filter_param(request.args.getlist("graphic"), ["0", "1", "2"])
+        screen = filter_param(request.args.getlist("screen"), ["0", "1", "2", "3"])
 
         cpu_conds = [
             "lower(laptop.cpu_prod) LIKE '%intel%'", 
@@ -277,13 +277,13 @@ class Search(Resource):
                     sql += "AND {} \n".format(cond)
                 
                 sql += "ORDER BY {} {}".format(order_method, order)
-                
                 cur.execute(sql)
+
                 item_id_list = cur.fetchall()
 
                 # if no result, or the id list does not reach this page id
                 if (not item_id_list) or (len(item_id_list) < page_id * 20):
-                    abort(404, "No more pages")
+                    return(404, "No more pages")        # here cannot use abort, it will be caught in the exception
 
                 result = {
                     'current_page': page_id,

@@ -1,5 +1,6 @@
 import * as util from "./util.js";
 import {navbar_set_up} from "./navbar.js";
+import * as modal from "./modal.js";
 
 
 util.addLoadEvent(navbar_set_up)
@@ -48,6 +49,11 @@ function filters_set_up(filters){
     title.textContent = "Filters";
     filters.appendChild(title);
 
+    // a wrap for all filters
+    let wrap = document.createElement("div");
+    wrap.classList.add("wrap");
+    filters.appendChild(wrap);
+
     // first section: price
     let div_price = document.createElement("div");
     div_price.classList.add("filter");
@@ -81,7 +87,7 @@ function filters_set_up(filters){
     price_max_input.addEventListener("change", ()=>filter_and_page_change_update());
 
     // link the price filters (top down)
-    filters.appendChild(div_price);
+    wrap.appendChild(div_price);
     util.appendListChild(div_price, [div_price_title, div_price_part]);
     util.appendListChild(div_price_part, 
         [price_symbol, price_min_input, price_to_desc, price_symbol.cloneNode(true), price_max_input]
@@ -133,7 +139,7 @@ function filters_set_up(filters){
         ]
     );
 
-    util.appendListChild(filters, [cpu, storage, memory, graphic, screen]);
+    util.appendListChild(wrap, [cpu, storage, memory, graphic, screen]);
     return;
 }
 
@@ -162,6 +168,59 @@ async function filter_and_page_change_update(page_id){
     for (let key in order_choice){
         url = add_url_param(key, order_choice[key], url);
     }
+
+    // and the price
+    let price_min = filters.querySelector("input[name=price_min]").value;
+    let price_max = filters.querySelector("input[name=price_max]").value;
+
+    if (isNaN(price_min) || parseFloat(price_min) < 0){
+        let mw = modal.create_simple_modal_with_text(
+            "Min Price Input Error", 
+            "Sorry. The minimum price you entered is invalid. Please try again..",
+            "OK",
+        );
+
+        mw['footer_btn'].addEventListener("click", function(){
+            util.removeSelf(mw['modal']);
+            return;
+        });
+
+        return;
+    }
+
+    if (isNaN(price_max) || parseFloat(price_max) < 0){
+        let mw = modal.create_simple_modal_with_text(
+            "Max Price Input Error", 
+            "Sorry. The maximum price you entered is invalid. Please try again..",
+            "OK",
+        );
+
+        mw['footer_btn'].addEventListener("click", function(){
+            util.removeSelf(mw['modal']);
+            return;
+        });
+
+        return;
+    }
+
+    if (parseFloat(price_max) < parseFloat(price_min)){
+        let mw = modal.create_simple_modal_with_text(
+            "Price Input Error", 
+            "Sorry. The maximum price you entered is less than the minimum price. Please try again..",
+            "OK",
+        );
+
+        mw['footer_btn'].addEventListener("click", function(){
+            util.removeSelf(mw['modal']);
+            return;
+        });
+
+        return;
+    }
+    
+
+    url = add_url_param("price_min", price_min, url);
+    url = add_url_param("price_max", price_max, url);
 
     console.log(url);
 
@@ -304,10 +363,25 @@ function fill_shelf(shelf, data){
     let products = shelf.getElementsByClassName("products")[0];
     let pages = shelf.getElementsByClassName("pages")[0];
 
-    put_products_on_shelf(products, data['data']);
-    
-    pages_set_up(pages, data['current_page'], data['page_count']);
-    
+    // if no data
+    if (data['data'] == null){
+        // remove all products and page buttons
+        util.removeAllChild(products);
+        util.removeAllChild(pages);
+
+        // statement: no product
+        let no_product = document.createElement("div");
+        no_product.classList.add("no-product");
+        no_product.textContent = "Sorry. There is no items meet all the conditions...";
+        products.appendChild(no_product);
+
+        return;
+    }
+    else{
+        put_products_on_shelf(products, data['data']);
+        pages_set_up(pages, data['current_page'], data['page_count']);
+    }
+
     return;
 }
 
@@ -402,7 +476,7 @@ function put_products_on_shelf(products, data){
         util.appendListChild(back, [
             back_name_tr, back_display_tr, back_cpu_tr, back_gpu_tr, back_ram_tr, back_storage_tr
         ]);
-
+        
 
         // event listener
         product.addEventListener("click", function(){

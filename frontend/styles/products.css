@@ -1,12 +1,12 @@
 main {
     width: 100%;
-    padding-top: 20px;
+    padding-top: 40px;
     padding-left: 20px;
     padding-right: 20px;
     padding-bottom: 10px;
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-flow: row wrap;
+    justify-content: space-between;
     background-image: url(../img/many_laptops_opa_7.jpg);
     background-repeat: no-repeat;
     background-attachment: fixed;
@@ -14,20 +14,103 @@ main {
 }
 
 .filters {
-    width: 20%;
-    height: 500px;
-    background-color: rgb(66, 93, 94);
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 340px;
+    height: fit-content;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    padding-right: 15px;
+    background-color: #f5f5f5;
+    display: flex;
+    flex-flow: column nowrap;
 }
 
-.shelf {
-    width: 80%;
-    min-width: 380px;
+.filters .big-title {
+    font-size: 26px;
+    font-weight: bold;
+    padding-bottom: 5px;
+}
+
+.filters .wrap {
     display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    padding-left: 30px;
-    padding-top: 10px;
+    flex-flow: column nowrap;
+}
+
+.wrap .filter {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    display: flex;
+    flex-flow: column wrap;
+    font-size: 24px;
+    padding-left: 5px;
     padding-right: 5px;
+}
+
+.filters .filter .title {
+    font-size: 24px;
+    font-weight: bold;
+    padding-bottom: 8px;
+}
+
+.filter .horizontal {
+    display: flex;
+    flex-flow: row nowarp;
+}
+
+.filter .horizontal input {
+    width: 80px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding-left: 7px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-size: 20px;
+}
+
+.filter .horizontal .price-symbol {
+    padding-left: 2px;
+    padding-right: 8px;
+    font-weight: bold;
+} 
+
+.filter .horizontal .desc {
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.filter .check {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    display: flex;
+    flex-flow: row nowarp;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.filter .check input {
+    padding: 3px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transform: scale(2);
+}
+
+.filter .check label {
+    padding-left: 15px;
+}
+
+
+.shelf {
+    width: 75%;
+    display: flex;
+    flex-flow: column nowrap;
+    padding-left: 5px;
+    padding-top: 5px;
+    padding-right: 5px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .shelf .dropdown {
@@ -43,15 +126,20 @@ main {
     width: 100%;
     padding-top: 10px;
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: flex-start;
+    flex-flow: row wrap;
+    justify-content: space-around;
     align-items: flex-start;
     align-content: space-between;
 }
 
+.shelf .products .no-product {
+    padding-top: 25px;
+    font-size: 28px;
+    text-align: left;
+}
+
 .shelf .products .product {
-    width: 360px;
+    width: 350px;
     height: 330px;
     margin: 10px;
     border: 1px solid #ccc;
@@ -149,13 +237,16 @@ main {
 }
 
 .shelf .pages .page-btn{
-    font-size: 20px;
+    width: 50px;
+    text-align: center;
+    font-size: 23px;
     font-weight: normal;
     padding-top: 10px;
     padding-bottom: 10px;
-    padding-left: 12px;
-    padding-right: 12px;
+    margin-left: 10px;
+    margin-right: 10px;
     border: 1px solid rgb(187, 185, 185);
+    border-radius: 5px;
     background-color: white;
 }
 
@@ -165,4 +256,5 @@ main {
 
 .shelf .pages .page-btn:hover{
     cursor: pointer;
+    background-color: #ccc;
 }
