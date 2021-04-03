@@ -198,7 +198,7 @@ export function isItemInCart(item_id){
 
 export function isCartEmpty(){
     let cart = getCart();
-    return cart == null;
+    return cart == null || Object.keys(cart).length == 1;
 }
 
 export function cartGetTotal(){
@@ -212,6 +212,17 @@ export function cartGetTotal(){
     return cart['total'];
 }
 
+export function emptyCart(){
+    sessionStorage.removeItem("cart");
+
+    let cart = {
+        'total': 0
+    };
+
+    saveToCart(cart);
+
+    return;
+}
 
 
 

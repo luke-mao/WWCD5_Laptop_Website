@@ -11,6 +11,7 @@ h1 {
     padding-bottom: 16px;
 }
 
+.checkout,
 .cart {
     width: 95%;
     padding-top: 24px;
@@ -119,6 +120,88 @@ tr.last-row td {
     cursor: pointer;
     outline: none;
 }
+
+.checkout .addresses,
+.checkout .pay {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.address {
+    padding-left: 8px;
+    padding-bottom: 6px;
+    padding-top: 6px;
+}
+
+.address:hover {
+    cursor: pointer;
+    background-color: #eee;
+}
+
+
+.address label {
+    font-size: 24px;
+    font-weight: normal;
+    margin-left: 12px;
+}
+
+.address input {
+    transform: scale(1.5);
+}
+
+.address input:hover {
+    cursor: pointer;
+}
+
+.pay form {
+    padding-left: 8px;
+}
+
+.row {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.row label {
+    font-size: 24px;
+    width: 210px;
+}
+
+.row input {
+    font-size: 22px;
+    padding: 4px;
+    padding-left: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.last_label{
+    width: fit-content !important;
+}
+
+form button {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    margin-left: -10px;
+    font-size: 22px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 12px;
+    padding-right: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+form button:hover {
+    cursor: pointer;
+    background-color: #ccc;
+}
+
+
 
 
 
