@@ -225,4 +225,9 @@ export function emptyCart(){
 }
 
 
-
+export function createMaterialIcon(tag, content){
+    let i = document.createElement(tag);
+    i.classList.add("material-icons");
+    i.textContent = content;
+    return i;
+}

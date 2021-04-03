@@ -49,7 +49,7 @@ token_header.add_argument(
 
 # profile model
 # full for GET profile
-profile_full = api.model('profile',{
+profile_full = api.model('profile_full',{
     'first_name': fields.String,
     'last_name': fields.String,
     'email': fields.String,
@@ -59,7 +59,8 @@ profile_full = api.model('profile',{
 })
 
 # simple for PUT profile (since the address is PUT separately)
-profile_simple = api.model("profile",{'first_name': fields.String,
+profile_simple = api.model("profile_simple", {
+    'first_name': fields.String,
     'last_name': fields.String,
     'email': fields.String,
     'mobile': fields.String,
@@ -128,15 +129,15 @@ order_success = api.model('order_success', {
 
 # for the order history, we return names instead of id
 order_history_item = api.model('order_history_item',{
-    'name': fields.String,
+    'item_id': fields.Integer,
     'price': fields.Float,
     'quantity': fields.Integer,
-    'thumbernail': fields.String
+    'snapshot': fields.String,      # the snapshot contains all the profile 
 })
 
 
 order_history = api.model('order_history', {
-    'address': fields.String,     # here give the full address instead of address_id
+    'address': fields.Nested(address),
     'notes': fields.String,
     'card_last_four': fields.String,
     'total_price': fields.String,

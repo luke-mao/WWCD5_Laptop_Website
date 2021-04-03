@@ -2,18 +2,19 @@ from flask_restx import Namespace, Resource, fields
 from flask import request, abort
 import sqlite3 
 import os
-
+import json 
 import re 
 import time 
 
 import models
 from utils.token import Token
 from utils.function import unpack, check_address, check_mobile, check_name, check_password, check_email
+from .item import get_all_profiles
 
 
 api = Namespace(
     'order',
-    description="Make and get all orders of a customer."
+    description="""Make and get all orders of a customer. The customer can see the specification snapshot of the ordered items at that time."""
 )
 
 
@@ -59,9 +60,10 @@ class Order(Resource):
                
                 
                 # extract the order items
+                # the snapshot can be json parse into a dictionary again
                 for order in orders:
                     sql_2 = """
-                        SELECT order_item.item_id, order_item.price, order_item.quantity, item.name, item.thumbnail
+                        SELECT order_item.item_id, order_item.price, order_item.quantity, order_item.snapshot
                         FROM order_item, item
                         WHERE order_item.ord_id = ? AND order_item.item_id = item.item_id
                     """
@@ -73,7 +75,8 @@ class Order(Resource):
                     # insert into the order
                     order["items"] = order_items
 
-                    # also fill the address
+                    # each order has an address (may be different for different orders)
+                    # the address is also a dictionary
                     sql_3 = """
                         SELECT unit_number, street_number, street_name, suburb, state, postcode
                         FROM customer_address, orders
@@ -84,7 +87,7 @@ class Order(Resource):
                     cur.execute(sql_3, sql_3_param)
                     address = cur.fetchone()
 
-                    # insert
+                    # insert, value is a dictionary
                     order["address"] = address
                 
                 return orders, 200
@@ -322,8 +325,8 @@ def submit_order(cart, identity):
             # insert all items
             # also update the item stock number
             sql_4 = """
-                INSERT INTO order_item(ord_id, item_id, quantity, price)
-                VALUES(?, ?, ?, ?)
+                INSERT INTO order_item(ord_id, item_id, quantity, price, snapshot)
+                VALUES(?, ?, ?, ?, ?)
             """
 
             sql_5 = """
@@ -333,11 +336,18 @@ def submit_order(cart, identity):
             """
 
             for item in items:
+                # get this item snapshot
+                profile_list = []
+                profile_list.append(item)
+
+                snapshot = get_all_profiles(profile_list)[0]
+
                 sql_4_param = (
                     new_order_id, 
                     item['item_id'],
                     item['quantity'],
-                    item['price']
+                    item['price'],
+                    json.dumps(snapshot),
                 )
 
                 sql_5_param = (

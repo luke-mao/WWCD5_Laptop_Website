@@ -33,6 +33,7 @@ export function navbar_set_up(){
     // left side is always the same: logo, home, products, search
     let logo = document.createElement("img");
     logo.src = "img/logo_ppt_4_nobg.png";
+    // logo.src = "img/cartoon_profile.png";
     logo.alt = "Laptop website logo";
 
     let nav_bar_left_ul = document.createElement("ul");

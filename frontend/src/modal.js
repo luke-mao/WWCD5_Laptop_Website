@@ -94,7 +94,21 @@ export function create_complex_modal_with_text(title_text, body_text, btn_1_text
 }
 
 
+export function create_force_logout_modal(){
+    let modal_dict = create_simple_modal_with_text(
+        "Authentication Error",
+        "Sorry. Something wrong with the authentication. Please log in again..",
+        "OK",
+    );
 
+    modal_dict['footer_btn'].addEventListener("click", function(){
+        sessionStorage.clear();
+        window.location.href = "login.html";
+        return;
+    });
+
+    return;
+}
 
 
 

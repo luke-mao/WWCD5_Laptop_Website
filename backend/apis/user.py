@@ -39,10 +39,11 @@ class Profile(Resource):
             WHERE user_id = ?
         """
         
+        #  address only return the valid ones
         sql2 = """
             SELECT address_id, unit_number, street_number, street_name, suburb, state, postcode
             FROM customer_address
-            WHERE user_id = ?
+            WHERE user_id = ? AND status == 1
         """
 
         sql_param = (identity['user_id'],)
@@ -168,7 +169,7 @@ class Profile(Resource):
                 cur = conn.cursor()
 
                 for i in range(len(sql_list)):
-                    db.execute(sql_list[i], sql_param_list[i])
+                    cur.execute(sql_list[i], sql_param_list[i])
 
                 return "OK", 200
 
@@ -225,7 +226,7 @@ class Address(Resource):
             # get all address for this user
             sql = """SELECT address_id, unit_number, street_number, street_name, suburb, state, postcode
                     FROM customer_address
-                    WHERE user_id = ?
+                    WHERE user_id = ? AND status == 1
             """
 
             values = (identity['user_id'],)
@@ -424,6 +425,79 @@ class Address(Resource):
             print(e)
             return "Internal server error", 500
 
+
+    @api.response(200, "OK")
+    @api.response(403, "No authorization token / token invalid / token expired")
+    @api.response(400, "Malformed request / Wrong data format")
+    @api.response(401, "Invalid address_id / The address is inactive / This is the last address set of this user.")
+    @api.expect(models.token_header, models.address_parser)
+    @api.doc(description="With the auth token, the user can remove one set of address. But cannot remove all of them. There must be one set left.")
+    def delete(self):
+        # first check the auth token
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return "No authorization token", 403
+        
+        T = Token()
+        identity = T.check(auth_header)
+        if not identity:
+            return "Wrong token", 403
+        
+        # require the address_id
+        if not request.args.get("address_id"):
+            return "Missing address_id", 400
+
+        address_id = None
+
+        try:
+            address_id = int(request.args.get("address_id"))
+        except ValueError:
+            return "Address_id should be integer", 400
+
+        if address_id and address_id <= 0:
+            return "Address_id should be positive", 400
+
+
+        # several things:
+        # 1. Check whether this address belongs to the user or not
+        # 2. The address must be active (i.e. state = 1)
+        # 3. The address should not be the last set of address of this user
+        try:
+            with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
+                conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
+                cur = conn.cursor()
+
+                sql_1 = "SELECT status FROM customer_address WHERE user_id = ? AND address_id = ?"
+                sql_1_param = (identity['user_id'], address_id)
+                cur.execute(sql_1, sql_1_param)
+
+                result_1 = cur.fetchone()
+
+                if not result_1:
+                    return "Invalid address_id", 401
+                
+                if result_1['status'] != 1:
+                    return "address_id is deleted already", 401
+                
+                sql_2 = "SELECT count(*) AS num FROM customer_address WHERE user_id = ? AND status = 1"
+                sql_2_param = (identity['user_id'],)
+                cur.execute(sql_2, sql_2_param)
+
+                result_2 = cur.fetchone()
+
+                if int(result_2['num']) == 1:
+                    return "This is the last address set of this user", 401
+                
+                # now change the status to 0
+                sql_3 = "UPDATE customer_address SET status = 0 WHERE address_id = ?"
+                sql_3_param = (address_id, )
+                cur.execute(sql_3, sql_3_param)
+
+                return "OK", 200 
+                
+        except Exception as e:
+            print(e)
+            return "Internal server error", 500
 
 
 @api.route('/viewhistory')
