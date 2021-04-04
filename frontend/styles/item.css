@@ -21,10 +21,15 @@ main {
     border: 1px solid #ccc;
 }
 
-
 .item {
     display: flex;
     flex-flow: column nowrap;
+}
+
+.item.snapshot {
+    background-image: url("../img/snapshot.png");
+    background-size: 100% auto;
+    background-repeat: repeat-y;
 }
 
 .simple {

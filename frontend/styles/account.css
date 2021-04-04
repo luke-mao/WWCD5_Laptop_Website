@@ -50,6 +50,7 @@ main {
     min-width: 500px;
 }
 
+table button,
 .profile .details button{
     font-size: 22px;
     padding-top: 6px;
@@ -63,15 +64,66 @@ main {
     margin-right: 8px;
 }
 
+table button:hover,
 .profile .details button:hover {
     cursor: pointer;
     background-color: #ccc;
+    outline: none;
 }
 
+.orders {
+    width: 100%;
+    padding-top: 32px;
+    padding-bottom: 32px;
+}
 
+.orders h1 {
+    padding-bottom: 24px;
+}
 
+.orders table {
+    border-collapse: collapse;
+    text-align: center;
+    font-size: 24px;
+    table-layout: fixed;
+}
 
+.big-table {
+    width: 100%;
+}
 
+.small-table {
+    width: max-content;
+    margin-left: 32px;
+}
 
+.small-table th,
+.small-table td {
+    border-top: none;
+    border-bottom: none;
+}
 
+th, td {
+    padding-top: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+    padding-left: 18px;
+    padding-right: 18px;
+}
+
+table img {
+    width: 200px;
+    height: auto;
+    object-fit: contain;
+}
+
+td.no-border {
+    border-bottom: none;
+}
+
+.underline:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
 

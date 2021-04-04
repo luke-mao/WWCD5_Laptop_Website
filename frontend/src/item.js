@@ -8,68 +8,80 @@ util.addLoadEvent(item_page_set_up);
 
 
 async function item_page_set_up(){
-    // check item_id from query string
-    let query = window.location.search.substring(1,);
+    let search = new URLSearchParams(window.location.search.substring(1));
 
-    if (query == ""){
-        alert("Redirect back to products page...");
-        window.location.href = "products.html";
-        return;
-    }
+    let item_id = search.get("item_id");
+    let type = search.get("type");
 
-    // check the query
-    query = query.split("&")[0];
-    let query_param_list = query.split("=");
+    // check item_id, must be number
+    // check the type: either null or snapshot
+    if (isNaN(item_id) || (type !== null && type !== "snapshot")){
+        let mw = modal.create_simple_modal_with_text(
+            "Website Error",
+            "Sorry. The product you are looking for is not found. Redirecting you back..",
+            "OK",
+        );
 
-    if (query_param_list[0] !== "item_id"){
-        alert("Wrong URL. Redirect to products page..");
-        window.location.href = "products.html";
-        return;
-    }
-
-    let item_id = query_param_list[1];
-    
-    let re_item_id = /^\d+$/;
-    if (! re_item_id.test(item_id)){
-        alert("Wrong URL. Redirect to products page..");
-        window.location.href = "products.html";
-        return;
-    }
-
-    // fetch
-    let url = "http://localhost:5000/item/id/" + item_id;
-    let init = {
-        method: 'GET',
-        headers: {
-            'Accept': 'application/json'
-        }
-    };
-
-    try{
-        let response = await fetch(url, init);
-
-        if (! response.ok){
-            alert("Sorry. The item is not found for now... Please try again later.");
+        mw['footer_btn'].addEventListener("click", function(){
             window.history.back();
             return;
-        }
+        })
 
-        let data = await response.json();  
-        put_item_on_page(data);
+        return;
     }
-    catch(err){
-        alert("error");
-        console.log(err);
+
+    if (type == "snapshot"){
+        let data = JSON.parse(localStorage.getItem(item_id));
+        put_item_on_page(data, true);
     }
+    else{
+        // fetch
+        let url = "http://localhost:5000/item/id/" + item_id;
+        let init = {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        };
+
+        try{
+            let response = await fetch(url, init);
+
+            if (! response.ok){
+                alert("Sorry. The item is not found for now... Please try again later.");
+                window.history.back();
+                return;
+            }
+
+            let data = await response.json();  
+            put_item_on_page(data, false);
+        }
+        catch(err){
+            alert("error");
+            console.log(err);
+        }
+    }
+    
+
+
 
     return;
 }
 
 
-function put_item_on_page(data){
+// is_snapshot: true for snapshot data, do not display the "add to cart" button
+//              false for real data, and display the button to customers (not to admin)
+function put_item_on_page(data, is_snapshot){
     let item = document.getElementsByClassName("item")[0];
     item.setAttribute("item_id", data['simple']['item_id']);
 
+    // if snapshot, give a background image showing: This is purchase snapshot
+    if (is_snapshot){
+        item.classList.add("snapshot");
+    }
+
+    // simple: photo and a profile
+    // detail: speicifications
     let div_simple = item.getElementsByClassName("simple")[0];
     let div_detail = item.getElementsByClassName("detail")[0];
 
@@ -87,7 +99,7 @@ function put_item_on_page(data){
 
     // left: 4 images
     put_photos(data['photos'], simple_left);
-    put_profile(data, simple_right);
+    put_profile(data, simple_right, is_snapshot);
 
     // for detail: provide specifications. 
     put_specification(data, div_detail);
@@ -485,7 +497,7 @@ function put_photos(photos, div){
 }
 
 
-function put_profile(data, div){
+function put_profile(data, div, is_snapshot){
     // right: small profile
     let name = document.createElement("div");
     name.classList.add("name");
@@ -537,59 +549,103 @@ function put_profile(data, div){
 
 
     // for customer, add the "purchase button"
-    if (sessionStorage.getItem("role") == 1){
-        let purchase = document.createElement("button");
-        purchase.classList.add("add-to-cart");
-        purchase.setAttribute("item_id", data['simple']['item_id']);
-    
-        if (util.isItemInCart(data['simple']['item_id'])){
-            purchase.textContent = "Added To Cart";
-            purchase.classList.add("in-cart");
-        }
-        else{
-            purchase.textContent = "Add To Cart";
-        }
-
-        // purchase onclick
-        purchase.addEventListener("click", function(){
-            if (purchase.classList.contains("in-cart")){
-                // already in cart
-                let mw = modal.create_complex_modal_with_text(
-                    "Item Already In Cart",
-                    "Dear Customer. The item is in your cart already.",
-                    "View Cart", 
-                    "Close",
-                );
-
-                mw['footer_btn_1'].addEventListener("click", function(){
-                    window.location.href = "checkout.html";
-                    return;
-                })
-
-                mw['footer_btn_2'].addEventListener("click", function(){
-                    util.removeSelf(mw['modal']);
-                    return;
-                })
-
-                return;
+    // for non-registered user, still display the button, but give login request when clicked
+    if (! is_snapshot){
+        if (sessionStorage.getItem("role") == 1 || sessionStorage.getItem("role") == null){
+            let purchase = document.createElement("button");
+            purchase.classList.add("add-to-cart");
+            purchase.setAttribute("item_id", data['simple']['item_id']);
+        
+            if (util.isItemInCart(data['simple']['item_id'])){
+                purchase.textContent = "Added To Cart";
+                purchase.classList.add("in-cart");
             }
-
-            // add to cart
-            util.addToCart(
-                data['simple']['item_id'], 
-                data['simple']['name'], 
-                data['photos'][0],
-                data['simple']['price'],
-            );
-
-            purchase.classList.add("in-cart");
-            purchase.textContent = "Added To Cart";
-
-            return;
-        });
-
-        div.appendChild(purchase);
+            else{
+                purchase.textContent = "Add To Cart";
+            }
+    
+            // purchase onclick
+            purchase.addEventListener("click", function(){
+                // if not logged in, display modal window to ask
+                if (sessionStorage.getItem("role") == null){
+                    let mw = modal.create_complex_modal_with_text(
+                        "Purchase Error",
+                        "Dear customer. Please log in before adding item to your cart.",
+                        "Log In",
+                        "Close",
+                    );
+    
+                    mw['footer_btn_1'].addEventListener("click", function(){
+                        window.location.href = "login.html";
+                        return;
+                    });
+    
+                    mw['footer_btn_2'].addEventListener("click", function(){
+                        util.removeSelf(mw['modal']);
+                        return;
+                    });
+    
+                    return;
+                }
+    
+    
+                // for customer
+                if (purchase.classList.contains("in-cart")){
+                    // already in cart
+                    let mw = modal.create_complex_modal_with_text(
+                        "Item Already In Cart",
+                        "Dear Customer. The item is in your cart already.",
+                        "View Cart", 
+                        "Close",
+                    );
+    
+                    mw['footer_btn_1'].addEventListener("click", function(){
+                        window.location.href = "checkout.html";
+                        return;
+                    })
+    
+                    mw['footer_btn_2'].addEventListener("click", function(){
+                        util.removeSelf(mw['modal']);
+                        return;
+                    })
+    
+                    return;
+                }
+    
+                // add to cart
+                util.addToCart(
+                    data['simple']['item_id'], 
+                    data['simple']['name'], 
+                    data['photos'][0],
+                    data['simple']['price'],
+                );
+    
+                purchase.classList.add("in-cart");
+                purchase.textContent = "Added To Cart";
+    
+                return;
+            });
+    
+            div.appendChild(purchase);
+        }
     }
+    else {
+        // for snapshot, give a button taking the customer to the item on sale
+        let view = document.createElement("button");
+        view.textContent = "View The Current Profile";
+
+        view.addEventListener("click", function(){
+            let search = new URLSearchParams(window.location.search.substring(1));
+            search.delete("type");
+
+            let new_url = `item.html?${search.toString()}`;
+            window.location.href = new_url;
+            return;
+        })
+
+        div.appendChild(view);
+    }
+
 
     return;
 }

@@ -4,7 +4,6 @@ import * as modal from "./modal.js";
 
 
 util.addLoadEvent(navbar_set_up);
-
 util.addLoadEvent(page_set_up);
 
 
@@ -52,8 +51,6 @@ async function page_set_up(){
 
 
 function fill_profile(div, data){
-    console.log(data);
-
     let img = document.createElement("img");
     img.src = "../img/cartoon_profile.png";
     img.alt = "cartoon";
@@ -852,6 +849,7 @@ function fill_orders(div, data){
     h1.textContent = "Your Orders";
 
     let table = document.createElement("table");
+    table.classList.add("big-table");
     
     // link
     util.appendListChild(div, [h1, table]);
@@ -860,7 +858,8 @@ function fill_orders(div, data){
     let tr = document.createElement("tr");
     table.appendChild(tr);
 
-    let th_list = ["Order ID", "Time", "Total Price", "Status", "Details"];
+    // total 5 columns for the outer table
+    let th_list = ["Order ID", "Time", "Total Price", "Status", "Items"];
 
     for (let i = 0; i < th_list.length; i++){
         let th = document.createElement("th");
@@ -868,6 +867,9 @@ function fill_orders(div, data){
         tr.appendChild(th);
     }
 
+    
+    // each row represents a data
+    // and another row includes all the items
     for (let i = 0; i < data.length; i++){
         let tr_2 = document.createElement("tr");
 
@@ -890,26 +892,114 @@ function fill_orders(div, data){
         }
 
         // the view has a button inside
+        // click the button can review the small table with all order items
+        // and click again to close
         let td_view = document.createElement("td");
         let btn_view = document.createElement("button");
         btn_view.textContent = "View";
-        
-        // link
-        table.appendChild(tr_2);
-        util.appendListChild(tr_2, [td_id, td_date, td_price, td_status, td_view]);
-        td_view.appendChild(btn_view);
 
-        // event
+        // another table
+        let tr_detail = document.createElement("tr");
+        tr_detail.style.display = "none";
+
+        // btn_view click event listener
         btn_view.addEventListener("click", function(){
-            // 
+            if (tr_detail.style.display == "none"){
+                tr_detail.style.display = "block";
+                btn_view.textContent = "Close View";
+            }
+            else{
+                tr_detail.style.display = "none";
+                btn_view.textContent = "View";
+            }
 
-
-
-
+            return;
         });
 
 
+        let td_detail = document.createElement("td");
+        td_detail.colSpan = "5";  // fill all columns
+        td_detail.classList.add("no-border");
+        
+        // link
+        util.appendListChild(table, [tr_2, tr_detail]);
+        util.appendListChild(tr_2, [td_id, td_date, td_price, td_status, td_view]);
+        td_view.appendChild(btn_view);
+        tr_detail.appendChild(td_detail);
 
+        // now focus on the small table
+        let small_table = document.createElement("table");
+        small_table.classList.add("small-table");
+
+        td_detail.appendChild(small_table);
+
+        let small_table_tr = document.createElement("tr");
+        small_table.appendChild(small_table_tr);
+
+        // total actually five columns 
+        // but col "Item" has two columns, one for the image, one for name
+        let small_th_list = ["Item", "Quantity", "Unit Price", "Purchase Snapshot"];
+
+        for (let j = 0; j < small_th_list.length; j++){
+            let th = document.createElement("th");
+            th.textContent = small_th_list[j];
+
+            if (small_th_list[j] == "Item"){
+                th.colSpan = 2;
+            }
+
+            small_table_tr.appendChild(th);
+        }
+
+        // list all items
+        for (let j = 0; j < data[i]['items'].length; j++){
+            let item_data = data[i]['items'][j];
+            let snapshot = JSON.parse(item_data['snapshot']);
+
+            let tr = document.createElement("tr");
+            
+            // first column : img
+            let td_1 = document.createElement("td");
+            let img = document.createElement("img");
+            img.src = snapshot['photos'][0];
+
+            // second column: name
+            // the name can be clicked to the product page
+            let td_2 = document.createElement("td");
+            td_2.textContent = snapshot['simple']['name'];
+            td_2.classList.add("underline");
+            td_2.addEventListener("click", function(){
+                window.location.href = `item.html?item_id=${item_data['item_id']}`;
+                return;
+            });
+
+            // col 3: quantity
+            let td_3 = document.createElement("td");
+            td_3.textContent = `×${item_data['quantity']}`;
+
+            // col 4: unit price
+            let td_4 = document.createElement("td");
+            td_4.textContent = `$ ${item_data['price']}`;
+
+            // col 5: button view snapshot
+            let td_5 = document.createElement("td");
+            let btn_snapshot = document.createElement("button");
+            btn_snapshot.textContent = "View";
+
+
+            // link
+            small_table.appendChild(tr);
+            util.appendListChild(tr, [td_1, td_2, td_3, td_4, td_5]);
+            td_1.appendChild(img);
+            td_5.appendChild(btn_snapshot);
+
+            // snapshot
+            btn_snapshot.addEventListener("click", function(){
+                localStorage.setItem(item_data['item_id'], item_data['snapshot']);
+                window.location.href = `item.html?item_id=${item_data['item_id']}&type=snapshot`;
+                return;
+            });
+        }
     }
 
 
