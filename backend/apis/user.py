@@ -429,7 +429,8 @@ class Address(Resource):
     @api.response(200, "OK")
     @api.response(403, "No authorization token / token invalid / token expired")
     @api.response(400, "Malformed request / Wrong data format")
-    @api.response(401, "Invalid address_id / The address is inactive / This is the last address set of this user.")
+    @api.response(401, "Invalid address_id / The address is inactive")
+    @api.response(402, "This is the last address set of this user.")
     @api.expect(models.token_header, models.address_parser)
     @api.doc(description="With the auth token, the user can remove one set of address. But cannot remove all of them. There must be one set left.")
     def delete(self):
@@ -486,7 +487,7 @@ class Address(Resource):
                 result_2 = cur.fetchone()
 
                 if int(result_2['num']) == 1:
-                    return "This is the last address set of this user", 401
+                    return "This is the last address set of this user", 402
                 
                 # now change the status to 0
                 sql_3 = "UPDATE customer_address SET status = 0 WHERE address_id = ?"
