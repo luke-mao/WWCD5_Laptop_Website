@@ -1,11 +1,3 @@
-main {
-    width: 80%;
-    margin-left: auto;
-    margin-right: auto;
-    padding-top: 32px;
-    padding-bottom: 24px;
-}
-
 h1 {
     font-size: 32px;
     padding-bottom: 16px;
@@ -102,25 +94,6 @@ tr.last-row td {
     text-align: right;
 }
 
-.cart .btns-below-cart button {
-    font-size: 22px;
-    margin-left: 16px;
-    margin-right: 16px;
-    font-weight: normal;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    padding-left: 16px;
-    padding-right: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-.cart .btns-below-cart button:hover {
-    background-color: #ccc;
-    cursor: pointer;
-    outline: none;
-}
-
 .checkout .addresses,
 .checkout .pay {
     padding-top: 20px;
@@ -171,14 +144,6 @@ tr.last-row td {
     width: 210px;
 }
 
-.row input {
-    font-size: 22px;
-    padding: 4px;
-    padding-left: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
 .last_label{
     width: fit-content !important;
 }
@@ -186,23 +151,6 @@ tr.last-row td {
 form button {
     margin-top: 15px;
     margin-bottom: 15px;
-    margin-left: -10px;
-    font-size: 22px;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    padding-left: 12px;
-    padding-right: 12px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    margin-left: 0;
 }
-
-form button:hover {
-    cursor: pointer;
-    background-color: #ccc;
-}
-
-
-
-
-
 

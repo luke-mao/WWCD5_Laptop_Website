@@ -50,27 +50,6 @@ main {
     min-width: 500px;
 }
 
-table button,
-.profile .details button{
-    font-size: 22px;
-    padding-top: 6px;
-    padding-bottom: 6px;
-    padding-left: 10px;
-    padding-right: 10px;
-    width: fit-content;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-left: 8px;
-    margin-right: 8px;
-}
-
-table button:hover,
-.profile .details button:hover {
-    cursor: pointer;
-    background-color: #ccc;
-    outline: none;
-}
-
 .orders {
     width: 100%;
     padding-top: 32px;

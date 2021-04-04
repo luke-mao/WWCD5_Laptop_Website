@@ -69,7 +69,7 @@ function load_cart(){
     // event listener
     btn_back.addEventListener("click", function(){
         // go back
-        window.location.href = "products.html";
+        window.history.back();
         return;
     });
 

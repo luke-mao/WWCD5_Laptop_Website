@@ -1,9 +1,3 @@
-* {
-    padding: 0px;
-    margin: 0px;
-    box-sizing: border-box;
-}
-
 .navbar {
     display: flex;
     flex-flow: row wrap;

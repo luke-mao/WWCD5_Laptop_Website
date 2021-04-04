@@ -1,9 +1,5 @@
 main {
-    width: 100%;
-    padding-top: 40px;
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-bottom: 10px;
+    width: 100% !important;
     display: flex;
     flex-flow: row wrap;
     justify-content: space-between;
@@ -58,16 +54,11 @@ main {
 .filter .horizontal {
     display: flex;
     flex-flow: row nowarp;
+    align-items: center;
 }
 
 .filter .horizontal input {
-    width: 80px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding-left: 7px;
-    padding-top: 2px;
-    padding-bottom: 2px;
-    font-size: 20px;
+    width: 85px;
 }
 
 .filter .horizontal .price-symbol {
@@ -88,13 +79,6 @@ main {
     flex-flow: row nowarp;
     justify-content: flex-start;
     align-items: center;
-}
-
-.filter .check input {
-    padding: 3px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    transform: scale(2);
 }
 
 .filter .check label {
