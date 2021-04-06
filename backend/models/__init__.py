@@ -232,6 +232,7 @@ rating_parser.add_argument(
 # filter item: we provide filters among many ways
 filter = reqparse.RequestParser()
 
+filter.add_argument("page_size", type=int, help="items per page, the default value = 18", location="args")
 filter.add_argument("order_method", type=str, help="view, name, price (single choice only)", location="args")
 filter.add_argument("order", type=str, help="asc, desc, (single choice only)", location="args")
 filter.add_argument("price_min", type=float, location="args")
@@ -263,3 +264,8 @@ filter.add_argument(
     action="append", location="args"
 )
 
+filter.add_argument(
+    "status", type=int,
+    help="0: deleted items, 1: on sell items, 2: all items. Only admin can access to deleted items. Require the token to verify the identity.",
+    location="args",
+)

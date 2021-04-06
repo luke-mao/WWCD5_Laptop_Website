@@ -1,7 +1,7 @@
 main {
     width: 100% !important;
     display: flex;
-    flex-flow: row wrap;
+    flex-flow: row nowrap;
     justify-content: space-between;
     background-image: url(../img/many_laptops_opa_7.jpg);
     background-repeat: no-repeat;
@@ -25,7 +25,7 @@ main {
 }
 
 .filters .big-title {
-    font-size: 26px;
+    font-size: 24px;
     font-weight: bold;
     padding-bottom: 5px;
 }
@@ -40,13 +40,13 @@ main {
     padding-bottom: 15px;
     display: flex;
     flex-flow: column wrap;
-    font-size: 24px;
-    padding-left: 5px;
-    padding-right: 5px;
+    font-size: 20px;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 
 .filters .filter .title {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
     padding-bottom: 8px;
 }
@@ -83,7 +83,7 @@ main {
 
 .filter .check label {
     padding-left: 15px;
-    font-size: 22px;
+    font-size: 18px;
 }
 
 .shelf {
@@ -97,13 +97,23 @@ main {
     margin-right: auto;
 }
 
+.shelf .dropdowns {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+}
+
 .shelf .dropdown {
-    text-align: right;
     width: fit-content;
     padding: 8px;
     font-size: 17px;
     line-height: 1.3;
-    margin-left: 10px;
+    margin-right: 30px;
+}
+
+.shelf .dropdown option {
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 .shelf .products {
