@@ -30,6 +30,8 @@ async function item_page_set_up(){
         return;
     }
 
+
+    // snapshot: read the data from the local storage and then display
     if (type == "snapshot"){
         let data = JSON.parse(localStorage.getItem(item_id));
         put_item_on_page(data, true);
@@ -48,7 +50,7 @@ async function item_page_set_up(){
             let response = await fetch(url, init);
 
             if (! response.ok){
-                alert("Sorry. The item is not found for now... Please try again later.");
+                alert("Sorry. The item may not exist or removed from the shelf. Please try again later.");
                 window.history.back();
                 return;
             }
@@ -62,9 +64,6 @@ async function item_page_set_up(){
         }
     }
     
-
-
-
     return;
 }
 
@@ -88,7 +87,9 @@ function put_item_on_page(data, is_snapshot){
     util.removeAllChild(div_simple);
     util.removeAllChild(div_detail);
 
-    // fill simple: left: 4 images, right: short introduction
+
+    // simple profile consists of two main parts
+    // the image on the left, and the short introduction on the left
     let simple_left = document.createElement("div");
     simple_left.classList.add("photos");
 
@@ -96,6 +97,7 @@ function put_item_on_page(data, is_snapshot){
     simple_right.classList.add("simple-profile");
 
     util.appendListChild(div_simple, [simple_left, simple_right]);
+
 
     // left: 4 images
     put_photos(data['photos'], simple_left);
@@ -127,11 +129,23 @@ function put_specification(data, div){
     title.textContent = "Technical Specification";
     header.appendChild(title);
        
-    
+    // summary the data we need to build
+    let specs_data_list = arrange_data_to_specs(data);
+
+    for (let i = 0; i < specs_data_list.length; i++){
+        let spec = create_table_with_input(specs_data_list[i]);
+        specs.append(spec);
+    }
+
+    return;
+}
+
+
+function arrange_data_to_specs(data){
     // the table: several sections: 
     //      processor, memory, video card, display, storage
     //      (chassis, wireless card, battery, os, warranty)
-    let details = data['detail'];
+    let d = data['detail'];
 
     // key value pair:
     //      each value is a list:
@@ -141,165 +155,47 @@ function put_specification(data, div){
     let data_table_cpu = {
         'title': "Processor",
         'specs': {
-            'Model': [
-                details['cpu_prod'] + " " + details['cpu_model'],
-                {
-                    'cpu_prod': details['cpu_prod'], 
-                    'cpu_model': details['cpu_model'],
-                },
-            ],
-            'Technology': [
-                details['cpu_lithography'] + " nm",
-                {
-                    'cpu_lithography': details['cpu_lithography'],
-                },
-            ],
-            'Cache': [
-                details['cpu_cache'] + " MB",
-                {
-                    'cpu_cache': details['cpu_cache']
-                },
-            ],
-            'Base Speed': [
-                details['cpu_base_speed'] + " GHz",
-                {
-                    'cpu_base_speed': details['cpu_base_speed']
-                },
-            ],
-            'Max Speed': [
-                details['cpu_boost_speed'] + " GHz",
-                {
-                    'cpu_boost_speed': details['cpu_boost_speed'],
-                },
-            ],
-            'Number of Cores': [
-                details['cpu_cores'],
-                {
-                    'cpu_cores': details['cpu_cores'],
-                },
-            ],
-            'TDP': [
-                details['cpu_tdp'] + " W",
-                {
-                    'cpu_tdp': details['cpu_tdp']
-                }
-            ],
+            'Model': `${d['cpu_prod']} ${d['cpu_model']}`,
+            'Technology': `${d['cpu_lithography']} nm`,
+            'Cache': `${d['cpu_cache']} MB`,
+            'Base Speed': `${d['cpu_base_speed']} GHz"`,
+            'Max Speed': `${d['cpu_boost_speed']} GHz`,
+            'Number of Cores': `${d['cpu_cores']}`,
+            'TDP': `${d['cpu_tdp']} W`,
         },
     };
 
     let data_table_gpu = {
         'title': 'Graphic Card',
         'specs': {
-            'Model': [
-                details['gpu_prod'] + " " + details['gpu_model'],
-                {
-                    'gpu_prod': details['gpu_prod'],
-                    'gpu_model': details['gpu_model'],
-                }
-            ],
-            'Architecture': [
-                details['gpu_architecture'],
-                {
-                    'gpu_architecture': details['gpu_architecture'],
-                }
-            ],
-            'Technology': [
-                details['gpu_lithography'] + " nm",
-                {
-                    'gpu_lithography': details['gpu_lithography'],
-                }
-            ],
-            'Base Speed': [
-                details['gpu_base_speed'] + " MHz",
-                {
-                    'gpu_base_speed': details['gpu_base_speed'],
-                }
-            ],
-            "Boost Speed": [
-                details['gpu_boost_speed'] + " MHz",
-                {
-                    'gpu_boost_speed': details['gpu_boost_speed'],
-                }
-            ],
-            'Memory Speed': [
-                details['gpu_memory_speed'] + " MHz",
-                {
-                    'gpu_memory_speed': details['gpu_memory_speed'],
-                }
-            ],
-            "Memory Bandwidth": [
-                details['gpu_memory_bandwidth'] + " bit",
-                {
-                    'gpu_memory_bandwidth': details['gpu_memory_bandwidth']
-                }
-            ],
-            "Memory Size": [
-                details['gpu_memory_size'] + " MB",
-                {
-                    'gpu_memory_size': details['gpu_memory_size'],
-                }
-            ],
-            "TDP": [
-                details['gpu_tdp'] + " W",
-                {
-                    'gpu_tdp': details['gpu_tdp'],
-                }
-            ],
+            'Model': `${d['gpu_prod']} ${d['gpu_model']}`,
+            'Architecture': `${d['gpu_architecture']}`,
+            'Technology': `${d['gpu_lithography']} nm`,
+            'Base Speed': `${d['gpu_base_speed']} MHz`,
+            "Boost Speed": `${d['gpu_boost_speed']} MHz`,
+            'Memory Speed': `${d['gpu_memory_speed']} MHz`,
+            "Memory Bandwidth": `${d['gpu_memory_bandwidth']} bit`,
+            "Memory Size": `${d['gpu_memory_size']} MB`,
+            "TDP": `${d['gpu_tdp']} W`,
         },
     };
 
     let data_table_memory = {
         'title': "Memory",
         'specs': {
-            'Memory Size': [
-                details['memory_size'] + " GB",
-                {
-                    'memory_size': details['memory_size'],
-                }
-            ],
-            'Memory Speed': [
-                details['memory_speed'] + " MHz",
-                {
-                    'memory_speed': details['memory_speed'],
-                }
-            ],
-            'Memory Type': [
-                details['memory_type'],
-                {
-                    'memory_type': details['memory_type'],
-                },
-            ],
+            'Memory Size': `${d['memory_size']} GB`,
+            'Memory Speed': `${d['memory_speed']} MHz`,
+            'Memory Type': `${d['memory_type']}`,
         },
     };
 
     let data_table_display = {
         'title': "Display",
         'specs': {
-            'Model': [
-                details['display_type'],
-                {
-                    'display_type': details['display_type'],
-                }
-            ],
-            'Size': [
-                details['display_size'] + " Inch",
-                {
-                    'display_size': details['display_size'],
-                }
-            ],
-            'Resolution': [
-                details['display_horizontal_resolution'] + " x " + details['display_vertical_resolution'],
-                {
-                    'display_horizontal_resolution': details['display_horizontal_resolution'],
-                    'display_vertical_resolution': details['display_vertical_resolution'],
-                },
-            ],
-            'Touch Screen': [
-                details['display_touch'].toUpperCase(),
-                {
-                    'display_touch': details['display_touch'],
-                }
-            ],
+            'Model': `${d['display_type']}`,
+            'Size': `$d['display_size']} Inch`,
+            'Resolution': `${d['display_horizontal_resolution']} × ${d['display_vertical_resolution']}`,
+            'Touch Screen': `${d['display_touch'].toUpperCase()}`,
         },
     };
     
@@ -307,100 +203,40 @@ function put_specification(data, div){
     let data_table_storage = {
         'title': 'Storage',
         'specs': {
-            'Model': [
-                details['primary_storage_model'],
-                {
-                    'primary_storage_model': details['primary_storage_model'],
-                }
-            ],
-            'Size': [
-                details['primary_storage_cap'] + " GB",
-                {
-                    'primary_storage_cap': details['primary_storage_cap'],
-                }
-            ],
-            'Read Speed': [
-                details['primary_storage_read_speed'] + " MB/s",
-                {
-                    'primary_storage_read_speed': details['primary_storage_read_speed'],
-                }
-            ],
+            'Model': `${d['primary_storage_model']}`,
+            'Size': `${d['primary_storage_cap']} GB`,
+            'Read Speed': `${d['primary_storage_read_speed']} MB/s`,
         }
     }
     
     let data_table_other = {
         'title': 'Miscellaneous',
         'specs': {
-            'Operating System': [
-                details['operating_system'],
-                {
-                    'operating_system': details['operating_system'],
-                }
-            ],
-            'WiFi Card': [
-                details['wireless_card_model'],
-                {
-                    'wireless_card_model': details['wireless_card_model'],
-                }
-            ],
-            'WiFi Speed': [
-                details['wireless_card_speed'] + " Mbps",
-                {
-                    'wireless_card_speed': details['wireless_card_speed'],
-                }
-            ],
-            'Warranty': [
-                details['warranty_years'] + " Years" + details['warranty_type_long'],
-                {
-                    'warranty_years': details['warranty_years'],
-                    'warranty_type_long': details['warranty_type_long'],
-                }
-            ],
-            'Dimension (W cm x D cm x H cm)': [
-                details['chassis_width_cm'] 
-                    + " x " + details['chassis_depth_cm']
-                    + " x " + details['chassis_height_cm']
-                ,
-                {
-                    'chassis_width_cm': details['chassis_width_cm'],
-                    'chassis_depth_cm': details['chassis_depth_cm'],
-                    'chassis_height_cm': details['chassis_height_cm'],
-                }
-            ],
-            'Weight': [
-                details['chassis_weight_kg'] + " kg",
-                {
-                    'chassis_weight_kg': details['chassis_weight_kg'],
-                }
-            ],
-            'Battery Capacity': [
-                details['battery_capacity'] + " WHr",
-                {
-                    'battery_capacity': details['battery_capacity'],
-                }
-            ],
+            'Operating System': `${d['operating_system']}`,
+            'WiFi Card': `${d['wireless_card_model']}`,
+            'WiFi Speed': `${d['wireless_card_speed']} Mbps`,
+            'Warranty': `${d['warranty_years']} Years ${d['warranty_type_long']}`,
+            'Dimension (W cm x D cm x H cm)': `${d['chassis_width_cm']} × ${d['chassis_depth_cm']} × ${d['chassis_height_cm']}`,
+            'Weight': `${d['chassis_weight_kg']} kg`,
+            'Battery Capacity': `${d['battery_capacity']} WHr`,
         },
     };
 
-    // build tables
-    let datas = [
-        data_table_cpu, 
-        data_table_gpu,
-        data_table_memory,
-        data_table_display,
-        data_table_storage,
-        data_table_other
+    let specs_data_list = [
+        data_table_cpu, data_table_gpu,
+        data_table_memory, data_table_display,
+        data_table_storage, data_table_other
     ];
 
-    for (let i = 0; i < datas.length; i++){
-        specs.appendChild(create_table_with_input(data['simple']['item_id'],datas[i]));
-    }
+    console.log(specs_data_list);
 
-    return;
+    return specs_data_list;
+
+    
 }
 
 
-function create_table_with_input(item_id, data){
+function create_table_with_input(data){
     let div = document.createElement("div");
     div.classList.add("spec");
 
@@ -418,7 +254,7 @@ function create_table_with_input(item_id, data){
         // there are two values in the values_list
         // first element is the display value
         // second element is the dict {original_key : original_vlaue}
-        let values_list = data['specs'][key];
+        let value = data['specs'][key];
 
         let tr = document.createElement("tr");
         
@@ -426,7 +262,7 @@ function create_table_with_input(item_id, data){
         td1.textContent = key;
 
         let td2 = document.createElement("td");
-        td2.textContent = values_list[0] == null ? "N.A." : values_list[0];
+        td2.textContent = value == null ? "N.A." : value;
 
         // link
         table.appendChild(tr);
@@ -505,7 +341,7 @@ function put_profile(data, div, is_snapshot){
 
     let price = document.createElement("div");
     price.classList.add("price");
-    price.textContent = "$ " + data['simple']['price'];
+    price.textContent = `$ ${data['simple']['price']}`; 
 
     let list = document.createElement("ul");
     list.classList.add("list");
@@ -514,38 +350,34 @@ function put_profile(data, div, is_snapshot){
     util.appendListChild(div, [name, price, list]);
 
     // fill the list
-    let li_display = document.createElement("li");
-    li_display.textContent = data['detail']['display_size'] + "\""
-        + " " + data['detail']['display_horizontal_resolution'] + " x " 
-        + data['detail']['display_vertical_resolution']
-        + " screen"
+    // total 5 li tag in the list
+    for (let i = 0; i < 5; i++){
+        let li = document.createElement("li");
+        list.appendChild(li);
+    }
+
+    let li_list = list.childNodes;
+
+    // display
+    li_list[0].textContent = `${data['detail']['display_size']}\"   
+        ${data['detail']['display_horizontal_resolution']} × ${data['detail']['display_vertical_resolution']} screen`
     ;
 
-    let li_cpu = document.createElement("li");
-    li_cpu.textContent = data['detail']['cpu_prod'] 
-        + " " + data['detail']['cpu_model']
-        + " boost up to " + data['detail']['cpu_boost_speed'] + " GHz"
+    // cpu
+    li_list[1].textContent = `${data['detail']['cpu_prod']} ${data['detail']['cpu_model']}
+        boost up to ${data['detail']['cpu_boost_speed']} GHz`
     ;
 
-    let li_gpu = document.createElement("li");
-    li_gpu.textContent = data['detail']['gpu_prod'] 
-        + " " + data['detail']['gpu_model']
+    // gpu
+    li_list[2].textContent = `${data['detail']['gpu_prod']} ${data['detail']['gpu_model']}`
+
+    // memory
+    li_list[3].textContent = `${data['detail']['memory_size']} GB ${data['detail']['memory_type']} 
+        ${data['detail']['memory_speed']} MHz`
     ;
 
-    let li_memory = document.createElement("li");
-    li_memory.textContent = data['detail']['memory_size'] + " GB"
-        + " " + data['detail']['memory_type']
-        + " " + data['detail']['memory_speed'] + " MHz"
-    ;
-
-    let li_storage = document.createElement("li");
-    li_storage.textContent = data['detail']['primary_storage_cap'] + " GB"
-        + " " + data['detail']['primary_storage_model']
-    ;
-
-    util.appendListChild(list, [
-        li_display, li_cpu, li_gpu, li_memory, li_storage
-    ])
+    // storage
+    li_list[4].textContent = `${data['detail']['primary_storage_cap']} GB ${data['detail']['primary_storage_model']}`;
 
 
     // for customer, add the "purchase button"
@@ -649,6 +481,4 @@ function put_profile(data, div, is_snapshot){
 
     return;
 }
-
-
 
