@@ -18,6 +18,8 @@ main {
 }
 
 button {
+    margin-top: 4px;
+    margin-bottom: 4px;
     margin-left: 8px;
     margin-right: 8px;
     text-align: center;
@@ -38,7 +40,7 @@ button:hover {
 }
 
 input[type=text] {
-    font-size: 21px;
+    font-size: 20px;
     padding-top: 6px;
     padding-bottom: 6px;
     padding-left: 10px;
@@ -55,9 +57,48 @@ input[type=checkbox]{
 }
 
 
+table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: auto;
+    text-align: center;
+}
 
+table th, 
+table td {
+    padding: 8px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
 
+table th {
+    font-size: 25px;
+    font-weight: bold;
+}
 
+table td {
+    font-size: 22px;
+    font-weight: normal;
+}
+
+table td.pointer-underline:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+table td.flexcell {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+table td img {
+    width: 200px;
+    height: auto;
+    object-fit: contain;
+    padding: 4px;
+}
 
 
 

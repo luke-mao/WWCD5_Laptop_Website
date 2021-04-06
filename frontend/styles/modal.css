@@ -34,7 +34,7 @@
 }
 
 .modal-content .header .header-title{
-    font-size: 30px;
+    font-size: 28px;
     font-weight: bold;
 }
 
@@ -43,44 +43,28 @@
     padding-bottom: 20px;
     padding-left: 10px;
     padding-right: 10px;
+    display: flex;
+    flex-flow: column nowrap;
 }
 
 .modal-content .body .p{
-    font-size: 25px;
+    font-size: 24px;
     font-weight: normal;
 }
 
-.modal-content .body table {
-    width: 100%;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: 5px;
-    padding-right: 5px;
-    font-size: 25px;
-    text-align: center;
+.modal-content .body .row {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    align-items: center;
 }
 
-.modal-content .body table tr {
-    line-height: 1.6;
-    width: fit-content;
+.modal-content .body .row label {
+    font-size: 24px;
+    padding-right: 24px;
 }
-
-.modal-content .body table td{
-    padding-left: 10px;
-    padding-right: 10px;
-}
-
-.modal-content .body table tr input{
-    font-size: 25px;
-    padding-top: 6px;
-    padding-bottom: 6px;
-    padding-left: 8px;
-    width: 280px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    margin-top: 10px;
-}
-
 
 .modal-content .footer {
     padding-top: 20px;
@@ -88,31 +72,3 @@
     text-align: right;
 }
 
-.modal-content .footer button {
-    margin-right: 15px;
-    margin-left: 15px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: 15px;
-    padding-right: 15px;
-    border-radius: 5px;
-    border: 1px solid rgb(190, 178, 178);
-    font-size: 25px;
-}
-
-.modal-content .footer button:hover{
-    cursor: pointer;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-  

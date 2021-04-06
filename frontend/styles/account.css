@@ -61,15 +61,15 @@ main {
 }
 
 .orders table {
-    border-collapse: collapse;
-    text-align: center;
-    font-size: 24px;
     table-layout: fixed;
 }
 
-.big-table {
-    width: 100%;
-}
+
+/*  The account.html page has some small modification
+*   to the table css in the base.css file. 
+*   This is due to that we fit a small table into the big table
+*/
+
 
 .small-table {
     width: max-content;
@@ -89,12 +89,6 @@ th, td {
     border-top: 1px solid #ddd;
     padding-left: 18px;
     padding-right: 18px;
-}
-
-table img {
-    width: 200px;
-    height: auto;
-    object-fit: contain;
 }
 
 td.no-border {

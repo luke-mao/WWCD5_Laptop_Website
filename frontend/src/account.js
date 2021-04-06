@@ -98,6 +98,10 @@ function fill_profile(div, data){
 
 
     // address part
+
+    console.log(data['address']);
+
+
     for (let i = 0; i < data['address'].length; i++){
         let this_addr = document.createElement("div");
         this_addr.classList.add("row");

@@ -223,7 +223,6 @@ async function filter_and_page_change_update(page_id){
         url = add_url_param("page_size", 18, url);
     }
 
-    console.log(url);
 
     let init = {
         method: 'GET',
@@ -408,10 +407,7 @@ function fill_shelf(shelf, data){
     let products = shelf.getElementsByClassName("products")[0];
     let pages = shelf.getElementsByClassName("pages")[0];
 
-    console.log(data);
-
     util.removeAllChild(products);
-
 
     // if no data
     if (data['data'] == null){
@@ -471,10 +467,12 @@ function put_products_on_shelf_for_admin(products, data){
         // product id
         let td_1 = document.createElement("td");
         td_1.textContent = `#${this_data['simple']['item_id']}`;
+        td_1.classList.add("pointer-underline");
 
         // name
         let td_2 = document.createElement("td");
         td_2.textContent = `${this_data['simple']['name']}`;
+        td_2.classList.add("pointer-underline");
 
         // price
         let td_3 = document.createElement("td");
@@ -501,6 +499,7 @@ function put_products_on_shelf_for_admin(products, data){
 
         // action, three buttons: Delete / Resume, Edit Price, Adjust Stock, Edit Specs
         let td_6 = document.createElement("td");
+        td_6.classList.add("flexcell");
 
         let btn_list = ['Price', 'Stock', "Specs"];
 
@@ -659,6 +658,7 @@ function put_products_on_shelf_for_admin(products, data){
 
             let input = document.createElement("input");
             input.placeholder = "New Price";
+            input.type = "text";
             
             // link
             util.appendListChild(mw['body'], [row_1, row_2]);
@@ -797,6 +797,7 @@ function put_products_on_shelf_for_admin(products, data){
 
             let input = document.createElement("input");
             input.placeholder = "+x to add. -x to reduce";
+            input.type = "text";
 
             // link
             util.appendListChild(mw['body'], [row_1, row_2]);
@@ -929,13 +930,7 @@ function put_products_on_shelf_for_admin(products, data){
                         console.log(err);
                     }
                 });
-
-
-
             });
-
-
-
         });
 
 
@@ -943,6 +938,7 @@ function put_products_on_shelf_for_admin(products, data){
         td_6.childNodes[3].addEventListener("click", function(){
             alert("Not finish, will direct to a new page");
 
+            
 
 
 
@@ -1062,7 +1058,6 @@ function pages_set_up(pages, current_page, page_count){
     current_page = parseInt(current_page);
     page_count = parseInt(page_count);
 
-    console.log(`current_page = ${current_page}, page_count = ${page_count}`);
 
     // if less than 6 pages, display all 6
     if (page_count < 6){
