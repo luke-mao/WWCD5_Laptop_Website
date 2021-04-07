@@ -156,6 +156,7 @@ export function navbar_set_up(){
             );
 
             mw['footer_btn_1'].addEventListener("click", function(){
+                localStorage.clear();
                 sessionStorage.clear();
                 util.removeSelf(mw['modal']);
 

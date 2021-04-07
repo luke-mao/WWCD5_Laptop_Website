@@ -102,6 +102,7 @@ export function create_force_logout_modal(){
     );
 
     modal_dict['footer_btn'].addEventListener("click", function(){
+        localStorage.clear();
         sessionStorage.clear();
         window.location.href = "login.html";
         return;

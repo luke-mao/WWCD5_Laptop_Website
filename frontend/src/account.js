@@ -368,6 +368,7 @@ function modal_window_edit_profile(data){
         label.style.textTransform = "capitalize";
         
         let input = document.createElement("input");
+        input.type = "text";
         input.name = attributes[i];
 
         input.placeholder = data[attributes[i]];
@@ -631,6 +632,7 @@ async function modal_window_edit_or_create_address(data, is_edit){
         label.style.textTransform = "capitalize";
         
         let input = document.createElement("input");
+        input.type = "text";
         input.name = attributes[i];
 
         if (is_edit){

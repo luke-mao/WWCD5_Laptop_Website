@@ -4,28 +4,30 @@ from utils.token import Token
 from flask import request
 import sqlite3
 import os
-import pandas as pd
+import random 
+
 from .item import get_all_profiles
 
+import pandas as pd
 from scipy import stats
 from sklearn.preprocessing import MinMaxScaler
 
 
 api = Namespace(
     'recommender',
-    description="Recommendation systems in terms of three aspects: item based, popularity based and view history based"
+    description="""Recommend upon 4 aspects: popularity, sale records, customer view history, items similarity"""
 )
 
 
 @api.route('/item')
-class RecommenderItemBased(Resource):
+class ItemBasedRecommender(Resource):
     @api.response(200, "OK")
     @api.response(403, "No authorization token / token invalid / token expired")
     @api.response(404, "Invalid user_id")
     @api.expect(models.token_header)
-    @api.doc(description="Each user could have own recommended items based on popularity and user similarity. Return 5 items.")
+    @api.doc(description="Recommend items based on popularity and user similarity. Require token. Return 8 items.")
     def get(self):
-        """Recommendation system based on item rating and customer purchase history"""
+        """Recommend items based on popularity and user similarity."""
 
         auth_header = request.headers.get("Authorization")
         
@@ -107,7 +109,7 @@ class RecommenderItemBased(Resource):
                     all_result.append(i)
                 
                 #推荐给用户商品数目:top_k
-                top_k = 5
+                top_k = 8
                 
                 for i in pop_item:
                     if len(all_result) < top_k and i not in all_result:
@@ -132,55 +134,48 @@ class RecommenderItemBased(Resource):
 
 
 
-@api.route('/popularity')
-class RecommenderPopularityBased(Resource):
-    @api.response(200, "OK")
+@api.route('/mostview')
+class PopularityBasedRecommender(Resource):
+    @api.response(200, "OK", models.item_profile_list)
     @api.response(500, "Internal Server Error")
-    @api.doc(description="Each not registered user could have own recommended items based on most-viewed item. Return 10 items")
+    @api.doc(description="Recommend items based on most-viewed item. No token required. Return 8 items")
     def get(self):
-        """Recommendation system based on most-viewed item"""
+        """Recommend items based on most-viewed item (no token)"""
         
-        # only select the active products
-        sql = """SELECT * FROM item WHERE status = 1"""
+        top_k = 8
         
         try:
             with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
                 conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
                 cur = conn.cursor()
 
-                r1 = cur.execute(sql)
-                result = r1.fetchall()
-                item = pd.DataFrame(result)
+                # get the top 30 most view items, and return 8 in random
+                sql = """SELECT item_id FROM item WHERE status = 1 ORDER BY view DESC LIMIT 30"""
+
+                cur.execute(sql)
+                item_id_list = cur.fetchall()
+
+                random.shuffle(item_id_list)
                 
-                ####取top-k个
-                k = 8
-                p_all = []
-                all_result = item[['item_id',"view"]].sort_values("view",ascending=False)[:k]['item_id'].values.tolist()
+                r = get_all_profiles(item_id_list[:top_k])
                 
-                for i in all_result:
-                    profile = {}
-                    profile['item_id'] = int(i)
-                    p_all.append(profile)
-                r = get_all_profiles(p_all)
-                
-                return r
+                return r, 200
         
         except Exception as e:
             print(e)
             return "Internal server error", 500
 
 
-
 @api.route('/viewhistory')
-class RecommenderViewHistoryBased(Resource):
+class ViewHistoryBasedRecommender(Resource):
     @api.response(200, "OK")
     @api.response(204, "New user, no view history yet")
     @api.response(403, "No authorization token / token invalid / token expired")
     @api.response(404, "Invalid user_id")
     @api.expect(models.token_header)
-    @api.doc(description="Each user could have own recommended items based on view history. Return 5 items")
+    @api.doc(description="Recommend items based on view history. Require token. Return 5 items")
     def get(self):
-        """Recommendation based on view history"""
+        """Recommend items based on user view history"""
 
         auth_header = request.headers.get("Authorization")
         if not auth_header:
@@ -256,9 +251,6 @@ class RecommenderViewHistoryBased(Resource):
                 
                 view_history,item,laptop = pd.DataFrame(result),pd.DataFrame(result1),pd.DataFrame(result2)
             
-                # print(view_history)
-
-
                 most_view = pd.DataFrame(
                     view_history.groupby('user_id')['item_id'].agg(lambda x: stats.mode(x)[0])).reset_index()
                 
@@ -310,9 +302,97 @@ class RecommenderViewHistoryBased(Resource):
                     profile = {}
                     profile['item_id'] = int(i)
                     p_all.append(profile)
+
                 r = get_all_profiles(p_all)
                 return r
 
         except Exception as e:
             print(e)
             return "Internal server error", 500
+
+
+@api.route('/topselling')
+class TopSelling(Resource):
+    @api.response(200, "OK", models.item_profile_list)
+    @api.response(500, "Internal Server Error")
+    @api.doc(description="Recommend top selling products. Each fetch may return slightly different items / order. Return 8 items.")
+    def get(self):
+        """Return top selling products (no token)"""
+        
+        try:
+            with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
+                conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
+                cur = conn.cursor()
+
+                # find all products that people bought, and order using number descending
+                # then pick random 8 from them. 
+
+                sql = """
+                    SELECT item_id, SUM(quantity) AS total
+                    FROM order_item
+                    GROUP BY item_id
+                    ORDER BY total DESC
+                """
+
+                cur.execute(sql)
+                item_id_list = cur.fetchall()
+
+                # require to return 8, check whether the length > 8
+                top_k = 8
+                
+                random.shuffle(item_id_list)
+
+                response = get_all_profiles(item_id_list[:top_k])
+                
+                return response, 200
+        
+        except Exception as e:
+            print(e)
+            return "Internal server error", 500
+
+
+@api.route("/random")
+class RandomForBanner(Resource):
+    @api.response(200, "OK", models.banners)
+    @api.response(500, "Internal Server Error")
+    @api.doc(description="Return random image for the home page banner. Response comes with the item_id and name. Default return 10.")
+    def get(self):
+        """Random images for the home page banner"""
+
+        try:
+            with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
+                conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
+                cur = conn.cursor()
+                
+                # get random 10 id
+                sql_1 = """
+                    SELECT item_id, name
+                    FROM item
+                    WHERE status = 1
+                    ORDER BY RANDOM()
+                    LIMIT 10
+                """
+
+                cur.execute(sql_1)
+                result = cur.fetchall()
+
+                # now iterate it, and add a photo to each
+                for i in range(len(result)):
+                    sql_2 = """SELECT photo FROM photo WHERE item_id = ? LIMIT 1"""
+                    sql_2_param = (result[i]['item_id'],)
+
+                    cur.execute(sql_2, sql_2_param)
+                    result_2 = cur.fetchone()
+
+                    result[i]['photo'] = result_2['photo']
+                
+                return result, 200
+
+        except Exception as e:
+            print(e)
+            return "Internal server error", 500
+
+
+
+
+

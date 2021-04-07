@@ -17,8 +17,8 @@ main {
     height: fit-content;
     padding-top: 10px;
     padding-bottom: 10px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: 16px;
+    padding-right: 16px;
     background-color: #f5f5f5;
     display: flex;
     flex-flow: column nowrap;
@@ -88,7 +88,7 @@ main {
 }
 
 .shelf {
-    width: 78%;
+    width: 76%;
     display: flex;
     flex-flow: column nowrap;
     padding-left: 5px;
@@ -138,7 +138,7 @@ main {
 
 .shelf .products .product {
     width: 350px;
-    height: 330px;
+    height: 370px;
     margin-top: 10px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
@@ -171,7 +171,6 @@ main {
     backface-visibility: hidden;
 }
 
-
 .inner .front {
     padding-top: 10px;
     padding-bottom: 10px;
@@ -187,21 +186,55 @@ main {
 .inner .front .name {
     font-size: 24px;
     font-weight: bold;
-    padding-bottom: 8px;
+    padding-bottom: 10px;
 }
 
-.inner .front .date {
-    font-size: 18px;
-    font-weight: normal;
+.inner .front .stickers {
+    padding-bottom: 10px;
+    width: 100%;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+    align-items: center;
+    align-content: space-around;
+}
+
+.inner .front .stickers .sticker {
+    margin-top: 3px;
+    margin-bottom: 3px;
+    padding-top: 5px;
     padding-bottom: 5px;
+    padding-left: 4px;
+    padding-right: 4px;
+    /* border: 1px solid #ccc; */
+    border-radius: 5px;
+    font-size: 19px;
+    font-size: bold;
+}
+
+.inner .front .stickers .sticker:nth-child(1){
+    background-color: #7fffd4;
+}
+
+.inner .front .stickers .sticker:nth-child(2){
+    background-color: #ffa50066;
+}
+
+.inner .front .stickers .sticker:nth-child(3){
+    background-color: #0000ff33
+}
+
+.inner .front .stickers .sticker:nth-child(4){
+    background-color: #ffc0cb;
 }
 
 .inner .front img {
-    width: 250px;
-    height: 150px;
+    width: 280px;
+    height: 200px;
     object-fit: contain;
-    padding-top: 20px;
+    padding-top: 10px;
     padding-bottom: 10px;
+    border-radius: 5px;
 }
 
 .inner .front .price{

@@ -269,3 +269,17 @@ filter.add_argument(
     help="0: deleted items, 1: on sell items, 2: all items. Only admin can access to deleted items. Require the token to verify the identity.",
     location="args",
 )
+
+
+# banner for the front page
+banner = api.model('banner', {
+    "item_id": fields.Integer,
+    "name": fields.String,
+    "photo": fields.String,
+})
+
+banners = api.model('banners', {
+    "banners": fields.List(fields.Nested(banner))
+})
+
+

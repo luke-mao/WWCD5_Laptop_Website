@@ -6,8 +6,6 @@ import * as modal from "./modal.js";
 util.addLoadEvent(navbar_set_up)
 util.addLoadEvent(product_page_set_up)
 
-// the url default is localhost:8000/products.html
-// if there is a search string, 
 
 async function product_page_set_up(){
     let main = document.getElementsByTagName("main")[0];
@@ -20,6 +18,9 @@ async function product_page_set_up(){
     // there may be one dropdown, or two dropdowns
     let div_dropdowns = shelf.getElementsByClassName("dropdowns")[0];
     dropdowns_set_up(div_dropdowns);
+
+    // after set up the filters and dropdown list / lists
+    // use them to get the page feed
     filter_and_page_change_update();
 }
 
@@ -86,9 +87,9 @@ function filters_set_up(filters){
     // 3rd: storage
     let storage = create_filter_with_multiple_checkbox(
         "Storage", "storage", filter_and_page_change_update, [
-            {"value": 0, "label": "Up to 256GB"},
-            {"value": 1, "label": "From 256 up to 512GB"},
-            {"value": 2, "label": "From 512 up to 1TB"},
+            {"value": 0, "label": "Up to 256 GB"},
+            {"value": 1, "label": "From 256 GB up to 512GB"},
+            {"value": 2, "label": "From 512 GB up to 1TB"},
             {"value": 3, "label": "More than 1TB"},
         ],
     );
@@ -96,8 +97,8 @@ function filters_set_up(filters){
     // filter: memory
     let memory = create_filter_with_multiple_checkbox(
         "Memory", "memory", filter_and_page_change_update, [
-            {"value": 0, "label": "Up to 8GB"},
-            {"value": 1, "label": "From 8GB up to 16GB"},
+            {"value": 0, "label": "Up to 8 GB"},
+            {"value": 1, "label": "From 8 GB up to 16 GB"},
             {"value": 2, "label": "More than 16 GB"},
         ]
     );
@@ -952,7 +953,7 @@ function put_products_on_shelf_for_admin(products, data){
 function put_products_on_shelf(products, data){
     util.removeAllChild(products);
 
-    // add product
+    // add each product
     for (let i = 0; i < data.length; i++){
         let product = document.createElement("div");
         product.classList.add("product");
@@ -981,9 +982,9 @@ function put_products_on_shelf(products, data){
         front_name.classList.add("name");
         front_name.textContent = data[i]['simple']['name'];
 
-        let front_date = document.createElement("div");
-        front_date.classList.add("date");
-        front_date.textContent = "Launched at " + data[i]['detail']['launch_date'];
+        let front_attr = document.createElement("div");
+        front_attr.classList.add("stickers");
+        fill_front_attributes(front_attr, data[i]);
 
         let front_img = document.createElement("img");
         front_img.src = data[i]['simple']['thumbnail'];
@@ -994,52 +995,44 @@ function put_products_on_shelf(products, data){
         front_price.textContent = "$ " + data[i]['simple']['price'];
 
         util.appendListChild(front,[
-            front_name, front_date, front_img, front_price
+            front_name, front_attr, front_img, front_price
         ]);
 
         
         // back side: name, display, cpu model, graphic card, ram amount, ssd amount
-        let tr = document.createElement("tr");
-        let th = document.createElement("th");
-        let td = document.createElement("td");
+        // the first row will create a <th> tag
+        // other row simple a <td> tag
+        let td_lists = []
 
-        let back_name_tr = tr.cloneNode(true);
-        let back_name = th.cloneNode(true);
-        back_name.textContent = data[i]['simple']['name'];
-        back_name_tr.appendChild(back_name);
+        for (let i = 0; i < 6; i++){
+            let tr = back.insertRow(-1);
 
-        let back_display_tr = tr.cloneNode(true);
-        let back_display = td.cloneNode(true);
-        back_display.textContent = data[i]['detail']['display_size'] + " inch" 
-            + " " + data[i]['detail']['display_horizontal_resolution'] 
-            + "x" + data[i]['detail']['display_vertical_resolution'] 
+            if (i == 0){
+                let th = document.createElement("th");
+                tr.appendChild(th);
+                td_lists.push(th);
+            }
+            else {
+                let td = tr.insertCell(-1);
+                td_lists.push(td);
+            }
+        }
+
+        // so total 6 textContents need to be assign
+        td_lists[0].textContent = `${data[i]['simple']['name']}`;
+
+        td_lists[1].textContent = `${data[i]['detail']['display_size']} inch 
+            ${data[i]['detail']['display_horizontal_resolution']} × ${data[i]['detail']['display_vertical_resolution']}`
         ;
-        back_display_tr.appendChild(back_display);
 
-        let back_cpu_tr = tr.cloneNode(true);
-        let back_cpu = td.cloneNode(true);
-        back_cpu.textContent = data[i]['detail']['cpu_prod'] + " " + data[i]['detail']['cpu_model'];
-        back_cpu_tr.appendChild(back_cpu);
+        td_lists[2].textContent = `${data[i]['detail']['cpu_prod']} ${data[i]['detail']['cpu_model']}`;
 
-        let back_gpu_tr = tr.cloneNode(true);
-        let back_gpu = td.cloneNode(true);
-        back_gpu.textContent = data[i]['detail']['gpu_prod'] + " " + data[i]['detail']['gpu_model'];
-        back_gpu_tr.appendChild(back_gpu);
+        td_lists[3].textContent = `${data[i]['detail']['gpu_prod']} ${data[i]['detail']['gpu_model']}`;
 
-        let back_ram_tr = tr.cloneNode(true);
-        let back_ram = td.cloneNode(true);
-        back_ram.textContent = data[i]['detail']['memory_size'] + "GB" + " RAM " + data[i]['detail']['memory_type'];
-        back_ram_tr.appendChild(back_ram);
+        td_lists[4].textContent = `${data[i]['detail']['memory_size']} GB RAM ${data[i]['detail']['memory_type']}`;
 
-        let back_storage_tr = tr.cloneNode(true);
-        let back_storage = td.cloneNode(true);
-        back_storage.textContent = data[i]['detail']['primary_storage_cap'] + " GB Storage";
-        back_storage_tr.appendChild(back_storage);
-
-        util.appendListChild(back, [
-            back_name_tr, back_display_tr, back_cpu_tr, back_gpu_tr, back_ram_tr, back_storage_tr
-        ]);
-        
+        td_lists[5].textContent = `${data[i]['detail']['primary_storage_cap']} GB Storage`;
+       
 
         // event listener
         product.addEventListener("click", function(){
@@ -1047,6 +1040,26 @@ function put_products_on_shelf(products, data){
             return;
         })
     }
+}
+
+
+// create 4 small sticker onto the post
+// example: 13.3" 4300U 8GB 128GB
+// display some elementary information including screen size, cpu, ram, storage
+function fill_front_attributes(div, item_data){
+    for (let i = 0; i < 4; i++){
+        let sticker = document.createElement("div");
+        sticker.classList.add("sticker");
+        div.appendChild(sticker);
+    }
+
+    // for the cpu, remove the PRO substring
+    // so that the stickers will not become two lines
+
+    div.childNodes[0].textContent = `${item_data['detail']['display_size']}"`;
+    div.childNodes[1].textContent = `${item_data['detail']['cpu_model']}`;
+    div.childNodes[2].textContent = `${item_data['detail']['memory_size']} GB`;
+    div.childNodes[3].textContent = `${item_data['detail']['primary_storage_cap']} GB`;
 }
 
 
