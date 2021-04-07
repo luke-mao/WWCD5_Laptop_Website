@@ -17,8 +17,8 @@ main {
     height: fit-content;
     padding-top: 10px;
     padding-bottom: 10px;
-    padding-left: 20px;
-    padding-right: 15px;
+    padding-left: 10px;
+    padding-right: 10px;
     background-color: #f5f5f5;
     display: flex;
     flex-flow: column nowrap;
@@ -88,7 +88,7 @@ main {
 }
 
 .shelf {
-    width: 75%;
+    width: 78%;
     display: flex;
     flex-flow: column nowrap;
     padding-left: 5px;

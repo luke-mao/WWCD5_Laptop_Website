@@ -14,6 +14,12 @@ main {
     background-repeat: repeat-y;
 }
 
+.item.preview {
+    background-image: url("../img/preview.png");
+    background-size: 100% auto;
+    background-repeat: repeat-y;
+}
+
 .simple {
     display: flex;
     flex-flow: row wrap;
@@ -124,14 +130,16 @@ main {
     padding-right: 20px;
 }
 
-.detail .specs {
+.specs {
+    padding-top: 10px;
+    padding-bottom: 10px;
     display: flex;
     flex-flow: row wrap;
     justify-content: space-between;
-    padding-top: 10px;
+    align-content: flex-start;
 }
 
-.detail .specs .spec {
+.specs .spec {
     width: 50%;
     padding-top: 20px;
     padding-bottom: 20px;
@@ -146,27 +154,23 @@ main {
     padding-bottom: 12px;
 }
 
-.spec .spec-table{
+.spec table{
     width: 90%;
     margin-left: auto;
     margin-right: auto;
-    font-size: 25px;
-    border-collapse: collapse;
 }
 
-.spec .spec-table tr{
-    padding-top: 5px;
-    padding-bottom: 5px;
-    border-bottom: 1px solid #ccc;
-    line-height: 1.6;
+.edit {
+    width: 100%;
+    padding-bottom: 24px;
 }
 
-.spec .spec-table tr td:nth-child(1){
-    width: 60%;
+.edit h1 {
+    padding-bottom: 24px;
 }
 
-.spec .spec-table tr td:nth-child(2){
-    width: 40%;
+.modified {
+    background-color: yellow;
+    border-radius: 5px;
 }
-
 

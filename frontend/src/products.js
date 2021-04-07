@@ -646,8 +646,11 @@ function put_products_on_shelf_for_admin(products, data){
             let row_1 = document.createElement("div");
             row_1.classList.add("row");
 
+            // read the price from the textContent
+            // instead of the data, since we local update all values and the data may out of date
+            // td_3.textContent stores the price
             let label_1 = document.createElement("label");
-            label_1.textContent = `Original Price: $ ${this_data['simple']['price']}`;
+            label_1.textContent = `Original Price: ${td_3.textContent}`;
 
             // second row
             let row_2 = document.createElement("div");
@@ -696,7 +699,7 @@ function put_products_on_shelf_for_admin(products, data){
 
                 // valid new price, check if too much difference
                 let new_price = parseFloat(input.value);
-                let old_price = parseFloat(this_data['simple']['price']);
+                let old_price = parseFloat(td_3.textContent.substring(2));
 
                 let variation_p = Math.round(Math.abs(new_price - old_price) / old_price * 100);
 
@@ -786,8 +789,11 @@ function put_products_on_shelf_for_admin(products, data){
             let row_1 = document.createElement("div");
             row_1.classList.add("row");
 
+            // use the textContent from the current table
+            // in case this_data is out of date
+            // td_4
             let label_1 = document.createElement("label");
-            label_1.textContent = `Current stock is ${this_data['simple']['stock_number']}`;
+            label_1.textContent = `Current stock is ${td_4.textContent}`;
 
             let row_2 = document.createElement("div");
             row_2.classList.add("row");
@@ -846,7 +852,7 @@ function put_products_on_shelf_for_admin(products, data){
                 }
 
 
-                let old_stock = this_data['simple']['stock_number'];
+                let old_stock = td_4.textContent;
                 let adjust = input.value;
                 let new_stock = parseInt(old_stock) + parseInt(adjust);
 
@@ -936,13 +942,8 @@ function put_products_on_shelf_for_admin(products, data){
 
         // edit the specs
         td_6.childNodes[3].addEventListener("click", function(){
-            alert("Not finish, will direct to a new page");
-
-            
-
-
-
-
+            window.location.href = `item.html?item_id=${this_data['simple']['item_id']}&type=edit`;
+            return;
         });
     }
 }

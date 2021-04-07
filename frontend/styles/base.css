@@ -64,6 +64,10 @@ table {
     text-align: center;
 }
 
+table tr {
+    line-height: 1.5;
+}
+
 table th, 
 table td {
     padding: 8px;
