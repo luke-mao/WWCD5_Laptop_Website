@@ -8,3 +8,16 @@ Start doing some research about RS and did a practise about it with kaggle datas
 
 Week 3
 Critical review relavant topic about e-commerce system and finish background of our proposal.
+
+Week4
+Finish user-profile update and insert api backend function.
+
+Week5
+Start working backend recommendation part
+
+Week7
+Finish backend recommendation system based on popularity, view history and item rating rated by users
+
+Week8
+Start working on backend sales function
+ 

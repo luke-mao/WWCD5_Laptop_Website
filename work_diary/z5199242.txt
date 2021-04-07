@@ -14,3 +14,6 @@ In week3, start my api's part which is about user's functions and have an acknow
 
 week5:
 In this week, i finish the view history api function
+
+week 6:
+In this week, i finish the view history function which returns 20 items that user views.
