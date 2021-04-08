@@ -1,10 +1,12 @@
 import {navbar_set_up} from "./navbar.js"
 import * as util from "./util.js";
 import * as modal from "./modal.js";
+import * as rec from "./recommender.js";
 
 
 util.addLoadEvent(navbar_set_up);
 util.addLoadEvent(page_set_up);
+util.addLoadEvent(account_page_recommender_set_up);
 
 
 async function page_set_up(){
@@ -47,6 +49,21 @@ async function page_set_up(){
         alert("error");
         console.log(err);
     }
+}
+
+
+async function account_page_recommender_set_up(){
+    let rec_dict = rec.getAllRecommenderDivs();
+
+    // for customer, since the admin may also check this page
+    if (sessionStorage.getItem("role") == 1){
+        // require token
+        rec.fill_view_history_or_recommender_with_token(rec_dict.byitem, "byitem");
+    }
+
+    rec.fill_top_selling_or_top_view(rec_dict.topselling, true);
+
+    return;
 }
 
 

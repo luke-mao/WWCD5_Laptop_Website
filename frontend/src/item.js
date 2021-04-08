@@ -1,10 +1,12 @@
 import * as util from "./util.js";
 import {navbar_set_up} from "./navbar.js";
 import * as modal from "./modal.js";
+import * as rec from "./recommender.js";
 
 
 util.addLoadEvent(navbar_set_up);
 util.addLoadEvent(item_page_set_up);
+util.addLoadEvent(item_page_set_recommender);
 
 
 // This page supports for 3 view format
@@ -108,6 +110,25 @@ async function item_page_set_up(){
         }
     }
     
+    return;
+}
+
+
+function item_page_set_recommender(){
+    let rec_dict = rec.getAllRecommenderDivs();
+
+    if (sessionStorage.getItem("role") == 1){
+        // require token
+        rec.fill_view_history_or_recommender_with_token(rec_dict.byitem, "byitem");
+        rec.fill_view_history_or_recommender_with_token(rec_dict.viewhistory, "viewhistory");
+        rec.fill_view_history_or_recommender_with_token(rec_dict.viewhistory, "byviewhistory");
+        
+    }
+    else{
+        rec.fill_top_selling_or_top_view(rec_dict.topselling, true);
+        rec.fill_top_selling_or_top_view(rec_dict.topview, false);
+    }
+
     return;
 }
 

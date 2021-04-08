@@ -1,5 +1,6 @@
 import {navbar_set_up} from "./navbar.js";
 import * as util from "./util.js";
+import * as rec from "./recommender.js";
 
 
 util.addLoadEvent(navbar_set_up);
@@ -137,86 +138,17 @@ function set_up_animation(){
 
 
 function home_page_recommender_set_up(){
-    let recommender = document.getElementsByClassName("recommender")[0];
-
-    // three with token
-    // two without token
-    let childs = recommender.getElementsByTagName("div");
-
-    console.log(childs);
+    let rec_dict = rec.getAllRecommenderDivs();
 
     if (sessionStorage.getItem("role") == 1){
-        // customer fill the 3 with token
-        fill_view_history(childs[0]);
-        // fill_recommender_by_item(childs[1]);
-        // fill_recommender_by_view_history(childs[2]);
+        // require token
+        rec.fill_view_history_or_recommender_with_token(rec_dict.viewhistory, "viewhistory");
+        rec.fill_view_history_or_recommender_with_token(rec_dict.byitem, "byitem");
     }
 
-    // fill_top_selling(childs[3]);
-    // fill_top_view(childs[4]);
+    rec.fill_top_selling_or_top_view(rec_dict.topselling, true);
+    rec.fill_top_selling_or_top_view(rec_dict.topview, false);
 
     return;
 }
-
-
-async function fill_view_history(div){
-    util.removeAllChild(div);
-
-    // set up a title, with h1 only
-    let title = document.createElement("div");
-    title.classList.add("title");
-    div.appendChild(title);
-    
-    let h1 = document.createElement("h1");
-    h1.textContent = "Recently Viewed";
-    title.appendChild(h1);
-
-    // products: css from products.css
-    let products = document.createElement("div");
-    products.classList.add("products");
-    div.appendChild(products);
-
-
-    let url = "http://localhost:5000/user/viewhistory";
-    
-    let init = {
-        method: 'GET',
-        headers: {
-            'Authorization': 'token ' + sessionStorage.getItem("token"),
-            'accpet': 'application/json',
-        },
-    };
-
-    try {
-        let response = await fetch(url, init);
-
-        if (response.status == 200){
-            let data = await response.json();
-            util.put_products_on_shelf(products, data);
-
-            console.log(data);
-
-        }
-        else if (response.status == 204){
-            let no_product = document.createElement("div");
-            no_product.textContent = "No view history available. Please visit the products page.";
-            products.appendChild(no_product);
-        }
-        else{
-            let text = await response.text();
-            throw Error(text);
-        }
-    }
-    catch(err){
-        alert("error");
-        console.log(err);
-    }
-}
-
-
-
-
-
-
-
 

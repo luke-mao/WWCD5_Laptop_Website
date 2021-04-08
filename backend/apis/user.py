@@ -520,7 +520,13 @@ class ViewHistory(Resource):
         if not identity:
             return "Wrong Token", 403
         
-        sql = "SELECT item_id FROM view_history WHERE user_id=? ORDER BY time DESC LIMIT 8"
+        sql = """
+            SELECT DISTINCT view_history.item_id 
+            FROM view_history LEFT OUTER JOIN item ON view_history.item_id = item.item_id
+            WHERE user_id= ? AND item.status = 1
+            ORDER BY time DESC 
+            LIMIT 8
+        """
         
         parameter = (identity["user_id"],)
 

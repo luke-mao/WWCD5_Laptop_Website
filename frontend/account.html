@@ -9,6 +9,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         
         <link rel="stylesheet" type="text/css" href="styles/base.css"/>
+        <link rel="stylesheet" type="text/css" href="styles/base2.css"/>
         <link rel="stylesheet" type="text/css" href="styles/account.css" />
 
         <link rel="stylesheet" type="text/css" href="styles/navbar.css"/>
@@ -25,7 +26,19 @@
 
         <main>
             <div class="profile"></div>
+
             <div class="orders"></div>
+            
+            <div class="recommender">
+                <!-- require token -->
+                <div class="viewhistory"></div>
+                <div class="byitem"></div>
+                <div class="byviewhistory"></div>    
+
+                <!-- these two does not require token -->
+                <div class="topselling"></div>
+                <div class="topview"></div>
+            </div>
         </main>
 
         <script type="module" src="src/account.js"></script>
