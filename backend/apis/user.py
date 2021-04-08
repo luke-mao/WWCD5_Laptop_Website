@@ -15,11 +15,49 @@ api = Namespace(
 )
 
 
+def get_user_profile(user_id):
+    sql1 = """
+        SELECT user_id, first_name, last_name, email, mobile
+        FROM user
+        WHERE user_id = ?
+    """
+    
+    #  address only return the valid ones
+    sql2 = """
+        SELECT address_id, unit_number, street_number, street_name, suburb, state, postcode
+        FROM customer_address
+        WHERE user_id = ? AND status == 1
+    """
+
+    sql_param = (user_id,)
+
+    try:
+        with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
+            conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
+
+            cur1 = conn.cursor()
+            cur2 = conn.cursor()
+            
+            r1, r2 = cur1.execute(sql1, sql_param), cur2.execute(sql2, sql_param)
+            
+            result1 = r1.fetchone()
+            result2 = r2.fetchall()
+
+            if not result1:
+                return None
+            else:
+                result1["address"] = result2
+                return result1
+
+    except Exception as e:
+        print(e)
+        abort(500)
+
+
 @api.route('/profile')
 class Profile(Resource):
     @api.response(200,"OK",models.profile_full)
     @api.response(403,"No authorization token / token invalid / token expired")
-    @api.response(404, "Invalid user_id")
     @api.expect(models.token_header)
     @api.doc(description="The registered user can retrieve all profile sets.")
     def get(self):
@@ -33,44 +71,9 @@ class Profile(Resource):
         if not identity:
             return "Wrong token", 403
         
-        sql1 = """
-            SELECT first_name, last_name, email, mobile
-            FROM user
-            WHERE user_id = ?
-        """
-        
-        #  address only return the valid ones
-        sql2 = """
-            SELECT address_id, unit_number, street_number, street_name, suburb, state, postcode
-            FROM customer_address
-            WHERE user_id = ? AND status == 1
-        """
+        result = get_user_profile(identity['user_id'])
+        return result
 
-        sql_param = (identity['user_id'],)
-
-        try:
-            with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
-                conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
-
-                cur1 = conn.cursor()
-                cur2 = conn.cursor()
-                
-                r1, r2 = cur1.execute(sql1, sql_param), cur2.execute(sql2, sql_param)
-                
-                result1 = r1.fetchone()
-                result2 = r2.fetchall()
-
-                if not result1:
-                    return "Invalid user_id", 404
-                
-                result1["address"] = result2
-
-                return result1, 200
-
-        except Exception as e:
-            print(e)
-            return "Internal server error", 500
-    
 
     @api.response(200, "OK")
     @api.response(403, "No authorization token / token invalid / token expired")

@@ -86,6 +86,12 @@ async function item_page_set_up(){
             }
         };
 
+        // if it is the logged in user, add the token into it 
+        if (sessionStorage.getItem("role") == 1){
+            init['headers']['Authorization'] = "token " + sessionStorage.getItem("token");
+        }
+
+        
         try{
             let response = await fetch(url, init);
 
@@ -117,6 +123,9 @@ async function item_page_set_up(){
 function item_page_set_recommender(){
     let rec_dict = rec.getAllRecommenderDivs();
 
+    // for recommender on the item page
+    // only for customer (logged in & not logged in)
+
     if (sessionStorage.getItem("role") == 1){
         // require token
         rec.fill_view_history_or_recommender_with_token(rec_dict.byitem, "byitem");
@@ -124,7 +133,7 @@ function item_page_set_recommender(){
         rec.fill_view_history_or_recommender_with_token(rec_dict.viewhistory, "byviewhistory");
         
     }
-    else{
+    else if (sessionStorage.getItem("role") == null){
         rec.fill_top_selling_or_top_view(rec_dict.topselling, true);
         rec.fill_top_selling_or_top_view(rec_dict.topview, false);
     }
@@ -639,7 +648,7 @@ function arrange_data_to_specs(data, status, original_data){
             'Model': `${d['cpu_prod']} ${d['cpu_model']}`,
             'Technology': `${d['cpu_lithography']} nm`,
             'Cache': `${d['cpu_cache']} MB`,
-            'Base Speed': `${d['cpu_base_speed']} GHz"`,
+            'Base Speed': `${d['cpu_base_speed']} GHz`,
             'Max Speed': `${d['cpu_boost_speed']} GHz`,
             'Number of Cores': `${d['cpu_cores']}`,
             'TDP': `${d['cpu_tdp']} W`,

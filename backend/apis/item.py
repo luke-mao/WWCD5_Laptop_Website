@@ -3,6 +3,7 @@ from flask import request, abort
 import sqlite3 
 import os
 import models
+import time 
 from textdistance import jaro_winkler
 from utils.token import Token
 from utils.attributes import simple_attributes, detail_attributes
@@ -174,8 +175,10 @@ class Item_with_id(Resource):
     @api.response(200, "OK", models.item_profile)
     @api.response(404, "Not found")
     @api.response(400, "Invalid item_id: item_id must be a positive integer / item_id not provided.")
+    @api.expect(models.token_header)
     @api.doc(description="""
         Everyone can view the details of the item. No need to provide token.
+        But for logged in user, the token can be used to store the view history. 
         status = 1 for available product. status = 0 means the product is deleted, and no longer for sale.
         Everyone can view the deleted items. But usually the customer will not be directed to deleted items.  
     """)
@@ -226,7 +229,23 @@ class Item_with_id(Resource):
                     'detail': detail_profile, 
                     'photos': photos
                 }
+
+                # before return, check the token header
+                header = request.headers.get("Authorization")
                 
+                # if exist, check the role
+                if header:
+                    T = Token()
+                    identity = T.check(header)
+
+                    if identity['role'] == 1:
+                        # for logged in user, store in the view history
+                        sql_4 = "INSERT INTO view_history(user_id, item_id, time) VALUES (?, ?, ?)"
+                        sql_4_param = (identity['user_id'], item_id, time.time())
+                        
+                        cur.execute(sql_4, sql_4_param)
+
+                # return result
                 return result, 200
 
         except Exception as e:

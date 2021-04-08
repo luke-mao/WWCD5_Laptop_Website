@@ -18,6 +18,58 @@ api = Namespace(
 )
 
 
+def get_this_order_history(ord_id):
+    try:
+        with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
+            conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
+            cur = conn.cursor()
+
+            sql_1 = """
+                SELECT orders.ord_id, orders.user_id, orders.unix_time, orders.total_price,
+                    orders.notes, orders.tracking, orders.card_last_four, user.first_name, user.last_name
+                FROM user, orders
+                WHERE orders.ord_id = ?
+            """
+
+            sql_1_param = (ord_id,)
+            cur.execute(sql_1, sql_1_param)
+
+            order = cur.fetchone()
+            
+            sql_2 = """
+                SELECT order_item.item_id, order_item.price, order_item.quantity, order_item.snapshot
+                FROM order_item, item
+                WHERE order_item.ord_id = ? AND order_item.item_id = item.item_id
+            """
+
+            cur.execute(sql_2, sql_1_param)
+            order_items = cur.fetchall()
+
+            # insert into the order
+            order["items"] = order_items
+
+            # each order has an address (may be different for different orders)
+            # the address is also a dictionary
+            sql_3 = """
+                SELECT unit_number, street_number, street_name, suburb, state, postcode
+                FROM customer_address, orders
+                WHERE orders.ord_id = ? AND orders.address_id = customer_address.address_id
+            """
+
+            cur.execute(sql_3, sql_1_param)
+            address = cur.fetchone()
+
+            # insert, value is a dictionary
+            order["address"] = address
+            
+            return order
+    
+    except Exception as e:
+        print(e)
+        abort(500)
+
+
+
 @api.route('')
 class Order(Resource):
     @api.response(200, "OK", models.order_history_list)
@@ -44,8 +96,7 @@ class Order(Resource):
                 cur = conn.cursor()
 
                 sql_1 = """
-                    SELECT orders.ord_id, orders.user_id, orders.unix_time, orders.total_price,
-                        orders.notes, orders.tracking, orders.card_last_four, user.first_name, user.last_name
+                    SELECT orders.ord_id
                     FROM user, orders
                     WHERE user.user_id = orders.user_id AND user.user_id = ?
                     ORDER BY unix_time DESC
@@ -53,44 +104,19 @@ class Order(Resource):
 
                 sql_1_param = (identity["user_id"],)
                 cur.execute(sql_1, sql_1_param)
-                orders = cur.fetchall()
 
-                if not orders:
+                sql_1_result = cur.fetchall()
+                order_id_list = [e['ord_id'] for e in sql_1_result]
+
+                if not order_id_list:
                     return "The customer has not made any orders yet", 204
                
-                
-                # extract the order items
-                # the snapshot can be json parse into a dictionary again
-                for order in orders:
-                    sql_2 = """
-                        SELECT order_item.item_id, order_item.price, order_item.quantity, order_item.snapshot
-                        FROM order_item, item
-                        WHERE order_item.ord_id = ? AND order_item.item_id = item.item_id
-                    """
+                result = []
 
-                    sql_2_param = (order["ord_id"],)
-                    cur.execute(sql_2, sql_2_param)
-                    order_items = cur.fetchall()
+                for ord_id in order_id_list:
+                    result.append(get_this_order_history(ord_id))
 
-                    # insert into the order
-                    order["items"] = order_items
-
-                    # each order has an address (may be different for different orders)
-                    # the address is also a dictionary
-                    sql_3 = """
-                        SELECT unit_number, street_number, street_name, suburb, state, postcode
-                        FROM customer_address, orders
-                        WHERE orders.ord_id = ? AND orders.address_id = customer_address.address_id
-                    """
-
-                    sql_3_param = (order["ord_id"],)
-                    cur.execute(sql_3, sql_3_param)
-                    address = cur.fetchone()
-
-                    # insert, value is a dictionary
-                    order["address"] = address
-                
-                return orders, 200
+                return result, 200
         
         except Exception as e:
             print(e)

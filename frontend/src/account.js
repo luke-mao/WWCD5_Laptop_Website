@@ -61,8 +61,6 @@ async function account_page_recommender_set_up(){
         rec.fill_view_history_or_recommender_with_token(rec_dict.byitem, "byitem");
     }
 
-    rec.fill_top_selling_or_top_view(rec_dict.topselling, true);
-
     return;
 }
 

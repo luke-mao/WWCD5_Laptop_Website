@@ -58,6 +58,12 @@ profile_full = api.model('profile_full',{
     'address': fields.List(fields.Nested(address))
 })
 
+# list of profiles, for admin use
+profile_full_list = api.model('profile_full_list', {
+    'users': fields.List(fields.Nested(profile_full))
+})
+
+
 # simple for PUT profile (since the address is PUT separately)
 profile_simple = api.model("profile_simple", {
     'first_name': fields.String,
@@ -151,6 +157,10 @@ order_history_list = api.model('order_history_list', {
     'orders': fields.List(fields.Nested(order_history))
 })
 
+all_orders_history_list = api.model('all_orders_history_list', {
+    'new': fields.List(fields.Nested(order_history)),
+    'old': fields.List(fields.Nested(order_history)),
+})
 
 # item module
 # the data contains two keys: simple and detail
