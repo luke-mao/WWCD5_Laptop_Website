@@ -507,7 +507,7 @@ class ViewHistory(Resource):
     @api.response(403, "No authorization token / token invalid / token expired")
     @api.response(204, "No content")
     @api.expect(models.token_header)
-    @api.doc(description="The registered user can retrieve the recent 20 view_history")
+    @api.doc(description="The registered user can retrieve the recent 8 view_history")
     def get(self):
 
         header = request.headers.get("Authorization")
@@ -520,7 +520,7 @@ class ViewHistory(Resource):
         if not identity:
             return "Wrong Token", 403
         
-        sql = "SELECT item_id FROM view_history WHERE user_id=? ORDER BY time DESC LIMIT 20"
+        sql = "SELECT item_id FROM view_history WHERE user_id=? ORDER BY time DESC LIMIT 8"
         
         parameter = (identity["user_id"],)
 
@@ -528,13 +528,16 @@ class ViewHistory(Resource):
             with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
                 conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
                 cur = conn.cursor()
+                
                 r = cur.execute(sql, parameter)
                 result = r.fetchall()
+                
                 if len(result) == 0:
                     return "No content", 204
                 else:
                     final = get_all_profiles(list(result))
                     return final, 200
+
         except Exception as e:
             print(e)
             return "Internal server error", 500

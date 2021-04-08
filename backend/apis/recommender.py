@@ -27,7 +27,7 @@ class ItemBasedRecommender(Resource):
     @api.expect(models.token_header)
     @api.doc(description="Recommend items based on popularity and user similarity. Require token. Return 8 items.")
     def get(self):
-        """Recommend items based on popularity and user similarity."""
+        """Recommend items based on popularity and user similarity (need token)"""
 
         auth_header = request.headers.get("Authorization")
         
@@ -134,13 +134,13 @@ class ItemBasedRecommender(Resource):
 
 
 
-@api.route('/mostview')
+@api.route('/topview')
 class PopularityBasedRecommender(Resource):
     @api.response(200, "OK", models.item_profile_list)
     @api.response(500, "Internal Server Error")
     @api.doc(description="Recommend items based on most-viewed item. No token required. Return 8 items")
     def get(self):
-        """Recommend items based on most-viewed item (no token)"""
+        """Return top viewed products (no token)"""
         
         top_k = 8
         
@@ -173,9 +173,9 @@ class ViewHistoryBasedRecommender(Resource):
     @api.response(403, "No authorization token / token invalid / token expired")
     @api.response(404, "Invalid user_id")
     @api.expect(models.token_header)
-    @api.doc(description="Recommend items based on view history. Require token. Return 5 items")
+    @api.doc(description="Recommend items based on the user's view history. Require token. Return 5 items")
     def get(self):
-        """Recommend items based on user view history"""
+        """Recommend items based on user view history (need token)"""
 
         auth_header = request.headers.get("Authorization")
         if not auth_header:
@@ -357,7 +357,7 @@ class RandomForBanner(Resource):
     @api.response(500, "Internal Server Error")
     @api.doc(description="Return random image for the home page banner. Response comes with the item_id and name. Default return 10.")
     def get(self):
-        """Random images for the home page banner"""
+        """Random images for the home page banner (no token)"""
 
         try:
             with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
@@ -378,7 +378,7 @@ class RandomForBanner(Resource):
 
                 # now iterate it, and add a photo to each
                 for i in range(len(result)):
-                    sql_2 = """SELECT photo FROM photo WHERE item_id = ? LIMIT 1"""
+                    sql_2 = """SELECT photo FROM photo WHERE item_id = ? ORDER BY RANDOM() LIMIT 1"""
                     sql_2_param = (result[i]['item_id'],)
 
                     cur.execute(sql_2, sql_2_param)

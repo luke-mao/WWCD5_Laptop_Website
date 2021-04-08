@@ -9,7 +9,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         
         <link rel="stylesheet" type="text/css" href="styles/base.css"/>
+        <link rel="stylesheet" type="text/css" href="styles/base2.css"/>
         <link rel="stylesheet" type="text/css" href="styles/index.css" />
+        
 
         <link rel="stylesheet" type="text/css" href="styles/navbar.css"/>
         <link rel="stylesheet" type="text/css" href="styles/modal.css"/>
@@ -25,7 +27,21 @@
         <nav class="navbar"></nav>
 
         <main>
-            <h1>Not yet implemented</h1>
+            <div class="banners"></div>
+
+            <!-- search bar leave later, need to figure out how to extract keyword onto that page -->
+            <!-- <div class="search"></div> -->
+
+            <div class="recommender">
+                <!-- require token -->
+                <div class="viewhistory"></div>
+                <div class="byitem"></div>
+                <div class="byviewhistory"></div>    
+
+                <!-- these two does not require token -->
+                <div class="topselling"></div>
+                <div class="topview"></div>
+            </div>
         </main>
 
         <script type="module" src="src/index.js"></script>
