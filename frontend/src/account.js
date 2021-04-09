@@ -10,8 +10,27 @@ util.addLoadEvent(account_page_recommender_set_up);
 
 
 async function page_set_up(){
-    let url_1 = "http://localhost:5000/user/profile";
-    let url_2 = "http://localhost:5000/order";
+    if (sessionStorage.getItem("role") == null){
+        let mw = modal.create_simple_modal_with_text(
+            "No Access",
+            "Sorry. You cannot access this page. Redirecting to the home page..",
+            "OK",
+        );
+
+        mw['footer_btn'].addEventListener("click", function(){
+            window.location.href = "index.html";
+            return;
+        });
+
+        return;
+    }
+
+
+    // two url, but need to determine whether they look at own profile
+    // or the admin wants to look at someone's profile
+    // init is the same
+    let url_1 = null;
+    let url_2 = null;
 
     let init = {
         method: 'GET',
@@ -21,6 +40,39 @@ async function page_set_up(){
         },
     };
 
+    let is_admin_view = false;
+
+    let url_search = new URLSearchParams(window.location.search.substring(1));
+
+    if (url_search.get("user_id") && sessionStorage.getItem("role") == "0"){
+        // admin look at someone's profile
+        let user_id = url_search.get("user_id");
+
+        if (isNaN(user_id)){
+            let mw = modal.create_simple_modal_with_text(
+                "Invalid Search",
+                "Sorry. This user search is invalid. Redirecting you back..",
+                "OK",
+            );
+    
+            mw['footer_btn'].addEventListener("click", function(){
+                window.history.back();
+                return;
+            });
+    
+            return;
+        }
+
+        is_admin_view = true;
+
+        url_1 = `http://localhost:5000/admin/user/${user_id}`;
+        url_2 = `http://localhost:5000/admin/orders/${user_id}`;
+    }
+    else{
+        url_1 = "http://localhost:5000/user/profile";
+        url_2 = "http://localhost:5000/order";
+    }
+    
 
     try{
         let response_1 = await fetch(url_1, init);
@@ -31,11 +83,18 @@ async function page_set_up(){
             return;
         }
 
+        ///////////////////////////////////////////////////////////
+
+        // here need to classify admin / customer
+        // also the admin can still view customer profile
+        ///////////////////////////////////////////////////////////
+
+
         let div_profile = document.getElementsByClassName("profile")[0];
         let div_orders = document.getElementsByClassName("orders")[0];
 
         let data_1 = await response_1.json();
-        fill_profile(div_profile, data_1);
+        fill_profile(div_profile, data_1, is_admin_view);
 
         if (response_2.status == 204){
             util.fill_no_orders(div_orders, "Orders");
@@ -65,7 +124,7 @@ async function account_page_recommender_set_up(){
 }
 
 
-function fill_profile(div, data){
+function fill_profile(div, data, is_admin_view){
     let img = document.createElement("img");
     img.src = "../img/cartoon_profile.png";
     img.alt = "cartoon";
@@ -113,10 +172,6 @@ function fill_profile(div, data){
 
 
     // address part
-
-    console.log(data['address']);
-
-
     for (let i = 0; i < data['address'].length; i++){
         let this_addr = document.createElement("div");
         this_addr.classList.add("row");
@@ -137,6 +192,16 @@ function fill_profile(div, data){
         label.textContent += `No. ${this_data['street_number']} ${this_data['street_name']} `;
         label.textContent += `${this_data['suburb']} ${this_data['state']} ${this_data['postcode']}`;
 
+        // link
+        details.appendChild(this_addr);
+        util.appendListChild(this_addr, [i_addr, label]);
+        
+        // if it is the admin view , no button required
+        if (is_admin_view){
+            continue;
+        }
+
+        // not admin view, add buttons
         let btn_edit = document.createElement("button");
         btn_edit.classList.add("edit");
         btn_edit.textContent = "Edit";
@@ -144,10 +209,9 @@ function fill_profile(div, data){
         let btn_remove = document.createElement("button");
         btn_remove.classList.add("remove");
         btn_remove.textContent = "Remove";
-        
+
         // link
-        details.appendChild(this_addr);
-        util.appendListChild(this_addr, [i_addr, label, btn_edit, btn_remove]);
+        util.appendListChild(this_addr, [btn_edit, btn_remove]);
 
         // event listener
         btn_edit.addEventListener("click", function(){
@@ -161,7 +225,11 @@ function fill_profile(div, data){
         });
     }
 
+    if (is_admin_view){
+        return;
+    }
 
+    
     // the last row has two buttons, edit profile, add new address
     let div_last = document.createElement("div");
     div_last.classList.add("row");
