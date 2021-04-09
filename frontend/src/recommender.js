@@ -58,11 +58,17 @@ export async function fill_view_history_or_recommender_with_token(div, keyword){
 
         if (response.status == 200){
             let data = await response.json();
+            
+            console.log("here prepare to send data");
+            console.log(data);
+            
+            
             util.put_products_on_shelf(div_dict.products, data);
+
+
             assign_sliding_dots(div_dict.products, div_dict.dots);
         }
-        else if (response.status == 204){
-
+        else {
             if (keyword == "viewhistory"){
                 let no_product = document.createElement("div");
                 no_product.textContent = "No view history available. Please visit the products page.";
@@ -72,10 +78,10 @@ export async function fill_view_history_or_recommender_with_token(div, keyword){
                 util.removeSelf(div);
             }
         }
-        else{
-            let text = await response.text();
-            throw Error(text);
-        }
+        // else{
+        //     let text = await response.text();
+        //     throw Error(text);
+        // }
     }
     catch(err){
         alert("error");
@@ -139,9 +145,18 @@ export function assign_sliding_dots(products, dots){
     // if less than 4, then remove the dots
     let product_list = products.getElementsByClassName("product");
 
+    console.log(product_list);
+    console.log(product_list.length);
+
+
     // the page layout can display 4 items in a row without wrap
     if (product_list.length <= 4){
-        util.removeSelf(dots);
+        // console.log("here!!!");
+        // console.log(dots);
+        // console.log(dots.parentNode);
+        // util.removeSelf(dots);
+
+        util.removeAllChild(dots);
         return;
     }
 

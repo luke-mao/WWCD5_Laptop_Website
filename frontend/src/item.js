@@ -52,7 +52,7 @@ async function item_page_set_up(){
 
     // valid: check three modes: purchase, snapshot, preview
     let is_valid_0 = type == null;
-    let is_valid_1 = type == "snapshot" && data !== null && sessionStorage.getItem("role") == 1;
+    let is_valid_1 = type == "snapshot" && data !== null && sessionStorage.getItem("role") !== null;
     let is_valid_2 = type == "edit" && sessionStorage.getItem("role") == 0;
     
 

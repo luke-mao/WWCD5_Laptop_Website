@@ -218,51 +218,41 @@ class OrdersByUserId(Resource):
     @api.response(200,"OK")
     @api.response(400, "Invalid ord_id")
     @api.response(403,"No authorization token / token invalid / token expired / not admin token")
-    @api.expect(models.token_header)
+    @api.expect(models.token_header, models.tracking)
     @api.doc(description="Admin can add the tracking number to a new order (tracking number can be repeatly updated).")
     def put(self, ord_id):
         identity = check_admin_token(request.headers.get("Authorization"))
-        ord_id = check_positive_integer(ord_id)
+        ord_id = check_positive_integer(ord_id, "ord_id")
 
+        # get the data
+        if not request.json:
+            return "No tracking data", 400
         
-        # try:
-        #     with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
-        #         conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
-        #         cur = conn.cursor()
+        data = request.json
 
-        #         # first prove that this user_id exist
-        #         sql_1 = "SELECT * FROM user WHERE user_id = ? AND role = 1"
-        #         sql_1_param = (user_id,)
+        if not data['tracking']:
+            return "No tracking data", 400
+        
+        tracking = data['tracking']
 
-        #         cur.execute(sql_1, sql_1_param)
-        #         res_1 = cur.fetchone()
+        try:
+            with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
+                conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
+                cur = conn.cursor()
 
-        #         if not res_1:
-        #             return "Invalid user_id", 400
+                sql = "UPDATE orders SET tracking = ? WHERE ord_id = ?"
+                sql_param = (tracking, ord_id)
 
+                cur.execute(sql, sql_param)
 
-        #         # select all orders, first select new orders (no tracking number)
-        #         # next select all finished orders
-        #         sql_2= "SELECT ord_id FROM orders WHERE user_id = ? ORDER BY unix_time DESC"
-
-        #         cur.execute(sql_2, sql_1_param)
-        #         res_2 = cur.fetchall()
-
-        #         if len(res_2) == 0:
-        #             return "No orders at all", 204
+                if cur.rowcount == 0:
+                    return "Invalid ord_id", 400
                 
-        #         ord_id_list = [e['ord_id'] for e in res_2]
+                return "OK", 200
 
-        #         orders = []
-
-        #         for ord_id in ord_id_list:
-        #             orders.append(get_this_order_history(ord_id))
-
-        #         return orders, 200 
-
-        # except Exception as e:
-        #     print(e)
-        #     abort(500)    
+        except Exception as e:
+            print(e)
+            abort(500)    
 
 
 

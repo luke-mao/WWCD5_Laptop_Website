@@ -293,3 +293,7 @@ banners = api.model('banners', {
 })
 
 
+tracking = api.model('tracking', {
+    'tracking': fields.String,
+})
+
