@@ -22,6 +22,7 @@ api = Namespace(
 @api.route('/item')
 class ItemBasedRecommender(Resource):
     @api.response(200, "OK")
+    @api.response(204, "Customer with no purchase and rating record")
     @api.response(403, "No authorization token / token invalid / token expired")
     @api.response(404, "Invalid user_id")
     @api.expect(models.token_header)
@@ -86,11 +87,21 @@ class ItemBasedRecommender(Resource):
                 
                 #####找出最邻近用户
                 def computeNearestNeighbor(user_id, k=3):
-                    return df.drop(user_id).index.to_series().apply(pearson, args=(user_id,)).nlargest(k)
-                
+                    # the customer may not have purchased before
+                    # so need to check, if no purchase, return none
+                    if user_id in df.columns:
+                        return df.drop(user_id).index.to_series().apply(pearson, args=(user_id,)).nlargest(k)
+                    else:
+                        return None
+
+
                 ####基于邻近用户做出推荐
                 def recommend(user_id):
                     # 找到距离最近的用户id
+                    # return None if the customer has no purchase record
+                    if not computeNearestNeighbor(user_id):
+                        return None 
+
                     nearest_user_id = computeNearestNeighbor(user_id).index[0]
                     
                     # 找出邻居评价过、但自己未曾评价的乐队（或商品）
@@ -102,7 +113,14 @@ class ItemBasedRecommender(Resource):
                     ###取前5个
                     return result[:5].index
                 
+
+                # if no purchase record, return 204
                 rec_result = recommend(u_id)
+                if not rec_result:
+                    return "Customer with no purchase and rating record", 204
+
+
+                # for customer with purchase record
                 all_result= []
                 
                 for i in rec_result:
@@ -116,7 +134,7 @@ class ItemBasedRecommender(Resource):
                         all_result.append(i)
                     elif len(all_result) >= 5:
                         break
-                
+
                 p_all = []
                 
                 for i in all_result:
@@ -125,7 +143,6 @@ class ItemBasedRecommender(Resource):
                     p_all.append(profile)
                 
                 r = get_all_profiles(p_all)
-                
                 return r, 200
 
         except Exception as e:
@@ -304,7 +321,7 @@ class ViewHistoryBasedRecommender(Resource):
                     p_all.append(profile)
 
                 r = get_all_profiles(p_all)
-                return r
+                return r, 200
 
         except Exception as e:
             print(e)
@@ -315,7 +332,7 @@ class ViewHistoryBasedRecommender(Resource):
 class TopSelling(Resource):
     @api.response(200, "OK", models.item_profile_list)
     @api.response(500, "Internal Server Error")
-    @api.doc(description="Recommend top selling products. Each fetch may return slightly different items / order. Return 8 items.")
+    @api.doc(description="Recommend top (8 from 20) selling products. Each fetch may return slightly different items / order. Return 8 items.")
     def get(self):
         """Return top selling products (no token)"""
         
@@ -324,14 +341,17 @@ class TopSelling(Resource):
                 conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
                 cur = conn.cursor()
 
-                # find all products that people bought, and order using number descending
+                # find top 20 products that people bought, and order using number descending
                 # then pick random 8 from them. 
+                # also notice, only choose those currently on sale
 
                 sql = """
-                    SELECT item_id, SUM(quantity) AS total
-                    FROM order_item
-                    GROUP BY item_id
+                    SELECT order_item.item_id, SUM(order_item.quantity) AS total
+                    FROM order_item LEFT OUTER JOIN item ON order_item.item_id = item.item_id
+                    WHERE item.status = 1
+                    GROUP BY order_item.item_id
                     ORDER BY total DESC
+                    LIMIT 20
                 """
 
                 cur.execute(sql)

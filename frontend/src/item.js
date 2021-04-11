@@ -6,8 +6,8 @@ import * as util_cart from "./util_cart.js";
 
 
 util.addLoadEvent(navbar_set_up);
-util.addLoadEvent(item_page_set_up);
-util.addLoadEvent(item_page_set_recommender);
+util.addLoadEvent(page_set_up);
+util.addLoadEvent(recommenders_set_up);
 
 
 // This page supports for 3 view format
@@ -22,7 +22,7 @@ const PREVIEW = 2;
 // url format = "item.html?item_id=xxx&typ=xxx"
 // for customer: type = null (can purchase), type = snapshot (cannot purchase, but can view)
 // for admin: type = null (view), type = edit (edit the specification)
-async function item_page_set_up(){
+async function page_set_up(){
     let search = new URLSearchParams(window.location.search.substring(1));
 
     let item_id = search.get("item_id");
@@ -121,7 +121,7 @@ async function item_page_set_up(){
 }
 
 
-function item_page_set_recommender(){
+function recommenders_set_up(){
     let rec_dict = rec.getAllRecommenderDivs();
 
     // for recommender on the item page
@@ -129,9 +129,9 @@ function item_page_set_recommender(){
 
     if (sessionStorage.getItem("role") == 1){
         // require token
-        rec.fill_view_history_or_recommender_with_token(rec_dict.byitem, "byitem");
+        // rec.fill_view_history_or_recommender_with_token(rec_dict.byitem, "byitem");
         rec.fill_view_history_or_recommender_with_token(rec_dict.viewhistory, "viewhistory");
-        rec.fill_view_history_or_recommender_with_token(rec_dict.viewhistory, "byviewhistory");
+        rec.fill_view_history_or_recommender_with_token(rec_dict.byviewhistory, "byviewhistory");
         
     }
     else if (sessionStorage.getItem("role") == null){

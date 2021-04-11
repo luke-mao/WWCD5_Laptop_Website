@@ -5,10 +5,10 @@ import * as util_products from "./util_products.js";
 
 
 util.addLoadEvent(navbar_set_up)
-util.addLoadEvent(product_page_set_up)
+util.addLoadEvent(page_set_up)
 
 
-async function product_page_set_up(){
+async function page_set_up(){
     let main = document.getElementsByTagName("main")[0];
 
     let filters = main.getElementsByClassName("filters")[0];

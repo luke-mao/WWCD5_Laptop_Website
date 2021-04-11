@@ -4,8 +4,14 @@ import * as rec from "./recommender.js";
 
 
 util.addLoadEvent(navbar_set_up);
-util.addLoadEvent(banner_set_up);
-util.addLoadEvent(home_page_recommender_set_up);
+util.addLoadEvent(page_set_up);
+
+
+function page_set_up(){
+    banner_set_up();
+    recommenders_set_up();
+    return;
+}
 
 
 async function banner_set_up(){
@@ -137,7 +143,7 @@ function set_up_animation(){
 }
 
 
-function home_page_recommender_set_up(){
+function recommenders_set_up(){
     let rec_dict = rec.getAllRecommenderDivs();
 
     if (sessionStorage.getItem("role") == 1){

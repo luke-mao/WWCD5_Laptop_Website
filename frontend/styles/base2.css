@@ -206,5 +206,8 @@
     width: fit-content;
 }
 
-
+.recommender .recommender-nothing {
+    font-size: 25px;
+    font-weight: 500;
+}
 

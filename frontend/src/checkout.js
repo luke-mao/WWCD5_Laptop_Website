@@ -5,10 +5,10 @@ import * as util_cart from "./util_cart.js";
 
 
 util.addLoadEvent(navbar_set_up);
+util.addLoadEvent(page_set_up);
 
-util.addLoadEvent(load_cart);
 
-function load_cart(){
+function page_set_up(){
     // only customer can view
     if (sessionStorage.getItem("role") !== "1"){
         let mw = modal.create_simple_modal_with_text(

@@ -17,6 +17,12 @@ main {
     margin-right: auto;
 }
 
+
+h1 {
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
 button {
     margin-top: 4px;
     margin-bottom: 4px;
@@ -59,6 +65,8 @@ input[type=checkbox]{
 
 
 table {
+    padding-top: 24px;
+    padding-bottom: 24px;
     border-collapse: collapse;
     width: 100%;
     table-layout: auto;
@@ -66,22 +74,21 @@ table {
 }
 
 table tr {
-    line-height: 1.5;
+    line-height: 1.6;
 }
 
-table th, 
 table td {
     padding: 8px;
     text-align: center;
     border-bottom: 1px solid #ddd;
 }
 
-table th {
+table thead td{
     font-size: 25px;
     font-weight: bold;
 }
 
-table td {
+table tbody td{
     font-size: 22px;
     font-weight: normal;
 }

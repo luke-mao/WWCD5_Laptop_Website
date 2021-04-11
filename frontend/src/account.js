@@ -7,7 +7,7 @@ import * as util_orders from "./util_orders.js";
 
 util.addLoadEvent(navbar_set_up);
 util.addLoadEvent(page_set_up);
-util.addLoadEvent(account_page_recommender_set_up);
+util.addLoadEvent(recommenders_set_up);
 
 
 async function page_set_up(){
@@ -112,7 +112,7 @@ async function page_set_up(){
 }
 
 
-async function account_page_recommender_set_up(){
+async function recommenders_set_up(){
     let rec_dict = rec.getAllRecommenderDivs();
 
     // for customer, since the admin may also check this page

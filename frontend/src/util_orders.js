@@ -1,11 +1,10 @@
 import * as util from "./util.js";
+import * as modal from "./modal.js";
 
 
 // display all orders onto a table
 // and insert the table into the given "div"
 export function fill_orders(div, data, title_text, require_tracking_btn){
-    console.log(data);
-
     // the order is returned with descending unix_time
     // we place all orders together in a table
     // columns: order_id, time, total price, status (sent / preparing), and buttons
@@ -19,7 +18,8 @@ export function fill_orders(div, data, title_text, require_tracking_btn){
     util.appendListChild(div, [h1, table]);
 
     // the table has some columns
-    let tr = table.insertRow(-1);
+    let header = table.createTHead();
+    let header_row = header.insertRow(-1);
 
     // total 5 columns for the outer table
     let th_list = ["Order ID", "Time", "Total Price", "Status", "Items"];
@@ -30,22 +30,23 @@ export function fill_orders(div, data, title_text, require_tracking_btn){
     }
 
     for (let i = 0; i < th_list.length; i++){
-        let th = tr.insertCell(-1);
+        let th = header_row.insertCell(-1);
         th.textContent = th_list[i];
     }
 
+    let tbody = table.createTBody();
     
     // each row represents a data
     // and another row includes all the items
     for (let i = 0; i < data.length; i++){
-        let tr_2 = table.insertRow(-1);
+        let tr = tbody.insertRow(-1);
 
         // 5 columns or 6 columns (when need to add tracking)
         for (let j = 0; j < th_list.length; j++){
-            let td = tr_2.insertCell(-1);
+            let td = tr.insertCell(-1);
         }
 
-        let td_list = tr_2.getElementsByTagName("td");
+        let td_list = tr.getElementsByTagName("td");
 
         td_list[0].textContent = `#${data[i]['ord_id']}`;
 
@@ -87,7 +88,7 @@ export function fill_orders(div, data, title_text, require_tracking_btn){
                     "Add Tracking Number", "", "Submit", "Close"
                 );
 
-                removeAllChild(mw['body']);
+                util.removeAllChild(mw['body']);
 
                 let row = document.createElement("div");
                 row.classList.add("row");
@@ -106,7 +107,7 @@ export function fill_orders(div, data, title_text, require_tracking_btn){
 
                 // close button
                 mw['footer_btn_2'].addEventListener("click", function(){
-                    removeSelf(mw['modal']);
+                    util.removeSelf(mw['modal']);
                     return;
                 });
 
@@ -129,11 +130,18 @@ export function fill_orders(div, data, title_text, require_tracking_btn){
                     try {
                         let response = await fetch(url, init);
                         if (response.ok){
-                            removeSelf(mw['modal']);
+                            util.removeSelf(mw['modal']);
 
-                            alert("Add tracking successful !!");
+                            let mw2 = modal.create_simple_modal_with_text(
+                                "Add Tracking Successful",
+                                "You have successfully added the tracking to this order. The customer can view this tracking on their orders page.",
+                                "OK"
+                            );
 
-                            window.location.reload();
+                            mw2['footer_btn'].addEventListener("click", function(){
+                                window.location.reload();
+                                return;
+                            });
                         }
                         else if (response.status == 403){
                             modal.create_force_logout_modal();
@@ -180,33 +188,34 @@ export function fill_orders(div, data, title_text, require_tracking_btn){
 
         td_detail.appendChild(small_table);
 
-        let small_table_tr = small_table.insertRow(-1);
+        let small_header = small_table.createTHead();
+        let small_header_row = small_header.insertRow(-1);
 
         // total actually five columns 
         // but col "Item" has two columns, one for the image, one for name
         let small_th_list = ["Item", "Quantity", "Unit Price", "Purchase Snapshot"];
 
         for (let j = 0; j < small_th_list.length; j++){
-            let th = document.createElement("th");
+            let th = small_header_row.insertCell(-1);
             th.textContent = small_th_list[j];
 
             if (small_th_list[j] == "Item"){
                 th.colSpan = 2;
             }
-
-            small_table_tr.appendChild(th);
         }
+
+        let small_tbody = small_table.createTBody();
 
         // list all items
         for (let j = 0; j < data[i]['items'].length; j++){
             let item_data = data[i]['items'][j];
             let snapshot = JSON.parse(item_data['snapshot']);
 
-            let tr = small_table.insertRow(-1);
+            let tr = small_tbody.insertRow(-1);
 
             // 5 columns
             for (let k = 0; k < 5; k++){
-                let td = tr.insertCell(-1);
+                tr.insertCell(-1);
             }
 
             let td_list = tr.getElementsByTagName("td");

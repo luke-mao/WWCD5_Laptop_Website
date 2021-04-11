@@ -55,22 +55,23 @@ async function page_set_up(){
 
 
 function display_all_customers(table, data){
-    console.log(data);
-
-    let tr_header = table.insertRow(-1);
+    let header = table.createTHead();
+    let header_tr = header.insertRow(-1);
     
     let header_text_list = ["Customer ID", "Name", "Email", "Contact Number", "Details & Orders"];
     for (let i = 0; i < header_text_list.length; i++){
-        let th = tr_header.insertCell(-1);
+        let th = header_tr.insertCell(-1);
         th.textContent = header_text_list[i];
     }
 
+    // body
+    let body = table.createTBody();
 
     for (let i = 0; i < data.length; i++){
-        let tr = table.insertRow(-1);
+        let tr = body.insertRow(-1);
 
         for (let j = 0; j < header_text_list.length; j++){
-            let td = tr.insertCell(-1);
+            tr.insertCell(-1);
         }
 
         let td_list = tr.getElementsByTagName("td");

@@ -32,7 +32,7 @@ export async function fill_view_history_or_recommender_with_token(div, keyword){
     let url = null;
 
     if (keyword == "viewhistory"){
-        div_dict = create_basic_format_for_recommender(div, "Recently Viewed", false);
+        div_dict = create_basic_format_for_recommender(div, "You Recently Viewed", false);
         url = "http://localhost:5000/user/viewhistory";
     }
     else if (keyword == "byitem"){
@@ -57,29 +57,33 @@ export async function fill_view_history_or_recommender_with_token(div, keyword){
     try {
         let response = await fetch(url, init);
 
+        // three results: 200 => display content, 204 => no record, 500 => error
         if (response.status == 200){
-            let data = await response.json();
-            
-            console.log("here prepare to send data");
-            console.log(data);
-            
+            let data = await response.json();            
             util_products.put_products_on_shelf(div_dict.products, data);
-            assign_sliding_dots(div_dict.products, div_dict.dots);
+            assign_sliding_dots(div_dict.products, div_dict.dots, keyword);
         }
-        else {
+        else if (response.status == 204){
+            // display: no view history 
             if (keyword == "viewhistory"){
                 let no_product = document.createElement("div");
+                no_product.classList.add("recommender-nothing");
                 no_product.textContent = "No view history available. Please visit the products page.";
                 div_dict.products.appendChild(no_product);
             }
+            else if (keyword == "byitem") {
+                // for the byitem recommender, simply remove the whole section
+                util.removeSelf(div);
+            }
             else {
+                // keyword == "byviewhistory"
                 util.removeSelf(div);
             }
         }
-        // else{
-        //     let text = await response.text();
-        //     throw Error(text);
-        // }
+        else{
+            let text = await response.text();
+            throw Error(text);
+        }
     }
     catch(err){
         alert("error");
@@ -138,23 +142,14 @@ export async function fill_top_selling_or_top_view(div, is_top_selling){
 }
 
 
-export function assign_sliding_dots(products, dots){
+function assign_sliding_dots(products, dots, keyword){
     // check how many products are there
     // if less than 4, then remove the dots
     let product_list = products.getElementsByClassName("product");
 
-    console.log(product_list);
-    console.log(product_list.length);
-
-
     // the page layout can display 4 items in a row without wrap
     if (product_list.length <= 4){
-        // console.log("here!!!");
-        // console.log(dots);
-        // console.log(dots.parentNode);
-        // util.removeSelf(dots);
-
-        util.removeAllChild(dots);
+        util.removeSelf(dots);
         return;
     }
 
