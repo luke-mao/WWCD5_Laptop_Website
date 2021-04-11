@@ -17,7 +17,6 @@ main {
     margin-right: auto;
 }
 
-
 h1 {
     padding-top: 12px;
     padding-bottom: 12px;
@@ -83,14 +82,14 @@ table td {
     border-bottom: 1px solid #ddd;
 }
 
+table td{
+    font-size: 23px;
+    font-weight: normal;
+}
+
 table thead td{
     font-size: 25px;
     font-weight: bold;
-}
-
-table tbody td{
-    font-size: 22px;
-    font-weight: normal;
 }
 
 table td.pointer-underline:hover {
@@ -101,7 +100,7 @@ table td.pointer-underline:hover {
 table td.flexcell {
     display: flex;
     flex-flow: row wrap;
-    justify-content: flex-start;
+    justify-content: space-around;
     align-items: center;
 }
 
@@ -109,8 +108,10 @@ table td img {
     width: 200px;
     height: auto;
     object-fit: contain;
-    padding: 4px;
+    padding: 12px;
 }
 
-
+table td.removed {
+    text-decoration: line-through;
+}
 

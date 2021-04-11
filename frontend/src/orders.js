@@ -87,11 +87,3 @@ async function page_set_up(){
     }
 }
 
-
-
-
-
-
-
-
-

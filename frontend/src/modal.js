@@ -112,6 +112,20 @@ export function create_force_logout_modal(){
 }
 
 
+export function show_modal_input_error_and_redirect_back(current_mw, title_text, body_text, btn_text){
+    current_mw.style.display = "none";
 
+    let new_mw = create_simple_modal_with_text(
+        title_text, body_text, btn_text
+    );
+
+    new_mw['footer_btn'].addEventListener("click", function(){
+        util.removeSelf(new_mw['modal']);
+        current_mw.style.display = "block";
+        return;
+    });
+
+    return;
+}
 
 

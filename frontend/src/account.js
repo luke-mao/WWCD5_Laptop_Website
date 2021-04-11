@@ -84,13 +84,6 @@ async function page_set_up(){
             return;
         }
 
-        ///////////////////////////////////////////////////////////
-
-        // here need to classify admin / customer
-        // also the admin can still view customer profile
-        ///////////////////////////////////////////////////////////
-
-
         let div_profile = document.getElementsByClassName("profile")[0];
         let div_orders = document.getElementsByClassName("orders")[0];
 
@@ -319,10 +312,11 @@ function modal_window_edit_password(){
         let pwd_2 = input_pwd_2.value;
 
         if (pwd == "" || pwd_2 == ""){
-            util.removeSelf(mw['modal']);
-
-            extra_modal_window_for_invalid_password(
-                "Dear customer, please input both fields before submitting.."
+            modal.show_modal_input_error_and_redirect_back(
+                mw['modal'],
+                "Update Password Error",
+                "Dear customer, please input both fields before submitting..",
+                "OK",
             );
 
             return;
@@ -330,10 +324,11 @@ function modal_window_edit_password(){
 
         // check if password is at least 6 digits
         if (pwd.length < 6){
-            util.removeSelf(mw['modal']);
-
-            extra_modal_window_for_invalid_password(
-                "Dear customer, the password needs at least 6 chars."
+            modal.show_modal_input_error_and_redirect_back(
+                mw['modal'],
+                "Update Password Error",
+                "Dear customer, the password needs to have at least 6 chars.",
+                "OK",
             );
 
             return;
@@ -341,10 +336,11 @@ function modal_window_edit_password(){
 
         // password needs to match
         if (pwd !== pwd_2){
-            util.removeSelf(mw['modal']);
-
-            extra_modal_window_for_invalid_password(
-                "Dear customer, the two password fields are not match.."
+            modal.show_modal_input_error_and_redirect_back(
+                mw['modal'],
+                "Update Password Error",
+                "Dear customer, the two password fields are not match.",
+                "OK",
             );
 
             return;
@@ -406,23 +402,6 @@ function modal_window_edit_password(){
 }
 
 
-function extra_modal_window_for_invalid_password(reason){
-    let mw2 = modal.create_simple_modal_with_text(
-        "Update Password Error",
-        reason,
-        "OK",
-    );
-
-    mw2['footer_btn'].addEventListener("click", function(){
-        util.removeSelf(mw2['modal']);
-        modal_window_edit_password();
-        return;
-    });
-
-    return;
-}
-
-
 function modal_window_edit_profile(data){
     let mw = modal.create_complex_modal_with_text(
         "Edit Profile",
@@ -471,19 +450,12 @@ function modal_window_edit_profile(data){
 
         for (let i = 0; i < inputs.length; i++){
             if (inputs[i].value == ""){
-                util.removeSelf(mw['modal']);
-
-                let mw2 = modal.create_simple_modal_with_text(
+                modal.show_modal_input_error_and_redirect_back(
+                    mw['modal'],
                     "Edit Profile Error",
                     "Dear customer. Please fill all fields before submitting..",
-                    "OK"
+                    "OK",
                 );
-
-                mw2['footer_btn'].addEventListener("click", function(){
-                    util.removeSelf(mw2['modal']);
-                    modal_window_edit_profile(data);
-                    return;
-                });
 
                 return;
             }
@@ -500,21 +472,14 @@ function modal_window_edit_profile(data){
         }        
 
         if (! is_updated){
-            util.removeSelf(mw['modal']);
-
-            let mw2 = modal.create_simple_modal_with_text(
+            modal.show_modal_input_error_and_redirect_back(
+                mw['modal'],
                 "Edit Profile Error",
                 "Please edit before submitting..",
                 "OK",
             );
 
-            mw2['footer_btn'].addEventListener("click", function(){
-                util.removeSelf(mw2['modal']);
-                modal_window_edit_profile(data);
-                return;
-            });
-
-            return;            
+            return;        
         }
 
         // now do a regex check
@@ -525,19 +490,37 @@ function modal_window_edit_profile(data){
         for (let i = 0; i < inputs.length; i++){
             if (inputs[i].name == "first_name" || inputs[i].name == "last_name"){
                 if (! re_name.test(inputs[i].value)){
-                    alert("Invalid name. Please check.");
-                    return;
+                    modal.show_modal_input_error_and_redirect_back(
+                        mw['modal'],
+                        "Edit Profile Error",
+                        "Invalid name. Please check..",
+                        "OK",
+                    );
+        
+                    return; 
                 }
             }
             else if (inputs[i].name == "email"){
                 if (! re_email.test(inputs[i].value)){
-                    alert("Invalid email. Please check.");
-                    return;
+                    modal.show_modal_input_error_and_redirect_back(
+                        mw['modal'],
+                        "Edit Profile Error",
+                        "Invalid email. Please check..",
+                        "OK",
+                    );
+        
+                    return; 
                 }
             }
             else if (inputs[i].name == "mobile"){
                 if (! re_mobile.test(inputs[i].value)){
-                    alert("Invalid mobile. Please check.");
+                    modal.show_modal_input_error_and_redirect_back(
+                        mw['modal'],
+                        "Edit Profile Error",
+                        "Invalid mobile. Please check..",
+                        "OK",
+                    );
+        
                     return;
                 }
             }
@@ -739,25 +722,14 @@ async function modal_window_edit_or_create_address(data, is_edit){
         // first check if some fields are empty
         for (let i = 0; i < inputs.length; i++){
             if (inputs[i].value == ""){
-                util.removeSelf(mw['modal']);
-
-                let mw2 = modal.create_simple_modal_with_text(
-                    "Add New Address Error",
+                modal.show_modal_input_error_and_redirect_back(
+                    mw['modal'],
+                    is_edit ? "Edit Address Error" : "Add New Address Error",
                     "Please fill all fields before submitting..",
                     "OK",
                 );
-
-                if (is_edit){
-                    mw2['title'] = "Edit Address Error";
-                }
-
-                mw2['footer_btn'].addEventListener("click", function(){
-                    util.removeSelf(mw2['modal']);
-                    modal_window_edit_or_create_address(data, is_edit);
-                    return;
-                });
-
-                return;
+    
+                return; 
             }
         }
 
@@ -772,21 +744,14 @@ async function modal_window_edit_or_create_address(data, is_edit){
             }        
 
             if (! is_updated){
-                util.removeSelf(mw['modal']);
-
-                let mw2 = modal.create_simple_modal_with_text(
+                modal.show_modal_input_error_and_redirect_back(
+                    mw['modal'],
                     "Edit Address Error",
                     "Please edit before submitting..",
                     "OK",
                 );
-
-                mw2['footer_btn'].addEventListener("click", function(){
-                    util.removeSelf(mw2['modal']);
-                    modal_window_edit_or_create_address(data, is_edit);
-                    return;
-                });
-
-                return;            
+    
+                return;         
             }
         }
 
@@ -800,38 +765,32 @@ async function modal_window_edit_or_create_address(data, is_edit){
 
         for (let i = 0; i < inputs.length; i++){
             if (inputs[i].name == "unit_number" && (! re_num.test(inputs[i].value))){
-                util.removeSelf(mw['modal']);
-                extra_modal_window_for_invalid_address(data, "unit number");
+                extra_modal_window_for_invalid_address(mw['modal'], "unit number");
                 return;
             }
 
             if (inputs[i].name == "street_number" && (! re_num.test(inputs[i].value))){
-                util.removeSelf(mw['modal']);
-                extra_modal_window_for_invalid_address(data, "street number");
+                extra_modal_window_for_invalid_address(mw['modal'], "street number");
                 return;
             }
 
             if (inputs[i].name == "street_name" && (! re_words.test(inputs[i].value))){
-                util.removeSelf(mw['modal']);
-                extra_modal_window_for_invalid_address(data, "street name");
+                extra_modal_window_for_invalid_address(mw['modal'], "street name");
                 return;
             }
 
             if (inputs[i].name == "suburb" && (! re_words.test(inputs[i].value))){
-                util.removeSelf(mw['modal']);
-                extra_modal_window_for_invalid_address(data, "suburb");
+                extra_modal_window_for_invalid_address(mw['modal'], "suburb");
                 return;
             }
 
             if (inputs[i].name == "postcode" && (! re_postcode.test(inputs[i].value))){
-                util.removeSelf(mw['modal']);
-                extra_modal_window_for_invalid_address(data, "postcode");
+                extra_modal_window_for_invalid_address(mw['modal'], "postcode");
                 return;
             }
 
             if (inputs[i].name == "state" && (! re_state.test(inputs[i].value))){
-                util.removeSelf(mw['modal']);
-                extra_modal_window_for_invalid_address(data, "state");
+                extra_modal_window_for_invalid_address(mw['modal'], "state");
                 return;
             }
         }
@@ -912,18 +871,13 @@ async function modal_window_edit_or_create_address(data, is_edit){
 }
 
 
-async function extra_modal_window_for_invalid_address(data, attribute){
-    let mw = modal.create_simple_modal_with_text(
+function extra_modal_window_for_invalid_address(current_mw, attribute){
+    modal.show_modal_input_error_and_redirect_back(
+        current_mw, 
         "Invalid Address Parameter",
         `The value for the attribute ${attribute} is invalid`,
         "OK",
-    );
-
-    mw['footer_btn'].addEventListener("click", function(){
-        util.removeSelf(mw['modal']);
-        modal_window_edit_address(data);
-        return;
-    })
+    )
 
     return;
 }

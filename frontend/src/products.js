@@ -449,64 +449,72 @@ function put_products_on_shelf_for_admin(products, data){
     products.appendChild(table);
 
     // table head row
-    let tr_head = document.createElement("tr");
-    table.appendChild(tr_head);
+    let header = table.createTHead();
+    let header_tr = header.insertRow(-1);
 
-    let th_list = ["Product ID", "Name", "Price", "Stock", "Status", "Action"];
+    let header_text_list = ["Product ID", "Name", "Price", "Stock", "Status", "Action"];
 
-    for (let i = 0; i < th_list.length; i++){
-        let th = document.createElement("th");
-        th.textContent = th_list[i];
-        tr_head.appendChild(th);
+    for (let i = 0; i < header_text_list.length; i++){
+        let td = header_tr.insertCell(-1);
+        td.textContent = header_text_list[i];
     }
+
+    let body = table.createTBody();
 
     // for the data
     for (let i = 0; i < data.length; i++){
         let this_data = data[i];
 
-        let tr = document.createElement("tr");
+        // 5 columns
+        let tr = body.insertRow(-1);
+
+        for (let i = 0; i < header_text_list.length; i++){
+            tr.insertCell(-1);
+        }
+
+        let td_list = tr.getElementsByTagName("td");
 
         // product id
-        let td_1 = document.createElement("td");
-        td_1.textContent = `#${this_data['simple']['item_id']}`;
-        td_1.classList.add("pointer-underline");
+        td_list[0].textContent = `#${this_data['simple']['item_id']}`;
+        td_list[0].classList.add("pointer-underline");
+        td_list[0].addEventListener("click", function(){
+            window.location.href = `item.html?item_id=${this_data['simple']['item_id']}`;
+        });
 
         // name
-        let td_2 = document.createElement("td");
-        td_2.textContent = `${this_data['simple']['name']}`;
-        td_2.classList.add("pointer-underline");
+        td_list[1].textContent = `${this_data['simple']['name']}`;
+        td_list[1].classList.add("pointer-underline");        
+        td_list[1].addEventListener("click", function(){
+            window.location.href = `item.html?item_id=${this_data['simple']['item_id']}`;
+        });
+
 
         // price
-        let td_3 = document.createElement("td");
-        td_3.textContent = `$ ${this_data['simple']['price']}`;
+        td_list[2].textContent = `$ ${this_data['simple']['price']}`;
 
         // stock
-        let td_4 = document.createElement("td");
-        td_4.textContent = `${this_data['simple']['stock_number']}`;
+        td_list[3].textContent = `${this_data['simple']['stock_number']}`;
 
         // status
-        let td_5 = document.createElement("td");
-        
         if (this_data['simple']['status'] == 1){
-            td_5.textContent = "On Sell";
+            td_list[4].textContent = "On Sell";
         }
         else{
-            td_5.textContent = "Deleted";
+            td_list[4].textContent = "Deleted";
 
             // for deleted, the name and id also has decoration
-            td_1.style.textDecoration = "line-through";
-            td_2.style.textDecoration = "line-through";
-            td_3.style.textDecoration = "line-through";
+            td_list[0].classList.add("removed");
+            td_list[1].classList.add("removed");
+            td_list[2].classList.add("removed");
         }
 
         // action, three buttons: Delete / Resume, Edit Price, Adjust Stock, Edit Specs
-        let td_6 = document.createElement("td");
-        td_6.classList.add("flexcell");
+        td_list[5].classList.add("flexcell");
 
         let btn_list = ['Price', 'Stock', "Specs"];
 
         if (this_data['simple']['status'] == 1){
-            btn_list.unshift("Delete");
+            btn_list.unshift("Hide");
         }
         else{
             btn_list.unshift("Resume");
@@ -515,27 +523,14 @@ function put_products_on_shelf_for_admin(products, data){
         for (let i = 0; i < btn_list.length; i++){
             let btn = document.createElement("button");
             btn.textContent = btn_list[i];
-            td_6.appendChild(btn);
+            td_list[5].appendChild(btn);
         }
-    
-
-        // link everything
-        table.appendChild(tr);
-        util.appendListChild(tr, [td_1, td_2, td_3, td_4, td_5, td_6]);
-
-        // now add the event listener
-        // first two cells same action, go to the item page
-        td_1.addEventListener("click", function(){
-            window.location.href = `item.html?item_id=${this_data['simple']['item_id']}`;
-        });
-
-        td_2.addEventListener("click", function(){
-            window.location.href = `item.html?item_id=${this_data['simple']['item_id']}`;
-        });
 
         
         // button: resume or delete
-        td_6.childNodes[0].addEventListener("click", function(e){
+        let buttons = td_list[5].getElementsByTagName("button");
+
+        buttons[0].addEventListener("click", function(e){
             let is_resume = (e.target.textContent == "Resume");
             
             let mw = null;
@@ -548,10 +543,10 @@ function put_products_on_shelf_for_admin(products, data){
                 );
             }
             else{
-                // delete
+                // hide
                 mw = modal.create_complex_modal_with_text(
                     "Confirm Deleting Item",
-                    "Are you sure to remove this item? This means customers can purchase this item. The item will still in the database but only admins can view.",
+                    "Are you sure to remove this item? This means customers can not purchase this item. The item will still in the database but only admins can view.",
                     "Yes", "Cancel",
                 );
             }
@@ -598,8 +593,8 @@ function put_products_on_shelf_for_admin(products, data){
                         }
                         else {
                             mw2 = modal.create_simple_modal_with_text(
-                                "Deleting Item Successful",
-                                "You have successfully removed this item. The item is still kept in the database and you can resume at any item.",
+                                "Hiding Item Successful",
+                                "You have successfully hided this item. The item is still kept in the database and you can resume at any item.",
                                 "OK",
                             );
                         }
@@ -629,7 +624,7 @@ function put_products_on_shelf_for_admin(products, data){
 
 
         // button: adjust price
-        td_6.childNodes[1].addEventListener("click", function(){
+        buttons[1].addEventListener("click", function(){
             // modal window: old price, new price
             // check if the price difference is more than 30%
             let mw = modal.create_complex_modal_with_text(
@@ -652,7 +647,7 @@ function put_products_on_shelf_for_admin(products, data){
             // instead of the data, since we local update all values and the data may out of date
             // td_3.textContent stores the price
             let label_1 = document.createElement("label");
-            label_1.textContent = `Original Price: ${td_3.textContent}`;
+            label_1.textContent = `Original Price: ${td_list[2].textContent}`;
 
             // second row
             let row_2 = document.createElement("div");
@@ -674,19 +669,12 @@ function put_products_on_shelf_for_admin(products, data){
             // when the user clicks the submit
             mw['footer_btn_1'].addEventListener("click", function(){
                 if (input.value == ""){
-                    util.removeSelf(mw['modal']);
-
-                    let mw2 = modal.create_simple_modal_with_text(
+                    modal.show_modal_input_error_and_redirect_back(
+                        mw['modal'],
                         "Adjust Price Error",
                         "Please fill the new price before submission..",
                         "OK",
                     );
-
-                    mw2['footer_btn'].addEventListener("click", function(){
-                        util.removeSelf(mw2['modal']);
-                        td_6.childNodes[1].click();
-                        return;
-                    });
 
                     return;
                 }
@@ -695,13 +683,19 @@ function put_products_on_shelf_for_admin(products, data){
                 let re_price = /^[1-9]\d*(\.\d{1,2})?$/;
 
                 if (! re_price.test(input.value)){
-                    alert("The new price is not valid. Please check.");
+                    modal.show_modal_input_error_and_redirect_back(
+                        mw['modal'],
+                        "Adjust Price Error",
+                        "The new price is not valid. Please check.",
+                        "OK",
+                    );
+
                     return;
                 }
 
                 // valid new price, check if too much difference
                 let new_price = parseFloat(input.value);
-                let old_price = parseFloat(td_3.textContent.substring(2));
+                let old_price = parseFloat(td_list[2].textContent.substring(2));
 
                 let variation_p = Math.round(Math.abs(new_price - old_price) / old_price * 100);
 
@@ -756,7 +750,7 @@ function put_products_on_shelf_for_admin(products, data){
                                 util.removeSelf(mw3['modal']);
 
                                 // update the price on the table
-                                td_3.textContent = `$ ${new_price}`;
+                                td_list[2].textContent = `$ ${new_price}`;
                                 return;
                             })
                         }
@@ -775,7 +769,7 @@ function put_products_on_shelf_for_admin(products, data){
 
 
         // adjust the stock
-        td_6.childNodes[2].addEventListener("click", function(){
+        buttons[2].addEventListener("click", function(){
             let mw = modal.create_complex_modal_with_text(
                 "Adjust Stock", "", "Submit", "Cancel",
             );
@@ -795,7 +789,7 @@ function put_products_on_shelf_for_admin(products, data){
             // in case this_data is out of date
             // td_4
             let label_1 = document.createElement("label");
-            label_1.textContent = `Current stock is ${td_4.textContent}`;
+            label_1.textContent = `Current stock is ${td_list[3].textContent}`;
 
             let row_2 = document.createElement("div");
             row_2.classList.add("row");
@@ -815,19 +809,12 @@ function put_products_on_shelf_for_admin(products, data){
             // click submit
             mw['footer_btn_1'].addEventListener("click", function(){
                 if (input.value == ""){
-                    util.removeSelf(mw['modal']);
-
-                    let mw2 = modal.create_simple_modal_with_text(
+                    modal.show_modal_input_error_and_redirect_back(
+                        mw['modal'],
                         "Adjust Stock Error",
                         "Please fill the input before submission..",
                         "OK",
-                    );
-
-                    mw2['footer_btn'].addEventListener("click", function(){
-                        util.removeSelf(mw2['modal']);
-                        td_6.childNodes[2].click();
-                        return;
-                    });
+                    )
 
                     return;
                 }
@@ -836,42 +823,28 @@ function put_products_on_shelf_for_admin(products, data){
                 let re_adjust = /^(\+|\-)[1-9]\d*$/;
 
                 if (! re_adjust.test(input.value)){
-                    util.removeSelf(mw['modal']);
-
-                    let mw2 = modal.create_simple_modal_with_text(
+                    modal.show_modal_input_error_and_redirect_back(
+                        mw['modal'],
                         "Adjust Stock Error",
                         "Invalid input. Please try again. Example: +5 to add 5 onto the stock, -5 to reduce 5. ",
                         "OK",
-                    );
-
-                    mw2['footer_btn'].addEventListener("click", function(){
-                        util.removeSelf(mw2['modal']);
-                        td_6.childNodes[2].click();
-                        return;
-                    });
+                    )
 
                     return;
                 }
 
 
-                let old_stock = td_4.textContent;
+                let old_stock = td_list[3].textContent;
                 let adjust = input.value;
                 let new_stock = parseInt(old_stock) + parseInt(adjust);
 
                 if (new_stock < 0){
-                    util.removeSelf(mw['modal']);
-
-                    let mw2 = modal.create_simple_modal_with_text(
+                    modal.show_modal_input_error_and_redirect_back(
+                        mw['modal'],
                         "Adjust Stock Error",
                         `After adjust, the new stock is ${new_stock} < 0. Please check and try again..`,
                         "OK",
-                    );
-
-                    mw2['footer_btn'].addEventListener("click", function(){
-                        util.removeSelf(mw2['modal']);
-                        td_6.childNodes[2].click();
-                        return;
-                    });
+                    )
 
                     return;
                 }
@@ -924,7 +897,7 @@ function put_products_on_shelf_for_admin(products, data){
                                 util.removeSelf(mw3['modal']);
 
                                 // update the price on the table
-                                td_4.textContent = `${new_stock}`;
+                                td_list[3].textContent = `${new_stock}`;
                                 return;
                             })
                         }
@@ -943,7 +916,7 @@ function put_products_on_shelf_for_admin(products, data){
 
 
         // edit the specs
-        td_6.childNodes[3].addEventListener("click", function(){
+        buttons[3].addEventListener("click", function(){
             window.location.href = `item.html?item_id=${this_data['simple']['item_id']}&type=edit`;
             return;
         });

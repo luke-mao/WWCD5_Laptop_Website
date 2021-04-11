@@ -335,7 +335,6 @@ async function fill_payment_div(div){
                 order_data['items'].push(item);
             }
 
-            console.log(order_data);
 
             let url = "http://localhost:5000/order";
             let init = {
@@ -370,6 +369,7 @@ async function fill_payment_div(div){
                     return;
                 }
                 else {
+                    /////////////////////////// here needs to figure out for the 204 
                     console.log(response);
                     throw Error(response);
                 }
@@ -458,25 +458,26 @@ async function fill_addresses_div(div){
 
 
 function fill_cart_table(table, cart_data){
-    let tr = document.createElement("tr");
+    let header = table.createTHead();
+    let header_tr = header.insertRow(-1);
 
-    // photo + item name, so take 2 columns
-    let th1 = document.createElement("th");
-    th1.colSpan = 2;
-    th1.textContent = "Item";
+    let header_text_list = ["Item", "Quantity", "Unit Price"];
 
-    let th3 = document.createElement("th");
-    th3.textContent = "Quantity";
+    for (let i = 0; i < header_text_list.length; i++){
+        let td = header_tr.insertCell(-1);
+        td.textContent = header_text_list[i];
 
-    let th4 = document.createElement("th");
-    th4.textContent = "Unit Price";
+        if (header_text_list[i] == "Item"){
+            td.colSpan = 2;
+        }
+    }
 
-    table.appendChild(tr);
-    util.appendListChild(tr, [th1, th3, th4]);
 
     // prepare the last line, for the total
     let td_total_amount = document.createElement("td");
     td_total_amount.textContent = `$ ${util_cart.cartGetTotal()}`;
+
+    let body = table.createTBody();
 
 
     // now loop the cart
@@ -485,29 +486,34 @@ function fill_cart_table(table, cart_data){
             continue;   
         }
 
-        let tr2 = document.createElement("tr");
+        // 4 cells
+        let tr = body.insertRow(-1);
+        
+        for (let i = 0; i < 4; i++){
+            tr.insertCell(-1);
+        }
+
+        let td_list = tr.getElementsByTagName("td");
+
 
         // image
-        let td1 = document.createElement("td");
-
         let img = document.createElement("img");
         img.src = cart_data[item_id]['src'];
         img.alt = "Image Not Available";
+        td_list[0].appendChild(img);
 
         // item name
-        let td2 = document.createElement("td");
-        td2.textContent = cart_data[item_id]['name'];
-        td2.classList.add("name");
-        td2.addEventListener("click", function(){
+        td_list[1].textContent = cart_data[item_id]['name'];
+        td_list[1].classList.add("pointer-underline");
+        td_list[1].addEventListener("click", function(){
             window.location.href = "item.html?item_id=" + item_id;
             return;
         });
 
         // quantity: minus btn, figure, plus btn, remove button
-        let td3 = document.createElement("td");
-
-        let div_td3 = document.createElement("div");
-        div_td3.classList.add("adjust");
+        let div_td2 = document.createElement("div");
+        div_td2.classList.add("adjust");
+        td_list[2].appendChild(div_td2);
         
         let minus = document.createElement("div");
         minus.classList.add("material-icons");
@@ -527,22 +533,17 @@ function fill_cart_table(table, cart_data){
         remove.textContent = "delete";
         remove.title = "Remove Item";
 
-        // price
-        let td4 = document.createElement("td");
-        td4.textContent = `$ ${cart_data[item_id]['price']}`;
+        util.appendListChild(div_td2, [minus, fig, plus, remove]);
 
-        // link: top-down
-        table.appendChild(tr2);
-        util.appendListChild(tr2, [td1, td2, td3, td4]);
-        td1.appendChild(img);
-        td3.appendChild(div_td3);
-        util.appendListChild(div_td3, [minus, fig, plus, remove]);
+        // price
+        td_list[3].textContent = `$ ${cart_data[item_id]['price']}`;
+        
 
         // adjust plus and minus, or click remove
         remove.addEventListener("click", function(){
             // confirm with remove
             let mw = modal.create_complex_modal_with_text(
-                "Confirm Remove", 
+                "Confirm Remove Item", 
                 "Are you sure to remove this item?",
                 "Yes", 
                 "No",
@@ -561,6 +562,7 @@ function fill_cart_table(table, cart_data){
 
             return;
         });
+
 
         plus.addEventListener("click", function(){
             // one order max 10 same items
@@ -605,18 +607,18 @@ function fill_cart_table(table, cart_data){
 
     // the last line: skip the first two columns
     // 3rd col = Total, 4th col = amount
-    let tr_last = document.createElement("tr");
+    let tr_last = body.insertRow(-1);
     tr_last.classList.add("last-row");
 
-    let td_empty = document.createElement("td");
+    let td_empty = tr_last.insertCell(-1);
+    td_empty.colSpan = 2;
 
-    let td_total = document.createElement("td");
+    let td_total = tr_last.insertCell(-1);
     td_total.textContent = "Total";
 
-    table.appendChild(tr_last);
-    util.appendListChild(
-        tr_last, 
-        [td_empty, td_empty.cloneNode(true), td_total, td_total_amount]
-    );
+    // also add the cell for the total amount of order
+    tr_last.appendChild(td_total_amount);
+
+    return;
 }
 
