@@ -2,6 +2,7 @@ import {navbar_set_up} from "./navbar.js"
 import * as util from "./util.js";
 import * as modal from "./modal.js";
 import * as rec from "./recommender.js";
+import * as util_orders from "./util_orders.js";
 
 
 util.addLoadEvent(navbar_set_up);
@@ -97,11 +98,11 @@ async function page_set_up(){
         fill_profile(div_profile, data_1, is_admin_view);
 
         if (response_2.status == 204){
-            util.fill_no_orders(div_orders, "Orders");
+            util_orders.fill_no_orders(div_orders, "Orders");
         }
         else{
             let data_2 = await response_2.json();
-            util.fill_orders(div_orders, data_2, "Orders");
+            util_orders.fill_orders(div_orders, data_2, "Orders");
         }
     }
     catch(err){

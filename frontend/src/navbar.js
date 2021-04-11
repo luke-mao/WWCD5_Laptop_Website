@@ -1,5 +1,6 @@
 import * as util from './util.js';
 import * as modal from "./modal.js";
+import * as util_cart from "./util_cart.js";
 
 // create a navigation bar from the html nav tag
 // or use class navbar to locate this tag
@@ -129,7 +130,7 @@ export function navbar_set_up(){
             })
 
             // if something in cart, add a symbol
-            if (! util.isCartEmpty()){
+            if (! util_cart.isCartEmpty()){
                 let snooze = document.createElement("i");
                 snooze.classList.add("material-icons");
                 snooze.textContent = "snooze";

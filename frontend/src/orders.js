@@ -2,6 +2,7 @@ import {navbar_set_up} from "./navbar.js"
 import * as util from "./util.js";
 import * as modal from "./modal.js";
 import * as rec from "./recommender.js";
+import * as util_orders from "./util_orders.js";
 
 
 util.addLoadEvent(navbar_set_up);
@@ -58,17 +59,17 @@ async function page_set_up(){
 
             // there are two sections: new and old
             if (data['new'].length == 0){
-                util.fill_no_orders(new_orders, "New Orders");
+                util_orders.fill_no_orders(new_orders, "New Orders");
             }
             else{
-                util.fill_orders(new_orders, data['new'], "New orders", true);
+                util_orders.fill_orders(new_orders, data['new'], "New orders", true);
             }
 
             if (data['old'].length == 0){
-                util.fill_no_orders(old_orders, "Finalized Orders");
+                util_orders.fill_no_orders(old_orders, "Finalized Orders");
             }
             else{
-                util.fill_orders(old_orders, data['old'], "Finalized orders");
+                util_orders.fill_orders(old_orders, data['old'], "Finalized orders");
             }
         }
         else if (response.status == 403){

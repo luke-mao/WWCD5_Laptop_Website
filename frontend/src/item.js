@@ -2,6 +2,7 @@ import * as util from "./util.js";
 import {navbar_set_up} from "./navbar.js";
 import * as modal from "./modal.js";
 import * as rec from "./recommender.js";
+import * as util_cart from "./util_cart.js";
 
 
 util.addLoadEvent(navbar_set_up);
@@ -906,7 +907,7 @@ function put_profile(data, div, status, original_data){
             purchase.classList.add("add-to-cart");
             purchase.setAttribute("item_id", data['simple']['item_id']);
         
-            if (util.isItemInCart(data['simple']['item_id'])){
+            if (util_cart.isItemInCart(data['simple']['item_id'])){
                 purchase.textContent = "Added To Cart";
                 purchase.classList.add("in-cart");
             }
@@ -963,7 +964,7 @@ function put_profile(data, div, status, original_data){
                 }
     
                 // add to cart
-                util.addToCart(
+                util_cart.addToCart(
                     data['simple']['item_id'], 
                     data['simple']['name'], 
                     data['photos'][0],

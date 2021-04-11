@@ -1,6 +1,7 @@
 import {navbar_set_up} from "./navbar.js"
 import * as util from "./util.js";
 import * as modal from "./modal.js";
+import * as util_cart from "./util_cart.js";
 
 
 util.addLoadEvent(navbar_set_up);
@@ -25,7 +26,7 @@ function load_cart(){
         return;
     }
 
-    if (util.isCartEmpty()){
+    if (util_cart.isCartEmpty()){
         let mw = modal.create_simple_modal_with_text(
             "Empty Cart",
             "Dear customer, your cart is empty right now. Redirect you to the item list. Enjoy !!",
@@ -42,7 +43,7 @@ function load_cart(){
     }
 
     // get cart, and display
-    let cart_data = util.getCart();
+    let cart_data = util_cart.getCart();
     let div_cart = document.getElementsByClassName("cart")[0];
 
     let cart_table = document.createElement("table");
@@ -85,7 +86,7 @@ function load_cart(){
 
         mw['footer_btn_1'].addEventListener("click", function(){
             util.removeSelf(mw['modal']);
-            util.emptyCart();
+            util_cart.emptyCart();
             window.location.reload();
             return;
         });
@@ -199,7 +200,7 @@ async function fill_payment_div(div){
     label_summary.classList.add("last_label");
 
     setInterval(function(){
-        label_summary.textContent = `Your card will be charged $ ${util.cartGetTotal()}`;
+        label_summary.textContent = `Your card will be charged $ ${util_cart.cartGetTotal()}`;
         return;
     }, 500);
 
@@ -302,7 +303,7 @@ async function fill_payment_div(div){
         // confirm with the customer again
         let mw = modal.create_complex_modal_with_text(
             "Order Submission Confirmation",
-            `Dear customer. The total amount is ${util.cartGetTotal()}. Please confirm to proceed..`,
+            `Dear customer. The total amount is ${util_cart.cartGetTotal()}. Please confirm to proceed..`,
             "Proceed",
             "Close",
         );
@@ -310,7 +311,7 @@ async function fill_payment_div(div){
         mw['footer_btn_1'].addEventListener("click", async function(){
             util.removeSelf(mw['modal']);
 
-            let cart = util.getCart();
+            let cart = util_cart.getCart();
 
             let order_data = {
                 "address_id": input_addr.value,
@@ -359,7 +360,7 @@ async function fill_payment_div(div){
 
                     mw2['footer_btn'].addEventListener("click", function(){
                         // order success, remove the cart detail
-                        util.emptyCart();
+                        util_cart.emptyCart();
 
                         window.location.href = "account.html";
                         ///////////// can scroll down to the related div
@@ -475,7 +476,7 @@ function fill_cart_table(table, cart_data){
 
     // prepare the last line, for the total
     let td_total_amount = document.createElement("td");
-    td_total_amount.textContent = `$ ${util.cartGetTotal()}`;
+    td_total_amount.textContent = `$ ${util_cart.cartGetTotal()}`;
 
 
     // now loop the cart
@@ -548,7 +549,7 @@ function fill_cart_table(table, cart_data){
             );
 
             mw['footer_btn_1'].addEventListener("click", function(){
-                util.cartRemoveItem(item_id);
+                util_cart.cartRemoveItem(item_id);
                 window.location.reload();
                 return;
             });
@@ -578,10 +579,10 @@ function fill_cart_table(table, cart_data){
                 return;
             }
 
-            util.cartAddQuantity(item_id);
+            util_cart.cartAddQuantity(item_id);
             
             fig.textContent = parseInt(fig.textContent) + 1;
-            td_total_amount.textContent = `$ ${util.cartGetTotal()}`;
+            td_total_amount.textContent = `$ ${util_cart.cartGetTotal()}`;
 
             return;
         });
@@ -594,9 +595,9 @@ function fill_cart_table(table, cart_data){
                 return;
             }
 
-            util.cartReduceQuantity(item_id);
+            util_cart.cartReduceQuantity(item_id);
             fig.textContent = parseInt(fig.textContent) - 1;
-            td_total_amount.textContent = `$ ${util.cartGetTotal()}`;
+            td_total_amount.textContent = `$ ${util_cart.cartGetTotal()}`;
 
             return;
         });

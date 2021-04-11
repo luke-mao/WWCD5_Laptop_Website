@@ -1,6 +1,7 @@
 import * as util from "./util.js";
 import {navbar_set_up} from "./navbar.js";
 import * as modal from "./modal.js";
+import * as util_products from "./util_products.js";
 
 
 util.addLoadEvent(navbar_set_up)
@@ -431,7 +432,7 @@ function fill_shelf(shelf, data){
             put_products_on_shelf_for_admin(products, data['data']);
         }
         else {
-            util.put_products_on_shelf(products, data['data']);
+            util_products.put_products_on_shelf(products, data['data']);
         }
 
         // set up the bottom page buttons

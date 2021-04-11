@@ -1,4 +1,5 @@
 import * as util from "./util.js";
+import * as util_products from "./util_products.js";
 
 
 export function getAllRecommenderDivs(){
@@ -62,10 +63,7 @@ export async function fill_view_history_or_recommender_with_token(div, keyword){
             console.log("here prepare to send data");
             console.log(data);
             
-            
-            util.put_products_on_shelf(div_dict.products, data);
-
-
+            util_products.put_products_on_shelf(div_dict.products, data);
             assign_sliding_dots(div_dict.products, div_dict.dots);
         }
         else {
@@ -125,7 +123,7 @@ export async function fill_top_selling_or_top_view(div, is_top_selling){
 
         if (response.ok){
             let data = await response.json();
-            util.put_products_on_shelf(div_dict.products, data);
+            util_products.put_products_on_shelf(div_dict.products, data);
             assign_sliding_dots(div_dict.products, div_dict.dots);
         }
         else{
