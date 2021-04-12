@@ -319,7 +319,9 @@ def submit_order(cart, identity):
     
 
     # check the total price
-    if round(total_price, 2) != round(order_total_price, 2):
+    total_price = round(total_price, 2)
+
+    if total_price != round(order_total_price, 2):
         response = {
             'total_price': round(order_total_price, 2)
         }
