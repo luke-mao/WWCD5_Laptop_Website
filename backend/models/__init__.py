@@ -297,3 +297,10 @@ tracking = api.model('tracking', {
     'tracking': fields.String,
 })
 
+
+#filter sales
+sale_filter = reqparse.RequestParser()
+
+sale_filter.add_argument("start", type=int, help="unix time, the smallest number is 1609459200", location="args")
+sale_filter.add_argument("end", type=int, help="unix time, the largest number allowed is the current time", location="args")
+sale_filter.add_argument("type", type=str, help="day / week / month", location="args")

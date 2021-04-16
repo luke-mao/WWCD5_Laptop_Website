@@ -1,5 +1,10 @@
 from flask_restx import Namespace, Resource, fields 
-
+import models
+import time
+import sqlite3
+import os
+from flask import request, abort
+from utils.token import Token
 
 api = Namespace(
     'sales',
@@ -7,12 +12,128 @@ api = Namespace(
 )
 
 
+def filter_start(start):
+    if start==None:
+        return 1609459200
+    else:
+        return start
+
+
+def filter_end(end):
+    if end==None:
+        return time.time()
+    else:
+        return end
+
+
+def filter_type(tp):
+    if tp==None:
+        return 'day'
+    else:
+        return tp
+
+
 @api.route('')
-class Cart(Resource):
+class Sales(Resource):
+    @api.response(200,"OK")
+    @api.response(400,"Invalid parameter")
+    @api.response(403, "No authorization token / token invalid / token expired / not admin")
+    @api.expect(models.sale_filter, models.token_header)
     def get(self):
-        pass 
+        auth_header = request.headers.get("Authorization")
+        if not auth_header:
+                return "No authorization", 403
+        T = Token()
+        identity = T.check(auth_header)
 
+        #if (not identity) or (identity['role']!=0):
+        #    return "Wrong token", 403
 
+        start_time=int(filter_start(request.args.get("start")))
+        end_time=int(filter_end(request.args.get("end")))
+        sale_type=filter_type(request.args.get("type"))
+
+        typelist=['day','week','month']
+        
+        if start_time > end_time or sale_type not in typelist or end_time > time.time() or start_time < 1609459200:
+            return "Invalid parameter", 400
+
+        sql="SELECT unix_time, total_price FROM orders WHERE unix_time <= ? and unix_time >= ? order by unix_time ASC"
+        values=(end_time, start_time)
+        
+        dictionary={}
+        
+        try:
+            with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
+                conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
+                cur = conn.cursor()
+                
+                cur.execute(sql, values)
+                result = cur.fetchall()
+
+                print(result)
+
+                # check if no result
+                if not result:
+                    return "No Record", 404
+                else:
+                    orders = []
+                    sales = []
+
+                    if sale_type == 'day':
+                        duration = int((end_time - start_time) / (24 * 60 * 60)) + 1
+
+                        for i in range(0, duration):
+                            order = 0
+                            sale = 0
+                            print("hello here {}, {}".format(duration, i))
+                            
+                            # only one day
+                            if i == 0 and duration == 1:
+                                start = start_time
+                                end = end_time
+                            
+                            # many days : first day
+                            elif i == 0 and duration > 1:
+                                start = start_time
+                                tmp = time.localtime(start)
+                                end = int(start-tmp.tm_hour * 60 * 60 - tmp.tm_min * 60 - tmp.tm_sec) + (24*60*60)
+                            
+                            # many days : last day
+                            elif i == (duration-1):
+                                start = end
+                                end = end_time
+                            
+                            # many days
+                            else:
+                                start = end
+                                end = start + (24*60*60)
+
+                            for j in range(0, len(result)):
+                                if result[j]["unix_time"] >= start and result[j]["unix_time"] < end:
+                                    order += 1
+                                    sale += round(result[j]["total_price"],2)
+                            
+                            print("here!!! order, sale = {}, {}".format(order, sale))
+                            print(order,sale)
+
+                            orders.append(order)
+                            sales.append(round(sale,2))
+
+                        dictionary['orders'] = orders
+                        dictionary['sales'] = sales
+                        return dictionary, 200
+                        
+                    elif sale_type == 'week':
+                        pass
+                    else:
+                        pass
+
+        except Exception as e:
+            print(e)
+            return "Internal server error", 500
+
+    
         """
         ONLY GET method is supported here.
         the url takes three parameters, example url as 
@@ -74,10 +195,8 @@ class Cart(Resource):
                         前端会制作成一个柱状图
                     ]
                 }
-
-
-
         """
+        
 
 
 

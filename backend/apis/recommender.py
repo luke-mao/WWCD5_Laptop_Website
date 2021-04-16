@@ -31,50 +31,53 @@ class ItemBasedRecommender(Resource):
         """Recommend items based on popularity and user similarity (need token)"""
 
         auth_header = request.headers.get("Authorization")
-        
         if not auth_header:
             return "No authorization token", 403
         
         T = Token()
-        
         identity = T.check(auth_header)
         
         if not identity:
             return "Wrong token", 403
         
         sql = """SELECT * FROM customer_rating"""
-        
-        # sql_param = (identity['user_id'],)
+
         u_id = identity['user_id']
-        
+
         try:
             with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
                 conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
-
                 cur = conn.cursor()
 
                 r1 = cur.execute(sql)
                 result = r1.fetchall()
-                
-                ####user-rating table
+
+                # user-rating table
                 user_rating = pd.DataFrame(result)
                 
-                ####每个item被评分的平均值
+                #if user has not purchased anything before
+                if u_id not in user_rating.user_id.values:
+                    return "user has not purchased anything",204
+                
+                # mean ratint rated by each user
                 ratings_mean_count = pd.DataFrame(
                     user_rating.groupby('item_id')['rating'].mean().sort_values(ascending=False))
                 
-                ####
                 ratings_mean_count['rating_counts'] = pd.DataFrame(user_rating.groupby('item_id')['rating'].count())
+                
                 popular = ratings_mean_count.sort_values(['rating_counts', 'rating'], ascending=False).reset_index()
+                
                 pop_item = popular['item_id'].values.tolist()
+                
                 df = user_rating.pivot_table(index='user_id', columns='item_id', values='rating')
                 
-                ####两个user对item评分共有的部分
+                # common part item rated by user pair
                 def build_xy(user_id1, user_id2):
                     bool_array = df.loc[user_id1].notnull() & df.loc[user_id2].notnull()
                     return df.loc[user_id1, bool_array], df.loc[user_id2, bool_array]
-                
-                ###皮尔逊相关系数计算user相似度
+
+
+                # pearsonr to count similarity of user pair
                 def pearson(user_id1, user_id2):
                     x, y = build_xy(user_id1, user_id2)
                     mean1, mean2 = x.mean(), y.mean()
@@ -85,40 +88,38 @@ class ItemBasedRecommender(Resource):
                         value = 0
                     return value
                 
-                #####找出最邻近用户
-                def computeNearestNeighbor(user_id, k=3):
+
+                # find nearest user
+                def computeNearestNeighbor(user_id, k=8):
                     # the customer may not have purchased before
                     # so need to check, if no purchase, return none
-                    if user_id in df.columns:
-                        return df.drop(user_id).index.to_series().apply(pearson, args=(user_id,)).nlargest(k)
-                    else:
-                        return None
+                    # print("1111",df.drop(user_id).index.to_series().apply(pearson, args=(user_id,)).nlargest(k))
+
+                    return df.drop(user_id).index.to_series().apply(pearson, args=(user_id,)).nlargest(k)
 
 
-                ####基于邻近用户做出推荐
+                ####CF user-based rec
                 def recommend(user_id):
-                    # 找到距离最近的用户id
-                    # return None if the customer has no purchase record
-                    if not computeNearestNeighbor(user_id):
-                        return None 
+                    # find nearest user_id
+                    result = 0
 
-                    nearest_user_id = computeNearestNeighbor(user_id).index[0]
-                    
-                    # 找出邻居评价过、但自己未曾评价的乐队（或商品）
-                    # 结果：index是商品名称，values是评分
-                    result = df.loc[
-                        nearest_user_id, df.loc[user_id].isnull() & df.loc[nearest_user_id].notnull()].sort_values(
-                        ascending=False)
-                    
-                    ###取前5个
+                    nearest_user_id_list = computeNearestNeighbor(user_id).index.tolist()
+                    #find out the item that is rated by neighbour but not user self
+                    #in case nearest user has the same rated item as user self.
+                    for nearest_user_id in nearest_user_id_list:
+                        k_near = df.loc[nearest_user_id, df.loc[user_id].isnull() & df.loc[nearest_user_id].notnull()]
+                        if len(k_near.values) != 0:
+                            result = k_near.sort_values(ascending=False)
+
+                            # print("result:",result[:5].index)
+                            break
+
+                    ###get top 5
                     return result[:5].index
                 
-
                 # if no purchase record, return 204
                 rec_result = recommend(u_id)
-                if not rec_result:
-                    return "Customer with no purchase and rating record", 204
-
+                # print(rec_result)
 
                 # for customer with purchase record
                 all_result= []
@@ -126,7 +127,7 @@ class ItemBasedRecommender(Resource):
                 for i in rec_result:
                     all_result.append(i)
                 
-                #推荐给用户商品数目:top_k
+                #recommend to users: top_k
                 top_k = 8
                 
                 for i in pop_item:
@@ -199,9 +200,8 @@ class ViewHistoryBasedRecommender(Resource):
             return "No authorization token", 403
         
         T = Token()
-        
+
         identity = T.check(auth_header)
-        
         if not identity:
             return "Wrong token", 403
         
@@ -297,7 +297,7 @@ class ViewHistoryBasedRecommender(Resource):
                     bool_array = nor_item.loc[item_id1].notnull() & nor_item.loc[item_id2].notnull()
                     return nor_item.loc[item_id1, bool_array], nor_item.loc[item_id2, bool_array]
                 
-                ###皮尔逊相关系数计算item相似度
+                ###pearsonr to calculate similarity of pair item
                 def pearson(item_id1, item_id2):
                     x, y = build_xy(item_id1, item_id2)
                     mean1, mean2 = x.mean(), y.mean()
@@ -308,7 +308,7 @@ class ViewHistoryBasedRecommender(Resource):
                         value = 0
                     return value
                 
-                #####找出K邻近物品
+                #####find out nearest item
                 def computeNearestNeighbor(item_id, k):
                     return nor_item.drop(item_id).index.to_series().apply(pearson, args=(item_id,)).nlargest(k)
                 
@@ -411,8 +411,4 @@ class RandomForBanner(Resource):
         except Exception as e:
             print(e)
             return "Internal server error", 500
-
-
-
-
 

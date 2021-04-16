@@ -10,7 +10,6 @@ from utils.attributes import simple_attributes, detail_attributes
 from utils.function import unpack
 
 
-
 api = Namespace(
     'item',
     description="This module supports getting item information and filtering items. It also supports the admin to upload new item or delelte/undelete/edit existing items"
@@ -59,7 +58,7 @@ def get_all_profiles(item_id_list):
 
     except Exception as e:
         print(e)
-        return abort(500, "Internal server error")
+        abort(500, "Internal server error")
 
 
 def get_page_count(total, item_per_page):
@@ -388,7 +387,8 @@ class Search(Resource):
                 conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
                 cur = conn.cursor()
 
-                sql = """SELECT item.item_id 
+                # get both item_id and name into the list
+                sql = """SELECT item.item_id, item.name 
                     FROM item LEFT OUTER JOIN laptop 
                     ON item.item_id = laptop.item_id 
                 """
@@ -404,20 +404,52 @@ class Search(Resource):
 
                 cur.execute(sql)
 
-                item_id_list = cur.fetchall()
+                item_id_name_list = cur.fetchall()
 
                 # if no result, or the id list does not reach this page id
-                if (not item_id_list) or (len(item_id_list) < page_id * page_size):
-                    return(404, "No more pages")        # here cannot use abort, it will be caught in the exception
+                # here cannot use abort, it will be caught in the exception
+                if (not item_id_name_list) or (len(item_id_name_list) < page_id * page_size):
+                    return(404, "No more pages")        
 
+
+                # if there is a keyword in the request, then we fetch all item names and compare
+                # the keyword will not have %20 inside
+                keyword = request.args.get("keyword")
+                result_id_list = item_id_name_list
+                
+                if keyword:
+                    keyword = keyword.lower()
+
+                    for item in item_id_name_list:
+                        name = item['name'].lower()
+                        item['similarity'] = jaro_winkler.normalized_similarity(keyword, name)
+
+                    sorted_id_name_list = sorted(
+                        item_id_name_list, 
+                        key=lambda x: x['similarity'],
+                        reverse=True
+                    )
+
+                    # print(sorted_id_name_list)
+
+                    # threshold = 0.6
+                    THRESHOLD = 0.6
+                    result_id_list = [d for d in sorted_id_name_list if d['similarity'] > THRESHOLD]
+
+
+                # again, check if no results
+                if (not result_id_list) or (len(result_id_list) < page_id * page_size):
+                    return(404, "No more pages")        
+
+
+                # pack the result
                 result = {
                     'current_page': page_id,
-                    'page_count': get_page_count(len(item_id_list), page_size),
-                    'data': get_all_profiles(item_id_list[page_id * page_size : (page_id+1) * page_size])
+                    'page_count': get_page_count(len(result_id_list), page_size),
+                    'data': get_all_profiles(result_id_list[page_id * page_size : (page_id+1) * page_size])
                 }
 
                 return result, 200 
-
 
         except Exception as e:
             print(e)
