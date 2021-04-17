@@ -88,7 +88,7 @@ export function navbar_set_up(){
             let new_item = util.createMaterialIcon("li", "note_add");
             new_item.title = "Add New Product";
             new_item.addEventListener("click", function(){
-                alert("New product page: not implemented yet");
+                window.location.href = "item.html?type=new";
                 return;
             });
 

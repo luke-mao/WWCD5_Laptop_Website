@@ -85,7 +85,7 @@ export function create_simple_modal_with_text(title_text, body_text, btn_text){
 export function create_simple_modal_with_text_and_close_feature(title_text, body_text, btn_text){
     let modal_dict = create_simple_modal_with_text(title_text, body_text, btn_text);
     modal_dict['footer_btn'].addEventListener("click", function(){
-        util.removeSlef(modal_dict['modal']);
+        util.removeSelf(modal_dict['modal']);
         return;
     });
 

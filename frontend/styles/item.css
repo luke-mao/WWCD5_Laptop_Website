@@ -10,12 +10,19 @@ main {
 
 .item.snapshot {
     background-image: url("../img/snapshot.png");
-    background-size: 100% auto;
-    background-repeat: repeat-y;
 }
 
 .item.preview {
     background-image: url("../img/preview.png");
+}
+
+.item.new {
+    background-image: url("../img/new.png");
+}
+
+.item.snapshot,
+.item.preview,
+.item.new {
     background-size: 100% auto;
     background-repeat: repeat-y;
 }
@@ -154,10 +161,34 @@ main {
     padding-bottom: 12px;
 }
 
+.spec .photos,
 .spec table{
     width: 90%;
     margin-left: auto;
     margin-right: auto;
+}
+
+.spec .photos .photo {
+    width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-around;
+    align-items: center;
+    padding-top: 16px;
+    padding-bottom: 16px;
+}
+
+.spec .photos .photo img {
+    width: 300px;
+    height: auto;
+    object-fit: contain;
+}
+
+.spec .photos .photo input {
+    padding-top: 24px;
+    padding-bottom: 24px;
+    font-size: 24px;
+    text-align: center;
 }
 
 .edit {

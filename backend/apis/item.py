@@ -693,3 +693,30 @@ class NewItem(Resource):
             print(e)
             return "Internal server error", 500
 
+
+@api.route('/empty')
+class NewItem(Resource):
+    @api.response(200, "OK", models.item_profile)
+    @api.response(403, "No authorization token / token invalid / token expired / not admin")
+    @api.expect(models.token_header)
+    @api.doc(description="""
+        Before the admin creates an item, the backend returns the newest set of specification to the admin.
+        And the admin will fill all fields. 
+    """)
+    def get(self):
+        """Only admin can use this method"""
+
+        identity, msg, code = check_admin_identity()
+        if not identity:
+            return msg, code
+
+        # use the simple_attribute and detail_attribute
+        result = {
+            "simple": {key : None for key in simple_attributes},
+            "detail": {key : None for key in detail_attributes},
+            "photos": []
+        }
+
+        return result, 200 
+
+

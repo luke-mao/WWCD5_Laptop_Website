@@ -17,6 +17,7 @@ util.addLoadEvent(recommenders_set_up);
 const PURCHASE = 0;
 const SNAPSHOT = 1;
 const PREVIEW = 2;
+const NEW = 3;
 
 
 // url format = "item.html?item_id=xxx&typ=xxx"
@@ -28,36 +29,19 @@ async function page_set_up(){
     let item_id = search.get("item_id");
     let type = search.get("type");
 
-    // check item_id, must be number
-    // check the type: either null or snapshot
-    if (isNaN(item_id) || (type !== null && type !== "snapshot" && type !== "edit")){
-        let mw = modal.create_simple_modal_with_text(
-            "Website Error",
-            "Sorry. The product you are looking for is not found. Redirecting you back..",
-            "OK",
-        );
-
-        mw['footer_btn'].addEventListener("click", function(){
-            window.history.back();
-            return;
-        })
-
-        return;
-    }
-
-
     // type = snapshot, require the customer role
     // type = edit, require the admin role
     // snapshot: read the data from the local storage and then display
     let data = JSON.parse(localStorage.getItem(item_id));
 
-    // valid: check three modes: purchase, snapshot, preview
-    let is_valid_0 = type == null;
-    let is_valid_1 = type == "snapshot" && data !== null && sessionStorage.getItem("role") !== null;
-    let is_valid_2 = type == "edit" && sessionStorage.getItem("role") == 0;
+    // valid: check 4 modes: purchase, snapshot, preview, new
+    let is_valid_0 = type == null && (! isNaN(item_id));
+    let is_valid_1 = type == "snapshot" && data !== null && sessionStorage.getItem("role") !== null && (! isNaN(item_id));
+    let is_valid_2 = type == "edit" && sessionStorage.getItem("role") == 0 && (! isNaN(item_id));
+    let is_valid_3 = type == "new" && sessionStorage.getItem("role") == 0;
     
 
-    if (! (is_valid_0 || is_valid_1 || is_valid_2)){
+    if (! (is_valid_0 || is_valid_1 || is_valid_2 || is_valid_3)){
         let mw = modal.create_simple_modal_with_text(
             "Website Error",
             "Sorry. The request you made is invalid. Redirecting you back..",
@@ -78,8 +62,9 @@ async function page_set_up(){
         put_item_on_page(data, SNAPSHOT, null);
     }
     else{
-        // fetch
-        let url = "http://localhost:5000/item/id/" + item_id;
+        // purchase, preview, new
+        let url = null;
+
         let init = {
             method: 'GET',
             headers: {
@@ -87,12 +72,21 @@ async function page_set_up(){
             }
         };
 
-        // if it is the logged in user, add the token into it 
-        if (sessionStorage.getItem("role") == 1){
-            init['headers']['Authorization'] = "token " + sessionStorage.getItem("token");
+        if (type === "new") {
+            url = "http://localhost:5000/item/empty";
+            init['headers']['Authorization'] = `token ${sessionStorage.getItem("token")}`;
+        }
+        else {
+            url = `http://localhost:5000/item/id/${item_id}`;
+
+            // if it is the logged in user, add the token into it 
+            // so the backend can refresh the view history
+            if (sessionStorage.getItem("role") == 1){
+                init['headers']['Authorization'] = "token " + sessionStorage.getItem("token");
+            }
         }
 
-        
+
         try{
             let response = await fetch(url, init);
 
@@ -104,8 +98,12 @@ async function page_set_up(){
 
             let data = await response.json();
             
+            /////////////////// here consider the new product
             if (type == "edit"){
-                put_item_on_page_for_edit(data);
+                put_edit_item_or_new_item_on_page(data, PREVIEW);
+            }
+            else if (type == "new"){
+                put_edit_item_or_new_item_on_page(data, NEW);
             }
             else {
                 put_item_on_page(data, PURCHASE, null);
@@ -143,21 +141,21 @@ function recommenders_set_up(){
 }
 
 
-function put_item_on_page_for_edit(data){
+function put_edit_item_or_new_item_on_page(original_data, status){
     // merge two dicts
     // since when send to the backend, simply use the key => value pair is enough
-    let merged_data = Object.assign({}, data['simple'], data['detail']);
+    let merged_data = Object.assign({}, original_data['simple'], original_data['detail']);
 
     let specs_data_list = provide_specs_list_for_edit(merged_data);
 
     let div_edit = document.getElementsByClassName("edit")[0];
-    fill_edit_with_data(div_edit, merged_data, specs_data_list);
+    fill_edit_with_data(original_data, div_edit, merged_data, specs_data_list);
 
     // assign the change event listener
-    assign_change_event_listener_to_inputs(div_edit, data);
+    assign_change_event_listener_to_inputs(original_data);
 
     // display the preview first
-    put_item_on_page(data, PREVIEW, data);
+    put_item_on_page(original_data, status, original_data);
 
     // add a submit button, assign the submit function
     assign_submit_button_after_preview();
@@ -346,14 +344,11 @@ function assign_submit_button_after_preview(){
 }
 
 
-
-
-
 // orignal_data: the data fetched from the backend
 // when some input is changed, replace the data with the original ones
-function assign_change_event_listener_to_inputs(div_edit, original_data){
-
-    let inputs = div_edit.querySelectorAll("input");
+function assign_change_event_listener_to_inputs(original_data){
+    let div_edit = document.getElementsByClassName("edit")[0];
+    let inputs = div_edit.querySelectorAll("input[type=text]");
 
     for (let i = 0; i < inputs.length; i++){
         inputs[i].addEventListener("change", function(){
@@ -362,31 +357,54 @@ function assign_change_event_listener_to_inputs(div_edit, original_data){
             // now get all changed inputs
             let changed_inputs = div_edit.querySelectorAll("input[is_changed=true]");
 
-            // deep copy
-            let new_data = JSON.parse(JSON.stringify(original_data));
-
             for (let j = 0; j < changed_inputs.length; j++){
                 changed_inputs[j].classList.add("modified");
-
-                let key = changed_inputs[j].getAttribute("real_key");
-                let new_value = changed_inputs[j].value;
-
-                if (key in new_data['simple']){
-                    new_data['simple'][key] = new_value;
-                }
-                else{
-                    new_data['detail'][key] = new_value;
-                }
             }
 
             // display the preview
-            put_item_on_page(new_data, PREVIEW, original_data);
+            let new_data = get_new_data_from_edit(original_data);
+            put_item_on_page(new_data, status, original_data);
         });
     }
 }
 
 
-function fill_edit_with_data(div_edit, merged_data, specs_data_list){
+function get_new_data_from_edit(original_data){
+    // deep copy
+    let new_data = JSON.parse(JSON.stringify(original_data));
+
+    // now get all changed inputs
+    let div_edit = document.getElementsByClassName("edit")[0];
+    let changed_inputs = div_edit.querySelectorAll("input[is_changed=true]");
+
+    for (let j = 0; j < changed_inputs.length; j++){
+        let key = changed_inputs[j].getAttribute("real_key");
+        let new_value = changed_inputs[j].value;
+
+        if (key in new_data['simple']){
+            new_data['simple'][key] = new_value;
+        }
+        else{
+            new_data['detail'][key] = new_value;
+        }
+    }
+
+    // also check the photos
+    let img_list = div_edit.getElementsByTagName("img");
+    let src_list = [];
+
+    for (let i = 0; i < img_list.length; i++){
+        src_list.push(img_list[i].src);
+    }
+
+    delete new_data['photos'];
+    new_data['photos'] = src_list;
+
+    return new_data;
+}
+
+
+function fill_edit_with_data(original_data, div_edit, merged_data, specs_data_list){
     util.removeAllChild(div_edit);
 
     // add the item_id
@@ -443,6 +461,148 @@ function fill_edit_with_data(div_edit, merged_data, specs_data_list){
         }
     }
 
+
+    // the last is for photos
+    let div_photos = document.createElement("div");
+    div_photos.classList.add("spec");
+    div_specs.appendChild(div_photos);
+
+    // header
+    let photo_title = document.createElement("div");
+    photo_title.classList.add("spec-title");
+    photo_title.textContent = "Photos"; 
+
+    let photo_body = document.createElement("div");
+    photo_body.classList.add("photos")
+
+    util.appendListChild(div_photos, [photo_title, photo_body]);
+
+    original_data['photos'].forEach((src) => {
+        let div = create_photo_section_in_edit(src, original_data);
+        photo_body.appendChild(div);
+    });
+
+    // also a button to upload new photo
+    add_new_photo_input(photo_body, original_data);
+
+    return;
+}
+
+
+function create_photo_section_in_edit(src, original_data){
+    // each photo has 2 things: img and remove button
+    let div = document.createElement("div");
+    div.classList.add("photo");
+
+    let img = document.createElement("img");
+    img.src = src;
+    img.alt = "Photo";
+
+    let btn_remove = document.createElement("button");
+    btn_remove.textContent = "Remove";
+
+    // link
+    util.appendListChild(div, [img, btn_remove]);
+
+    // remove function
+    btn_remove.addEventListener("click", function(){
+        // check how many images left
+        // cannot remove the last one
+        let count = div.parentNode.getElementsByTagName("img").length;
+
+        if (count == 1){
+            modal.create_simple_modal_with_text_and_close_feature(
+                "Remove Photo Error",
+                "The item must have one photo. Try to upload a new one before remove this last photo.",
+                "OK",
+            )
+
+            return;
+        }
+
+        let mw = modal.create_complex_modal_with_text(
+            "Remove Photo Confirmation",
+            "Are you sure to remove this photo? You may keep a copy first.",
+            "Remove", "Close",
+        );
+
+        mw['footer_btn_1'].addEventListener("click", function(){
+            util.removeSelf(div);
+            util.removeSelf(mw['modal']);
+
+            // update the preview
+            let new_data = get_new_data_from_edit(original_data);
+            put_item_on_page(new_data, status, original_data);
+
+            return;
+        });
+
+        mw['footer_btn_2'].addEventListener("click", function(){
+            util.removeSelf(mw['modal']);
+            return;
+        })
+    });
+
+    return div;
+}
+
+
+function add_new_photo_input(div_parent, original_data){
+    let div = document.createElement("div");
+    div.classList.add("photo");
+    div_parent.appendChild(div);
+
+    let input = document.createElement("input");
+    input.type = "file";
+    input.textContent = "Upload New Photo";
+    div.appendChild(input);
+
+    input.addEventListener("change", function(){
+        let file = input.files[0];
+
+        let validFileTypes = ['image/png', 'image/jpg', 'image/jpeg'];
+        let valid = validFileTypes.find(type => type === file.type);
+
+        // Bad data, let's walk away.
+        if (! valid) {
+            modal.create_simple_modal_with_text_and_close_feature(
+                "Image File Type Error",
+                "Sorry. The website only supports png, jpg and jpeg at this moment ..",
+                "OK",
+            );
+
+            // reset
+            input.value = "";
+            return;
+        }
+
+        // now decode this file use the promise
+        // then add a new photo section before the input
+        // and clear the input
+        util.fileToDataUrl(file)
+            .then((img_url) => {
+                let new_div = create_photo_section_in_edit(img_url, original_data);
+                div_parent.insertBefore(new_div, div);
+                input.value = "";
+
+                // call the update
+                // update the preview
+                let new_data = get_new_data_from_edit(original_data);
+                put_item_on_page(new_data, status, original_data);
+
+            })
+            .catch((err) => {
+                console.log(err);
+
+                modal.create_simple_modal_with_text_and_close_feature(
+                    "Upload Photo Error",
+                    "Sorry. Something wrong with our website and your photo cannot be decoded properly. Please try another one..",
+                    "OK",
+                );
+            })
+        ;
+    });
+
     return;
 }
 
@@ -459,7 +619,8 @@ function provide_specs_list_for_edit(){
     let main = {
         "title": "Main",
         "specs": {
-            "Item Name": "name", 
+            "Item Name": "name",
+            "Price": "price", 
         }
     };
 
@@ -546,8 +707,10 @@ function provide_specs_list_for_edit(){
 
 // status = PURCHASE, SNAPSHOT, PREVIEW
 function put_item_on_page(data, status, original_data){
+    // item div, set either the real item_id, or -1
     let item = document.getElementsByClassName("item")[0];
     item.setAttribute("item_id", data['simple']['item_id']);
+
 
     // if snapshot, give a background image showing: This is purchase snapshot
     if (status == SNAPSHOT){
@@ -555,6 +718,9 @@ function put_item_on_page(data, status, original_data){
     }
     else if (status == PREVIEW){
         item.classList.add("preview");
+    }
+    else if (status == NEW){
+        item.classList.add("new");
     }
 
     // simple: photo and a profile
@@ -686,7 +852,7 @@ function arrange_data_to_specs(data, status, original_data){
             'Model': `${d['display_type']}`,
             'Size': `${d['display_size']} Inch`,
             'Resolution': `${d['display_horizontal_resolution']} × ${d['display_vertical_resolution']}`,
-            'Touch Screen': `${d['display_touch'].toUpperCase()}`,
+            'Touch Screen': d['display_touch'] ? `${d['display_touch'].toUpperCase()}` : "NULL",
         },
     };
     
@@ -834,7 +1000,7 @@ function put_profile(data, div, status, original_data){
     // right: small profile
     let name = document.createElement("div");
     name.classList.add("name");
-    name.textContent = data['simple']['name'];
+    name.textContent = data['simple']['name'] ? data['simple']['name'] : "Null";
 
     if (status == PREVIEW && data['simple']['name'] !== original_data['simple']['name']){
         name.classList.add("modified");
@@ -843,7 +1009,11 @@ function put_profile(data, div, status, original_data){
     // price cannot change under preview
     let price = document.createElement("div");
     price.classList.add("price");
-    price.textContent = `$ ${data['simple']['price']}`; 
+    price.textContent = `$ ${data['simple']['price']}`;
+    
+    if (status == PREVIEW && data['simple']['price'] !== original_data['simple']['price']){
+        price.classList.add("modified");
+    }
 
     let list = document.createElement("ul");
     list.classList.add("list");
@@ -851,48 +1021,26 @@ function put_profile(data, div, status, original_data){
     // link
     util.appendListChild(div, [name, price, list]);
 
-    // fill the list
+    // fill the list with texts
+    let li_texts = create_texts_for_simple_profile(data);
+
     // total 5 li tag in the list
-    for (let i = 0; i < 5; i++){
+    for (let i = 0; i < li_texts.length; i++){
         let li = document.createElement("li");
+        li.textContent = li_texts[i];
         list.appendChild(li);
     }
 
     let li_list = list.childNodes;
-
-    // display
-    li_list[0].textContent = `${data['detail']['display_size']}\" ${data['detail']['display_horizontal_resolution']} × ${data['detail']['display_vertical_resolution']} screen`;
-
-    // cpu
-    li_list[1].textContent = `${data['detail']['cpu_prod']} ${data['detail']['cpu_model']} boost up to ${data['detail']['cpu_boost_speed']} GHz`;
-
-    // gpu
-    li_list[2].textContent = `${data['detail']['gpu_prod']} ${data['detail']['gpu_model']}`
-
-    // memory
-    li_list[3].textContent = `${data['detail']['memory_size']} GB ${data['detail']['memory_type']} ${data['detail']['memory_speed']} MHz`;
-
-    // storage
-    li_list[4].textContent = `${data['detail']['primary_storage_cap']} GB ${data['detail']['primary_storage_model']}`;
-
     
+
     // for admin preview, add "modified" class to editted data
     if (status == PREVIEW){
         // reconstruct all the 5 sentences, then check
-        let text_0 = `${original_data['detail']['display_size']}\" ${original_data['detail']['display_horizontal_resolution']} × ${original_data['detail']['display_vertical_resolution']} screen`;
-        
-        let text_1 = `${original_data['detail']['cpu_prod']} ${original_data['detail']['cpu_model']} boost up to ${original_data['detail']['cpu_boost_speed']} GHz`;
+        let old_texts = create_texts_for_simple_profile(original_data);
 
-        let text_2 = `${original_data['detail']['gpu_prod']} ${original_data['detail']['gpu_model']}`
-
-        let text_3 = `${original_data['detail']['memory_size']} GB ${original_data['detail']['memory_type']} ${original_data['detail']['memory_speed']} MHz`;
-
-        let text_4 = `${original_data['detail']['primary_storage_cap']} GB ${original_data['detail']['primary_storage_model']}`;
-
-        let texts = [text_0, text_1, text_2, text_3, text_4];
-
-        for (let i = 0; i < texts.length; i++){
-            if (texts[i] !== li_list[i].textContent){
+        for (let i = 0; i < li_texts.length; i++){
+            if (old_texts[i] !== li_texts[i]){
                 li_list[i].classList.add("modified");
             }
         }
@@ -1000,4 +1148,26 @@ function put_profile(data, div, status, original_data){
 
     return;
 }
+
+
+function create_texts_for_simple_profile(data){
+    // display
+    let t1 = `${data['detail']['display_size']}\" ${data['detail']['display_horizontal_resolution']} × ${data['detail']['display_vertical_resolution']} screen`;
+
+    // cpu
+    let t2 = `${data['detail']['cpu_prod']} ${data['detail']['cpu_model']} boost up to ${data['detail']['cpu_boost_speed']} GHz`;
+
+    // gpu
+    let t3 = `${data['detail']['gpu_prod']} ${data['detail']['gpu_model']}`
+
+    // memory
+    let t4 = `${data['detail']['memory_size']} GB ${data['detail']['memory_type']} ${data['detail']['memory_speed']} MHz`;
+
+    // storage
+    let t5 = `${data['detail']['primary_storage_cap']} GB ${data['detail']['primary_storage_model']}`;
+    
+    return [t1, t2, t3, t4, t5];
+}
+
+
 
