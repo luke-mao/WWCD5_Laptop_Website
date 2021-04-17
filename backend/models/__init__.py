@@ -243,12 +243,22 @@ rating_parser.add_argument(
 filter = reqparse.RequestParser()
 
 filter.add_argument("page_size", type=int, help="items per page, the default value = 18", location="args")
-filter.add_argument("order_method", type=str, help="view, name, price (single choice only)", location="args")
-filter.add_argument("order", type=str, help="asc, desc, (single choice only)", location="args")
 filter.add_argument("price_min", type=float, location="args")
 filter.add_argument("price_max", type=float, location="args")
 filter.add_argument("cpu", type=int, help="0=Intel, 1=Amd (multiple choice)", action="append", location="args")
 filter.add_argument("keyword", type=str, help="string, use %20 to replace the space", location="args")
+
+filter.add_argument(
+    "order_method", type=str, 
+    help="view, name, price, or relevancy (single choice only, for keyword search, please use relevancy by default)", 
+    location="args"
+)
+
+filter.add_argument(
+    "order", type=str, 
+    help="asc, desc, (single choice only, can be omit when using keyword search)", 
+    location="args"
+)
 
 filter.add_argument(
     "storage", type=int, 

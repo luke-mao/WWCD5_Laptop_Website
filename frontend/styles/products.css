@@ -98,6 +98,20 @@ main {
     margin-right: auto;
 }
 
+.shelf .keyword {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    padding-bottom: 24px;
+    width: fit-content;
+}
+
+.shelf .keyword h3 {
+    font-size: 27px;
+    padding-right: 16px;
+}
+
 .shelf .dropdowns {
     display: flex;
     flex-flow: row nowrap;
@@ -107,7 +121,7 @@ main {
 .shelf .dropdown {
     width: fit-content;
     padding: 8px;
-    font-size: 17px;
+    font-size: 18px;
     line-height: 1.3;
     margin-right: 30px;
     border-radius: 5px;

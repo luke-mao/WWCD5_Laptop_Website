@@ -274,7 +274,7 @@ class Search(Resource):
         page_size = filter_page_size(request.args.get("page_size"), 18)
 
         order_method = "view"
-        if request.args.get("order_method") in ["view", "name", "price"]:
+        if request.args.get("order_method") in ["view", "name", "price", "relevancy"]:
             order_method = request.args.get("order_method")
         
         order = "asc"
@@ -291,12 +291,9 @@ class Search(Resource):
         conds = []
         conds.append("(item.price >= {} AND item.price <= {})".format(price_min, price_max))
 
-        ##################################################
-        # keyword, the %20 symbol is removed automatically
+        # keyword search, may be empty
+        # when it is the keyword search, default is order_method = relevancy and order = desc
         keyword = request.args.get("keyword")
-        # keyword related things are not implemented yet
-        ##################################################
-
 
         # multi-valued attributes
         cpu = filter_param(request.args.getlist("cpu"), ["0", "1"])
@@ -399,8 +396,8 @@ class Search(Resource):
                     else:
                         sql += "WHERE {} \n".format(cond)
 
-                
-                sql += "ORDER BY {} {}".format(order_method, order)
+                if order_method != "relevancy":
+                    sql += "ORDER BY {} {}".format(order_method, order)
 
                 cur.execute(sql)
 
@@ -414,7 +411,6 @@ class Search(Resource):
 
                 # if there is a keyword in the request, then we fetch all item names and compare
                 # the keyword will not have %20 inside
-                keyword = request.args.get("keyword")
                 result_id_list = item_id_name_list
                 
                 if keyword:
@@ -424,17 +420,18 @@ class Search(Resource):
                         name = item['name'].lower()
                         item['similarity'] = jaro_winkler.normalized_similarity(keyword, name)
 
-                    sorted_id_name_list = sorted(
-                        item_id_name_list, 
-                        key=lambda x: x['similarity'],
-                        reverse=True
-                    )
-
-                    # print(sorted_id_name_list)
+                    # if the keyword search asks for order by similarity
+                    # use descending order by default
+                    if order_method == "relevancy":
+                        item_id_name_list = sorted(
+                            item_id_name_list, 
+                            key= lambda d: d['similarity'],
+                            reverse=True
+                        )
 
                     # threshold = 0.6
-                    THRESHOLD = 0.6
-                    result_id_list = [d for d in sorted_id_name_list if d['similarity'] > THRESHOLD]
+                    THRESHOLD = 0.65
+                    result_id_list = [d for d in item_id_name_list if d['similarity'] > THRESHOLD]
 
 
                 # again, check if no results

@@ -82,6 +82,17 @@ export function create_simple_modal_with_text(title_text, body_text, btn_text){
 }
 
 
+export function create_simple_modal_with_text_and_close_feature(title_text, body_text, btn_text){
+    let modal_dict = create_simple_modal_with_text(title_text, body_text, btn_text);
+    modal_dict['footer_btn'].addEventListener("click", function(){
+        util.removeSlef(modal_dict['modal']);
+        return;
+    });
+
+    return;
+}
+
+
 export function create_complex_modal_with_text(title_text, body_text, btn_1_text, btn_2_text){
     let modal_dict = create_modal_with_two_btns();
 
@@ -127,5 +138,4 @@ export function show_modal_input_error_and_redirect_back(current_mw, title_text,
 
     return;
 }
-
 

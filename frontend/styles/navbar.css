@@ -49,6 +49,10 @@
     padding-top: 6px;
     padding-bottom: 6px;
     font-size: 40px;
+    display: flex;
+    flex-direction: row nowrap;
+    justify-content: center;
+    align-items: center;
 }
 
 .navbar ul li:hover {
@@ -64,4 +68,19 @@
     top: -20px;
     right: 0px;
 }
+
+.navbar ul li input {
+    border: 1px solid #ccc;
+}
+
+.navbar ul li input:focus {
+    outline-width: 0px;
+}
+
+
+.navbar ul li .icon {
+    font-size: 40px;
+}
+
+
 

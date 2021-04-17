@@ -18,7 +18,7 @@ async function page_set_up(){
 
     // there may be one dropdown, or two dropdowns
     let div_dropdowns = shelf.getElementsByClassName("dropdowns")[0];
-    dropdowns_set_up(div_dropdowns);
+    dropdowns_set_up(div_dropdowns, true);
 
     // after set up the filters and dropdown list / lists
     // use them to get the page feed
@@ -152,6 +152,10 @@ async function filter_and_page_change_update(page_id){
         url = add_url_param(key, order_choice[key], url);
     }
 
+    // check if the dropdown has keyword 
+    let keyword = "keyword" in order_choice ? order_choice['keyword'] : null;
+
+
     // also check the second dropdown, if the admin logs in
     if (sessionStorage.getItem("role") == 0){
         let dropdown_2 = document.getElementsByClassName("dropdown")[1];
@@ -183,31 +187,21 @@ async function filter_and_page_change_update(page_id){
     }
 
     if (isNaN(price_max) || parseFloat(price_max) < 0){
-        let mw = modal.create_simple_modal_with_text(
+        modal.create_simple_modal_with_text_and_close_feature(
             "Max Price Input Error", 
             "Sorry. The maximum price you entered is invalid. Please try again..",
             "OK",
         );
 
-        mw['footer_btn'].addEventListener("click", function(){
-            util.removeSelf(mw['modal']);
-            return;
-        });
-
         return;
     }
 
     if (parseFloat(price_max) < parseFloat(price_min)){
-        let mw = modal.create_simple_modal_with_text(
+        modal.create_simple_modal_with_text_and_close_feature(
             "Price Input Error", 
             "Sorry. The maximum price you entered is less than the minimum price. Please try again..",
             "OK",
         );
-
-        mw['footer_btn'].addEventListener("click", function(){
-            util.removeSelf(mw['modal']);
-            return;
-        });
 
         return;
     }
@@ -243,7 +237,7 @@ async function filter_and_page_change_update(page_id){
         let response = await fetch(url, init);
         let new_data = await response.json();
 
-        fill_shelf(shelf, new_data);
+        fill_shelf(shelf, new_data, keyword);   /////////////////////////
     }
     catch(err){
         alert("error");
@@ -259,6 +253,11 @@ function add_url_param(key, value, old_url){
         new_url += "&";
     }
 
+    // replace all spaces in the value as %20
+    if (typeof value === "string"){
+        value = value.replace(/\ /g, "%20");
+    }
+    
     new_url += `${key}=${value}`;
     return new_url;
 }
@@ -314,9 +313,9 @@ function create_filter_with_multiple_checkbox(str_title, checkbox_name, event_ha
 }
 
 
-function dropdowns_set_up(div_dropdowns){
+// require_check_url: true if need to check url for keywords string
+function dropdowns_set_up(div_dropdowns, require_check_url){
     util.removeAllChild(div_dropdowns);
-
 
     // default is a dropdown to control the order of display
     let dropdown = document.createElement("select");
@@ -365,6 +364,37 @@ function dropdowns_set_up(div_dropdowns){
         op_trending, op_price_asc, op_price_desc, op_alp_asc, op_alp_desc
     ]);
 
+    // require_check_url
+    if (require_check_url){
+        // check the url
+        let params = new URLSearchParams(window.location.search.substring(1));
+        let keyword = params.get("keyword");
+
+        if (keyword !== null){
+            // add a new option, insert to be the first
+            let op_relevancy = document.createElement("option");
+            op_relevancy.textContent = "Relevancy";
+            op_relevancy.value = JSON.stringify({
+                "order_method": "relevancy",
+            });
+
+            // set it to be the default
+            op_relevancy.selected = true;
+
+            // insert to be the first & default option
+            dropdown.insertBefore(op_relevancy, dropdown.firstChild);
+
+            // also need to attach the keyword to all childs of the dropdown list
+            let all_options = dropdown.getElementsByTagName("option");
+
+            for (let i = 0; i < all_options.length; i++){
+                let value = JSON.parse(all_options[i].value);
+                value['keyword'] = keyword;
+                all_options[i].value = JSON.stringify(value);
+            }
+        }
+    }
+
     // bind change listener
     dropdown.addEventListener("change", () => filter_and_page_change_update());
 
@@ -404,12 +434,35 @@ function dropdowns_set_up(div_dropdowns){
 }
 
 
-function fill_shelf(shelf, data){
+function fill_shelf(shelf, data, keyword){
     // shelves have 3 parts: dropdown, products, pages
     let products = shelf.getElementsByClassName("products")[0];
     let pages = shelf.getElementsByClassName("pages")[0];
 
     util.removeAllChild(products);
+
+    // display the keyword if exist
+    // as the first child of shelf
+    if (keyword !== null){
+        let div_keyword = shelf.getElementsByClassName("keyword")[0];
+        util.removeAllChild(div_keyword);
+
+        // two things: a text massage, and a button to cancel
+        let text = document.createElement("h3");
+        text.textContent = `Results for "${keyword}"`;
+
+        let btn_cancel = document.createElement("button");
+        btn_cancel.textContent = "Cancel";
+
+        util.appendListChild(div_keyword, [text, btn_cancel]);
+
+        // cancel
+        btn_cancel.addEventListener("click", function(){
+            window.location.href = "products.html";
+            return;
+        });
+    }
+
 
     // if no data
     if (data['data'] == null){
