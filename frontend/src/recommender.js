@@ -48,7 +48,7 @@ export async function fill_view_history_or_recommender_with_token(div, keyword){
     let init = {
         method: 'GET',
         headers: {
-            'Authorization': 'token ' + sessionStorage.getItem("token"),
+            'Authorization': `token ${sessionStorage.getItem("token")}`,
             'accpet': 'application/json',
         },
     };

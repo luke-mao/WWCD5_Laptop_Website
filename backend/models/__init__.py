@@ -83,17 +83,21 @@ address_parser.add_argument(
 )
 
 # rating
-rating_parser = reqparse.RequestParser()
-rating_parser.add_argument(
-    'item_id',
-    type=int,
-    help="item_id",
-    location="args"
-)
-
 rating = api.model('rating', {
     'Rating': fields.Integer,
 })
+
+my_rating_single_item = api.model('my_rating_single_item', {
+    'item_id': fields.Integer,
+    'item_name': fields.String,
+    'photo': fields.String,
+    'rating': fields.Integer,
+})
+
+my_rating = api.model('my_rating', {
+    "all": fields.List(fields.Nested(my_rating_single_item))
+})
+
 
 # when sending an order, we use id to identify
 order_item = api.model('order_item', {
@@ -238,14 +242,6 @@ filter_item = api.model('filter_item', {
     "keyword": fields.String,                     # keyword
 });
 
-# rating
-rating_parser = reqparse.RequestParser()
-rating_parser.add_argument(
-    'item_id',
-    type=int,
-    help="item_id",
-    location="args"
-)
 
 # filter item: we provide filters among many ways
 filter = reqparse.RequestParser()

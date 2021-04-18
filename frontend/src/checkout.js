@@ -340,7 +340,7 @@ async function fill_payment_div(div){
             let init = {
                 method: 'POST',
                 headers: {
-                    'Authorization': 'token ' + sessionStorage.getItem("token"),
+                    'Authorization': `token ${sessionStorage.getItem("token")}`,
                     'accept': 'application/json',
                     'Content-Type': 'application/json',
                 },
@@ -415,7 +415,7 @@ async function fill_addresses_div(div){
     let init = {
         method: 'GET',
         headers: {
-            'Authorization': 'token ' + sessionStorage.getItem('token'),
+            'Authorization': `token ${sessionStorage.getItem("token")}`,
             'accept': 'application/json',
         },
     };

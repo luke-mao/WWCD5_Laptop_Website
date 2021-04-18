@@ -229,7 +229,7 @@ async function filter_and_page_change_update(page_id){
 
     // for admin, add the headers
     if (sessionStorage.getItem("role") == 0){
-        init['headers']['Authorization'] = "token " + sessionStorage.getItem("token");
+        init['headers']['Authorization'] = `token ${sessionStorage.getItem("token")}`;
     }
 
 
@@ -625,7 +625,7 @@ function put_products_on_shelf_for_admin(products, data){
                 let init = {
                     method: 'PUT',
                     headers: {
-                        'Authorization': 'token ' + sessionStorage.getItem("token"),
+                        'Authorization': `token ${sessionStorage.getItem("token")}`,
                         'accept': 'application/json',
                     },
                 };
@@ -780,7 +780,7 @@ function put_products_on_shelf_for_admin(products, data){
                     let init = {
                         method: 'PUT',
                         headers: {
-                            'Authorization': 'token ' + sessionStorage.getItem("token"),
+                            'Authorization': `token ${sessionStorage.getItem("token")}`,
                             'accept': 'application/json',
                             'Content-Type': 'application/json',
                         },
@@ -927,7 +927,7 @@ function put_products_on_shelf_for_admin(products, data){
                     let init = {
                         method: 'PUT',
                         headers: {
-                            'Authorization': 'token ' + sessionStorage.getItem("token"),
+                            'Authorization': `token ${sessionStorage.getItem("token")}`,
                             'accept': 'application/json',
                             'Content-Type': 'application/json',
                         },

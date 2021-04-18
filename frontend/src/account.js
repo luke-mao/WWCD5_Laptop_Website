@@ -36,7 +36,7 @@ async function page_set_up(){
     let init = {
         method: 'GET',
         headers: {
-            'Authorization': "token " + sessionStorage.getItem("token"),
+            'Authorization': `token ${sessionStorage.getItem("token")}`,
             'accept': 'application/json',
         },
     };
@@ -52,12 +52,12 @@ async function page_set_up(){
         if (isNaN(user_id)){
             let mw = modal.create_simple_modal_with_text(
                 "Invalid Search",
-                "Sorry. This user search is invalid. Redirecting you back..",
+                "Sorry. This user search is invalid. Redirecting you back to the customer page",
                 "OK",
             );
     
             mw['footer_btn'].addEventListener("click", function(){
-                window.history.back();
+                window.location.href = "customers.html";
                 return;
             });
     
@@ -96,6 +96,30 @@ async function page_set_up(){
         else{
             let data_2 = await response_2.json();
             util_orders.fill_orders(div_orders, data_2, "Orders");
+        }
+
+        // if it is the customer, then retrieve the rating page
+        if (! is_admin_view){
+            let div_rating = document.getElementsByClassName("rating")[0];
+
+            let url_3 = "http://localhost:5000/rating/myrating";
+            let response_3 = await fetch(url_3, init);
+
+            if (response_3.status == 200){
+                let data_3 = await response_3.json();
+                util_orders.fill_order_rating(div_rating, data_3);
+            }
+            else if (response_3.status == 204){
+                util.removeSelf(div_rating);
+            }
+            else if (response_3.status == 403){
+                modal.create_force_logout_modal();
+                return;
+            }
+            else {
+                let text = await response.text();
+                throw Error(text);
+            }
         }
     }
     catch(err){
@@ -358,7 +382,7 @@ function modal_window_edit_password(){
         let init = {
             method: 'PUT',
             headers: {
-                'Authorization': 'token ' + sessionStorage.getItem('token'),
+                'Authorization': `token ${sessionStorage.getItem("token")}`,
                 'Content-Type': 'application/json',
                 'accept': 'application/json',
             },
@@ -540,7 +564,7 @@ function modal_window_edit_profile(data){
         let init = {
             method: 'PUT',
             headers: {
-                'Authorization': 'token ' + sessionStorage.getItem('token'),
+                'Authorization': `token ${sessionStorage.getItem("token")}`,
                 'Content-Type': 'application/json',
                 'accept': 'application/json',
             },
@@ -602,7 +626,7 @@ async function modal_window_remove_address(address_id){
         let init = {
             method: 'DELETE',
             headers: {
-                'Authorization': 'token ' + sessionStorage.getItem("token"),
+                'Authorization': `token ${sessionStorage.getItem("token")}`,
                 'accept': 'application/json',
             },
         };
@@ -811,7 +835,7 @@ async function modal_window_edit_or_create_address(data, is_edit){
         let init = {
             method: 'POST',
             headers: {
-                'Authorization': 'token ' + sessionStorage.getItem("token"),
+                'Authorization': `token ${sessionStorage.getItem("token")}`,
                 'accept': 'application/json',
                 'Content-Type': 'application/json',
             },

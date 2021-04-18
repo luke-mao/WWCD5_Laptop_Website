@@ -44,7 +44,7 @@ async function page_set_up(){
     let init = {
         method: 'GET',
         headers: {
-            'Authorization': 'token ' + sessionStorage.getItem("token"),
+            'Authorization': `token ${sessionStorage.getItem("token")}`,
             'accept': 'application/json',
         },
     };

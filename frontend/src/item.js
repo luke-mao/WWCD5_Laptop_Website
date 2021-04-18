@@ -82,7 +82,7 @@ async function page_set_up(){
             // if it is the logged in user, add the token into it 
             // so the backend can refresh the view history
             if (sessionStorage.getItem("role") == 1){
-                init['headers']['Authorization'] = "token " + sessionStorage.getItem("token");
+                init['headers']['Authorization'] = `token ${sessionStorage.getItem("token")}`;
             }
         }
 
@@ -517,7 +517,7 @@ function submit_for_edit_item(original_data){
         let init = {
             method: 'PUT',
             headers: {
-                'Authorization': 'token ' + sessionStorage.getItem("token"),
+                'Authorization': `token ${sessionStorage.getItem("token")}`,
                 'accept': 'application/json',
                 'Content-Type': 'application/json',
             },

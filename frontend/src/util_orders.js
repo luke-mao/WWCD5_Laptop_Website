@@ -118,7 +118,7 @@ export function fill_orders(div, data, title_text, require_tracking_btn){
                     let init = {
                         method: 'PUT',
                         headers: {
-                            'Authorization': 'token ' + sessionStorage.getItem("token"),
+                            'Authorization': `token ${sessionStorage.getItem("token")}`,
                             'accept': 'application/json',
                             'Content-Type': 'application/json',
                         },
@@ -270,3 +270,136 @@ export function fill_no_orders(div, title_text){
     util.appendListChild(div, [h1, h2]);
     return;
 }
+
+
+export function fill_order_rating(div, data){
+    let h1 = document.createElement("h1");
+    h1.textContent = "Your Ratings";
+
+    let h2 = document.createElement("h2");
+    h2.textContent = "Please rate your purchased items so we can provide better recommendations for you.";
+
+    let table = document.createElement("table");
+    table.classList.add("big-table");
+    
+    // link
+    util.appendListChild(div, [h1, h2, table]);
+
+    // the table has some columns
+    let header = table.createTHead();
+    let header_row = header.insertRow(-1);
+
+    // total 5 columns for the outer table
+    let header_cell_1 = header_row.insertCell(-1);
+    header_cell_1.colSpan = 2;
+    header_cell_1.textContent = "Item";
+
+    let header_cell_2 = header_row.insertCell(-1);
+    header_cell_2.textContent = "Rating";
+
+
+    // body
+    let tbody = table.createTBody();
+    
+    // each row represents a data
+    // and another row includes all the items
+    for (let i = 0; i < data.length; i++){
+        let tr = tbody.insertRow(-1);
+
+        // image
+        let td_1 = tr.insertCell(-1);
+        let img = document.createElement("img");
+        img.src = data[i]['photo'];
+        td_1.appendChild(img);
+
+        // name
+        let td_2 = tr.insertCell(-1);
+        td_2.textContent = data[i]['name'];
+        td_2.classList.add("pointer-underline");
+        td_2.addEventListener("click", function(){
+            window.location.href = `item.html?item_id=${data[i]['item_id']}`;
+            return;
+        });
+
+        // 5 starts
+        let td_3 = tr.insertCell(-1);
+        let stars = [];
+
+        for (let j = 0; j < 5; j++){
+            let star = util.createMaterialIcon("i", "star");
+            td_3.appendChild(star);
+            stars.push(star);
+
+            if (data[i]['rating'] == null || j+1 > data[i]['rating']){
+                star.classList.add("no-rated");
+            }
+            else {
+                star.classList.add("rated");
+            }
+        }
+
+        for (let j = 0; j < stars.length; j++){
+            stars[j].addEventListener("click", async function(){
+                // style all starts from the first one up to this
+                for (let k = 0; k < stars.length; k++){
+                    if (k <= j){
+                        stars[k].classList.add("rated");
+                        stars[k].classList.remove("no-rated");
+                    }
+                    else {
+                        stars[k].classList.remove("rated");
+                        stars[k].classList.add("no-rated");
+                    }
+                }
+
+
+                // post to the backend
+                let url = `http://localhost:5000/rating/${data[i]['item_id']}`;
+                
+                let init = {
+                    method: 'PUT',
+                    headers: {
+                        'accept': 'application/json',
+                        'Authorization': `token ${sessionStorage.getItem("token")}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        "Rating": j+1,
+                    }),
+                };
+
+                try {
+                    let response = await fetch(url, init);
+
+                    if (response.ok){
+                        let mw = modal.create_simple_modal_with_text(
+                            "Rating Submission Success",
+                            "Thank you for updaing your rating. These ratings will help us to better recommend products to you. Refreshing pages now.",
+                            "OK",
+                        );
+
+                        mw['footer_btn'].addEventListener("click", function(){
+                            window.location.reload();
+                            return;
+                        });
+                    }
+                    else if (response.status == 403){
+                        modal.create_force_logout_modal();
+                    }
+                    else {
+                        let text = await response.text();
+                        throw Error(text);
+                    }
+                }
+                catch(err) {
+                    alert("error");
+                    console.log(err);
+                }
+            })
+        }
+    }
+
+    return;
+}
+
+
