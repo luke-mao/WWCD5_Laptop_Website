@@ -198,7 +198,8 @@ item_profile_update = api.model('item_update', {
     'attributeA': fields.String,
     'attributeB': fields.String,
     'attributeC': fields.String,
-    'many_many_attributes': fields.String
+    'many_many_attributes': fields.String,
+    'photos': fields.List(fields.String),
 })
 
 
@@ -211,7 +212,14 @@ new_item = api.model('new_item', {
     "warranty": fields.String,
     "thumbnail": fields.String,
     'other_attribute': fields.String,
-    'other_other_attribute': fields.String
+    'other_other_attribute': fields.String,
+    'photos': fields.List(fields.String),
+})
+
+
+# after admin upload, return a new item id
+new_item_id = api.model('new_item_id', {
+    "item_id": fields.Integer,
 })
 
 

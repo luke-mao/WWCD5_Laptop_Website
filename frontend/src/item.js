@@ -158,13 +158,15 @@ function put_edit_item_or_new_item_on_page(original_data, status){
     put_item_on_page(original_data, status, original_data);
 
     // add a submit button, assign the submit function
-    assign_submit_button_after_preview();
+    assign_submit_button_after_preview(status, original_data);
 
     return;
 }
 
 
-function assign_submit_button_after_preview(){
+// status = PREVIEW or NEW
+// buttons are the same, minor difference in functions
+function assign_submit_button_after_preview(status, original_data){
     let main = document.getElementsByTagName("main")[0];
 
     // three buttons: submit, reset, cancel
@@ -189,7 +191,7 @@ function assign_submit_button_after_preview(){
     btn_reset.addEventListener("click", function(){
         let mw = modal.create_complex_modal_with_text(
             "Reset Confirmation",
-            "You are going to reset this page. All edits you made will be lost. Do you want to proceed?",
+            "You are going to reset this page. All existing works you made will be lost. Do you want to proceed?",
             "Yes", "Cancel",
         );
 
@@ -211,12 +213,12 @@ function assign_submit_button_after_preview(){
     btn_cancel.addEventListener("click", function(){
         let mw = modal.create_complex_modal_with_text(
             "Cancel Confirmation",
-            "You are going to cancel this edit. All edits you made will be lost. After that, you will be redirected to previous page. Do you want to proceed?",
+            "You are going to cancel this edit. All existing works you made will be lost. After that, you will be redirected to the products page. Do you want to proceed?",
             "Yes", "Cancel",
         );
 
         mw['footer_btn_1'].addEventListener("click", function(){
-            window.history.back();
+            window.location.href = "products.html";
             return;
         });
 
@@ -230,117 +232,329 @@ function assign_submit_button_after_preview(){
 
 
     // submit
+    // attach all photos 
     btn_submit.addEventListener("click", function(){
-        let div_edit = document.getElementsByClassName("edit")[0];
-        let item_id = div_edit.getAttribute("item_id");
-    
-        let changed_inputs = div_edit.querySelectorAll("input[is_changed=true]");
-        
-        // no changes at all
-        if (changed_inputs.length == 0){
-            let mw = modal.create_simple_modal_with_text(
-                "Submit Error",
-                "Please edit before submission.",
+        if (status == PREVIEW){
+            submit_for_edit_item(original_data);
+        }
+        else{
+            submit_for_new_item();
+        }
+    });
+}
+
+
+// all inputs must be filled
+// need at least one photo
+function submit_for_new_item(){
+    let div_edit = document.getElementsByClassName("edit")[0];
+
+    let inputs = div_edit.querySelectorAll("input[type=text]");
+
+    for (let i = 0; i < inputs.length; i++){
+        if (inputs[i].value == ""){
+            modal.create_simple_modal_with_text_and_close_feature(
+                "New Item Submission Error",
+                "Please fill all fields before submit.",
                 "OK",
             );
-    
-            mw['footer_btn'].addEventListener("click", function(){
-                util.removeSelf(mw['modal']);
-                return;
-            });
-    
+
             return;
         }
+    }
 
-        // submit change
-        let mw = modal.create_complex_modal_with_text(
-            "Submit Confirmation", "", "Confirm", "Cancel"
+    // also need at least one photo
+    let all_img = div_edit.getElementsByTagName("img");
+
+    if (all_img.length == 0){
+        modal.create_simple_modal_with_text_and_close_feature(
+            "New Item submission Error",
+            "Please upload at least one photo before submit.",
+            "OK",
         );
 
-        mw['footer_btn_2'].addEventListener("click", function(){
-            util.removeSelf(mw['modal']);
+        return;
+    }
+
+    // now give a modal window for price and initial stock
+    let mw = modal.create_complex_modal_with_text(
+        "New Item Submission","", "Submit", "Close",
+    );
+
+    util.removeAllChild(mw['body']);
+
+    mw['footer_btn_2'].addEventListener("click", function(){
+        util.removeSelf(mw['modal']);
+        return;
+    });
+
+    // add content into the body
+    let row_1 = document.createElement("div");
+    row_1.classList.add("row");
+
+    let label_1 = document.createElement("label");
+    label_1.textContent = "Please set initial price and stock number.";
+
+    // price and stock
+    let row_2 = document.createElement("div");
+    row_2.classList.add("row");
+
+    let label_2 = document.createElement("label");
+    label_2.textContent = "Price";
+
+    let input_price = document.createElement("input");
+    input_price.placeholder = "Price";
+    input_price.type = "text";
+
+    let row_3 = document.createElement("div");
+    row_3.classList.add("row");
+
+    let label_3 = document.createElement("label");
+    label_3.textContent = "Stock";
+
+    let input_stock = document.createElement("input");
+    input_stock.placeholder = "Stock";
+    input_stock.type = "text";
+
+    // link
+    util.appendListChild(mw['body'], [row_1, row_2, row_3]);
+    row_1.appendChild(label_1);
+    util.appendListChild(row_2, [label_2, input_price]);
+    util.appendListChild(row_3, [label_3, input_stock]);
+
+
+    // click, check
+    mw['footer_btn_1'].addEventListener("click", async function(){
+        if (input_price.value == "" || input_stock.value == ""){
+            modal.show_modal_input_error_and_redirect_back(
+                mw['modal'], 
+                "New Item Submission Error", 
+                "Please fill both price and stock before submission.",
+                "OK",
+            );
+
             return;
-        });
+        }
 
-        util.removeAllChild(mw['body']);
-        
-        // confirmation of all changes
-        let row_1 = document.createElement("div");
-        row_1.classList.add("row");
-        mw['body'].appendChild(row_1);
+        let reg_price = /^\d+(\.\d{0,2})?$/;
+        let reg_stock = /^\d+$/;
 
-        let label_1 = document.createElement("label");
-        label_1.textContent = "Please double check these changes. Press confirm to proceed.";
-        row_1.appendChild(label_1);
+        if (! reg_price.test(input_price.value)){
+            modal.show_modal_input_error_and_redirect_back(
+                mw['modal'], 
+                "New Item Submission Error", 
+                "Please correct the price input before submission.",
+                "OK",
+            );
 
-        for (let i = 0; i < changed_inputs.length; i++){
-            let input = changed_inputs[i];
+            return;
+        }
 
-            let row_2 = document.createElement("div");
-            row_2.classList.add("row");
+        if (! reg_stock.test(input_stock.value)){
+            modal.show_modal_input_error_and_redirect_back(
+                mw['modal'], 
+                "New Item Submission Error", 
+                "Please correct the stock number input before submission.",
+                "OK",
+            );
 
-            let label_2 = document.createElement("label");
-            label_2.textContent = `${input.getAttribute("display_key")}: ${input.getAttribute("original_value")}  =>  ${input.value}`;
-
-            // link
-            mw['body'].appendChild(row_2);
-            row_2.appendChild(label_2);
+            return;
         }
 
         
-        // submit !!!
-        mw['footer_btn_1'].addEventListener("click", async function(){
-            let new_data = {};
+        // fill all data
+        let new_data = {
+            "price": input_price.value,
+            "stock_number": input_stock.value,
+            "photos": [],
+        };
+        
+        for (let i = 0; i < inputs.length; i++){
+            new_data[inputs[i].getAttribute("real_key")] = inputs[i].value;
+        }
+
+        for (let i = 0; i < all_img.length; i++){
+            new_data['photos'].push(all_img[i].src);
+        };
+
+        util.removeSelf(mw['modal']);
+
+        // submit
+        let url = "http://localhost:5000/item";
+
+        let init = {
+            method: 'POST',
+            headers: {
+                'accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `token ${sessionStorage.getItem("token")}`,
+            },
+            body: JSON.stringify(new_data),
+        };
+
+        try {
+            let response = await fetch(url, init);
+
+            if (! response.ok){
+                let text = await response.text();
+                throw Error(text);
+            }
+
+            let data = await response.json();
             
-            for (let i = 0; i < changed_inputs.length; i++){
-                new_data[changed_inputs[i].getAttribute("real_key")] = changed_inputs[i].value;
-            }
+            let mw2 = modal.create_simple_modal_with_text(
+                "New Item Submission Success",
+                "You have successfully uploaded a new item. The customer can view and purchase now. Redirecting to the item page.",
+                "OK",
+            );
 
-            util.removeSelf(mw['modal']);
-
-
-            let url = `http://localhost:5000/item/${item_id}`;
-
-            let init = {
-                method: 'PUT',
-                headers: {
-                    'Authorization': 'token ' + sessionStorage.getItem("token"),
-                    'accept': 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(new_data),
-            };
-
-            try {
-                let response = await fetch(url, init);
-
-                if (response.ok){
-                    let mw2 = modal.create_simple_modal_with_text(
-                        "Edit Specification Successful",
-                        "You have successfully editted the specs. These edits come into effect now. Redirecting you to the item page.",
-                        "OK",
-                    );
-
-                    mw2['footer_btn'].addEventListener("click", function(){
-                        window.location.href = `item.html?item_id=${item_id}`;
-                        return;
-                    })
-                }
-                else if (response.status == 403){
-                    modal.create_force_logout_modal();
-                    return;
-                }
-                else{
-                    let text = await response.text();
-                    throw Error(text);
-                }
-            }
-            catch(err) {
-                alert("error");
-                console.log(err);
-            }
-        })
+            mw2['footer_btn'].addEventListener("click", function(){
+                window.location.href = `item.html?item_id=${data['item_id']}`;
+                return;
+            });
+            
+            return;
+        }
+        catch(err){
+            alert("error");
+            console.log(err);
+        }
     });
+
+    return;
+}
+
+
+// get all changed inputs
+// also get all photos
+function submit_for_edit_item(original_data){
+    let div_edit = document.getElementsByClassName("edit")[0];
+
+    // itm_id = -1 for status = NEW
+    let item_id = div_edit.getAttribute("item_id");
+
+    // check if there is any change
+    // change include changes in photo, and changes in text
+    let all_img = div_edit.getElementsByTagName("img");
+    let new_photos = [];
+
+    for (let i = 0; i < all_img.length; i++){
+        new_photos.push(all_img[i].src);
+    }
+    
+    let changed_inputs = div_edit.querySelectorAll("input[is_changed=true]");
+    
+    // no changes at all
+    if (changed_inputs.length == 0 && JSON.stringify(new_photos) == JSON.stringify(original_data['photos'])){
+        modal.create_simple_modal_with_text_and_close_feature(
+            "Submit Error",
+            "Please edit before submission.",
+            "OK",
+        );
+
+        return;
+    }
+
+    // submit change
+    let mw = modal.create_complex_modal_with_text(
+        "Submit Confirmation", "", "Confirm", "Cancel"
+    );
+
+    mw['footer_btn_2'].addEventListener("click", function(){
+        util.removeSelf(mw['modal']);
+        return;
+    });
+
+    util.removeAllChild(mw['body']);
+    
+    // confirmation of all changes
+    let row_1 = document.createElement("div");
+    row_1.classList.add("row");
+    mw['body'].appendChild(row_1);
+
+    let label_1 = document.createElement("label");
+    label_1.textContent = "Please double check these text changes. ";
+    label_1.textContent += "All changes in the photos will also be sent to the database. Press confirm to proceed.";
+    row_1.appendChild(label_1);
+
+    for (let i = 0; i < changed_inputs.length; i++){
+        let input = changed_inputs[i];
+
+        let row_2 = document.createElement("div");
+        row_2.classList.add("row");
+
+        let label_2 = document.createElement("label");
+        label_2.textContent = `${input.getAttribute("display_key")}: ${input.getAttribute("original_value")}  =>  ${input.value}`;
+
+        // link
+        mw['body'].appendChild(row_2);
+        row_2.appendChild(label_2);
+    }
+
+    
+    // submit !!!
+    mw['footer_btn_1'].addEventListener("click", async function(){
+        // new data has all changes, and all photos
+        let new_data = {};
+        
+        for (let i = 0; i < changed_inputs.length; i++){
+            new_data[changed_inputs[i].getAttribute("real_key")] = changed_inputs[i].value;
+        }
+
+        // also include changes in the photo
+        if (JSON.stringify(new_photos) !== JSON.stringify(original_data['photos'])){
+            new_data['photos'] = new_photos;
+        }
+
+        console.log(new_data);
+
+        // turn off currrent modal window
+        util.removeSelf(mw['modal']);
+
+
+        let url = `http://localhost:5000/item/${item_id}`;
+
+        let init = {
+            method: 'PUT',
+            headers: {
+                'Authorization': 'token ' + sessionStorage.getItem("token"),
+                'accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(new_data),
+        };
+
+        try {
+            let response = await fetch(url, init);
+
+            if (response.ok){
+                let mw2 = modal.create_simple_modal_with_text(
+                    "Edit Specification Successful",
+                    "You have successfully editted the specs. These edits come into effect now. Redirecting you to the item page.",
+                    "OK",
+                );
+
+                mw2['footer_btn'].addEventListener("click", function(){
+                    window.location.href = `item.html?item_id=${item_id}`;
+                    return;
+                })
+            }
+            else if (response.status == 403){
+                modal.create_force_logout_modal();
+                return;
+            }
+            else{
+                let text = await response.text();
+                throw Error(text);
+            }
+        }
+        catch(err) {
+            alert("error");
+            console.log(err);
+        }
+    });
+    
+    return;
 }
 
 
@@ -620,7 +834,6 @@ function provide_specs_list_for_edit(){
         "title": "Main",
         "specs": {
             "Item Name": "name",
-            "Price": "price", 
         }
     };
 
@@ -798,7 +1011,7 @@ function put_specification(data, div, status, original_data){
 }
 
 
-function arrange_data_to_specs(data, status, original_data){
+function arrange_data_to_specs(data){
     // the table: several sections: 
     //      processor, memory, video card, display, storage
     //      (chassis, wireless card, battery, os, warranty)

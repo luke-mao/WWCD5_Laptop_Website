@@ -3,7 +3,6 @@ simple_attributes = [
     "price",
     "stock_number",
     "status",
-    "warranty",
     "thumbnail"
 ]
 

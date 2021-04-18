@@ -465,6 +465,7 @@ class Item(Resource):
     @api.doc("""
         Admin update the item info. 
         The admin is free to update everything from price, stock to the computer specifications.
+        Attach all photos when photos are editted. 
     """)
     def put(self, item_id):
         """Only admin can edit"""
@@ -482,6 +483,8 @@ class Item(Resource):
         data = request.json
         if not data:
             return "Malformed request", 400
+        
+        print(data)
 
         # sql part
         try:
@@ -493,6 +496,7 @@ class Item(Resource):
                 sql_1 = "SELECT * FROM item WHERE item_id = ?"
                 param_1 = (item_id,)
 
+
                 cur.execute(sql_1, param_1)
                 is_exist = cur.fetchone()
 
@@ -501,20 +505,45 @@ class Item(Resource):
 
                 # scan all attributes, make sure all keys are ok
                 for key in data:
-                    if key not in simple_attributes and key not in detail_attributes:
+                    if key not in simple_attributes and key not in detail_attributes and key != "photos":
                         return "Invalid attribute {}".format(key), 400
-                
+
+
+                # if photo is in the data
+                # check the validity: require at least one photo
+                if "photos" in data:           
+                    if not (type(data['photos']) is list):
+                        return "The photos value must be a list", 400
+                    
+                    if len(data['photos']) == 0:
+                        return "Need to provide at least one photo", 400              
+
+
                 # now update the simple profile first
                 for key in data:
                     sql_2 = None 
                     if key in simple_attributes:
                         sql_2 = "UPDATE item SET {} = ? WHERE item_id = ?".format(key)
-                    else:
+                    elif key in detail_attributes:
                         sql_2 = "UPDATE laptop SET {} = ? WHERE item_id = ?".format(key)
                     
-                    param_2 = (data[key], item_id)
+                    if sql_2 is not None:
+                        param_2 = (data[key], item_id)
+                        cur.execute(sql_2, param_2)
 
-                    cur.execute(sql_2, param_2)
+
+                # now update the photo, if exist
+                if "photos" in data:
+                    # remove all existing photos
+                    sql_3 = "DELETE FROM photo WHERE item_id = {}".format(item_id)
+                    cur.execute(sql_3)
+
+                    # insert all photos into it
+                    for src in data['photos']:
+                        sql_4 = "INSERT INTO photo(item_id, photo) VALUES (?, ?)"
+                        param_4 = (item_id, src)
+                        cur.execute(sql_4, param_4)
+
 
                 return "OK", 200
 
@@ -591,8 +620,8 @@ class Status(Resource):
 
 @api.route('')
 class NewItem(Resource):
-    @api.response(200, "OK", models.item_profile)
-    @api.response(400, "Invalid attribute")
+    @api.response(200, "OK", models.new_item_id)
+    @api.response(400, "Invalid attribute / No photos provided")
     @api.response(500, "Internal server error")
     @api.response(403, "No authorization token / token invalid / token expired / not admin")
     @api.expect(models.token_header, models.new_item)
@@ -616,19 +645,32 @@ class NewItem(Resource):
 
         # scan all attributes, make sure all keys are ok
         for key in data:
-            if key not in simple_attributes and key not in detail_attributes:
+            if key not in simple_attributes and key not in detail_attributes and key != "photos":
                 return "Invalid attribute {}".format(key), 400
 
         # simple_attributes must be fullfilled
         # the thumbnail can be empty for now
         success, unpack_result = unpack(
             data, 
-            "name", "price", "stock_number", "status", "warranty"
+            "name", "price", "stock_number", "status",
         )
 
         if not success:
             return "Simple attributes must be fullfilled (you can leave thumbnail for now)", 400
+
+
+        # the admin must upload at least one photo
+        if "photos" not in data:
+            return "No photos provided", 400
         
+        if not (type(data['photos']) is list):
+            return "The photos value must be a list", 400
+        
+        if len(data['photos']) == 0:
+            return "Need to provide at least one photo", 400
+
+        print(data)
+
         # sql part
         try:
             with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
@@ -638,8 +680,8 @@ class NewItem(Resource):
                 # insert simple profile and get id
                 # view starts from 0
                 sql_1 = """
-                    INSERT INTO item(name, price, stock_number, status, warranty, view)
-                    VALUES (?, ?, ?, ?, ?, 0)
+                    INSERT INTO item(name, price, stock_number, status, view)
+                    VALUES (?, ?, ?, ?, 0)
                 """
 
                 param_1 = tuple(unpack_result)
@@ -658,35 +700,20 @@ class NewItem(Resource):
                         sql_3 = "UPDATE laptop SET {} = ? WHERE item_id = ?".format(key)
                         param_3 = (data[key], new_item_id)
                         cur.execute(sql_3, param_3)
+                
+
+                # insert all photos
+                for src in data['photos']:
+                    sql_4 = "INSERT INTO photo(item_id, photo) VALUES (?, ?)"
+                    param_4 = (new_item_id, src)
+                    cur.execute(sql_4, param_4)
 
                 
-                # after insertion, return the profile
-                sql_4 = """SELECT * FROM item WHERE item_id = ?"""
-                sql_5 = """SELECT * FROM laptop WHERE item_id = ?"""
-                sql_6 = """SELECT * FROM photo WHERE item_id = ?"""
-                
-                sql_param = (new_item_id,)
-
-                cur.execute(sql_4, sql_param)
-                simple_profile = cur.fetchone()
-                
-                cur.execute(sql_5, sql_param)
-                detail_profile = cur.fetchone()
-
-                cur.execute(sql_6, sql_param)
-                raw_photos = cur.fetchall()
-
-                photos = []
-
-                for each in raw_photos:
-                    photos.append(each['photo'])
-
+                # after insertion, return the id
                 result = {
-                    'simple': simple_profile, 
-                    'detail': detail_profile, 
-                    'photos': photos
+                    "item_id": new_item_id,
                 }
-                
+
                 return result, 200
 
         except Exception as e:
