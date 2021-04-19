@@ -24,9 +24,44 @@
         <nav class="navbar"></nav>
 
         <main>
-            <h1>Not yet implemented</h1>
-        </main>
+            <h1>Sales Report</h1>
 
+            <div class="fields">
+                <div class="row">
+                    <label>From</label>
+                    <input type="date" name="from" min="2021-01-01"/>
+                </div>
+                
+                <div class="row">
+                    <label>To</label>
+                    <input type="date" name="to" min="2021-01-01"/>
+                </div>
+
+                <div class="row">
+                    <input type="radio" name="type" value="day"/>
+                    <label>By day</label>
+                </div>
+
+                <div class="row">
+                    <input type="radio" name="type" value="week"/>
+                    <label>By week</label>
+                </div>
+
+                <div class="row">
+                    <input type="radio" name="type" value="month"/>
+                    <label>By month</label>
+                </div>
+
+                <button>View</button>
+            </div>
+
+            <div class="reports">
+                <div class="simple"></div>
+                <div class="graphs"></div>
+            </div>
+        </main>
+        
+        <script src="https://d3js.org/d3.v4.js"></script>
         <script type="module" src="src/reports.js"></script>
     </body>
 </html>

@@ -62,14 +62,14 @@ async function page_set_up(){
                 util_orders.fill_no_orders(new_orders, "New Orders");
             }
             else{
-                util_orders.fill_orders(new_orders, data['new'], "New orders", true);
+                util_orders.fill_orders(new_orders, data['new'], "New orders", true, true);
             }
 
             if (data['old'].length == 0){
                 util_orders.fill_no_orders(old_orders, "Finalized Orders");
             }
             else{
-                util_orders.fill_orders(old_orders, data['old'], "Finalized orders");
+                util_orders.fill_orders(old_orders, data['old'], "Finalized orders", false, true);
             }
         }
         else if (response.status == 403){

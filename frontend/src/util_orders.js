@@ -4,7 +4,7 @@ import * as modal from "./modal.js";
 
 // display all orders onto a table
 // and insert the table into the given "div"
-export function fill_orders(div, data, title_text, require_tracking_btn){
+export function fill_orders(div, data, title_text, require_tracking_btn, is_admin_view){
     // the order is returned with descending unix_time
     // we place all orders together in a table
     // columns: order_id, time, total price, status (sent / preparing), and buttons
@@ -21,8 +21,18 @@ export function fill_orders(div, data, title_text, require_tracking_btn){
     let header = table.createTHead();
     let header_row = header.insertRow(-1);
 
+
     // total 5 columns for the outer table
-    let th_list = ["Order ID", "Time", "Total Price", "Status", "Items"];
+    let th_list = [];
+
+    // for admin view, add one more column for the customer
+    if (is_admin_view){
+        th_list = ["Order ID", "Time", "Total Price", "Customer", "Address", "Status", "Items"];
+    }
+    else {
+        th_list = ["Order ID", "Time", "Total Price", "Address", "Status", "Items"];
+    }
+
 
     // if require tracking update, then add a column
     if (require_tracking_btn){
@@ -34,6 +44,8 @@ export function fill_orders(div, data, title_text, require_tracking_btn){
         th.textContent = th_list[i];
     }
 
+    
+    // table body
     let tbody = table.createTBody();
     
     // each row represents a data
@@ -48,39 +60,59 @@ export function fill_orders(div, data, title_text, require_tracking_btn){
 
         let td_list = tr.getElementsByTagName("td");
 
+        // order_id
         td_list[0].textContent = `#${data[i]['ord_id']}`;
 
+        // time
         td_list[1].textContent = new Date(data[i]['unix_time'] * 1000).toLocaleString();
 
+        // total price
         td_list[2].textContent = `$ ${data[i]['total_price']}`;
         
-        if (data[i]['tracking'] != null){
-            td_list[3].textContent = `Sent  #${data[i]['tracking']}`;
-            td_list[3].classList.add("underline");
+        // for admin view, here needs to set the customer name
+        // also name the index
+        let j = 3;
 
-            td_list[3].addEventListener("click", function(){
+        if (is_admin_view){
+            td_list[3].textContent = `${data[i]['first_name']} ${data[i]['last_name']}`;
+            j = 4;
+        }
+
+
+        // address
+        td_list[j].textContent = util.form_full_address_text(data[i]['address']);
+        j += 1;
+
+        // status
+        if (data[i]['tracking'] != null){
+            td_list[j].textContent = `Sent  #${data[i]['tracking']}`;
+            td_list[j].classList.add("underline");
+
+            td_list[j].addEventListener("click", function(){
                 window.location.href = `https://auspost.com.au/mypost/track/#/details/${data[i]['tracking']}`;
                 return;
             })
         }
         else{
-            td_list[3].textContent = "Preparing for delivery";
+            td_list[j].textContent = "Preparing for delivery";
         }
+
+        j += 1;
 
         // the view has a button inside
         // click the button can review the small table with all order items
         // and click again to close
         let btn_view = document.createElement("button");
         btn_view.textContent = "View";
-        td_list[4].appendChild(btn_view);
-
+        td_list[j].appendChild(btn_view);
+        j += 1;
         
         // if require tracking btn
         if (require_tracking_btn){
             // add a button
             let btn_tracking = document.createElement("button");
             btn_tracking.textContent = "Add";
-            td_list[5].appendChild(btn_tracking);
+            td_list[j].appendChild(btn_tracking);
 
             // click, a modal window
             btn_tracking.addEventListener("click", function(){

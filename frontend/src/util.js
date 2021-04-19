@@ -99,4 +99,17 @@ export function createMaterialIcon(tag, content){
 }
 
 
+export function form_full_address_text(data){
+    let text = "";
+
+    if (data['unit_number'] !== 0){
+        text = `Unit ${data['unit_number']}, `;
+    }
+
+    text += `No.${data['street_number']} ${data['street_name']} ${data['postcode']} ${data['state']}`;
+
+    return text;
+}
+
+
 

@@ -1,6 +1,10 @@
 from flask_restx import Namespace, Resource, fields 
 import models
 import time
+from datetime import datetime
+from datetime import timedelta
+from dateutil.relativedelta import relativedelta
+from copy import deepcopy
 import sqlite3
 import os
 from flask import request, abort
@@ -12,196 +16,207 @@ api = Namespace(
 )
 
 
-def filter_start(start):
-    if start==None:
-        return 1609459200
+def move_forward(graph_type):
+    if graph_type == "day":
+        return timedelta(days=1)
+    elif graph_type == "week":
+        return timedelta(weeks=1)
+    elif graph_type == "month":
+        return relativedelta(months=1)
     else:
-        return start
+        raise ValueError("Incorrect type {}".format(graph_type))
 
 
-def filter_end(end):
-    if end==None:
-        return time.time()
-    else:
-        return end
-
-
-def filter_type(tp):
-    if tp==None:
-        return 'day'
-    else:
-        return tp
+def filter_start_and_end(start_str, end_str):
+    try:
+        # convert string to datetime object
+        start_range = datetime.strptime(start_str, "%Y-%m-%d")
+        end_range = datetime.strptime(end_str, "%Y-%m-%d")
+        return start_range, end_range
+    except ValueError:
+        abort("400", "Invalid format of input date string")
 
 
 @api.route('')
 class Sales(Resource):
     @api.response(200,"OK")
+    @api.response(204, "No sale records")
     @api.response(400,"Invalid parameter")
     @api.response(403, "No authorization token / token invalid / token expired / not admin")
     @api.expect(models.sale_filter, models.token_header)
+    @api.doc(description="Admin view sales data, require both start and end date.")
     def get(self):
         auth_header = request.headers.get("Authorization")
         if not auth_header:
                 return "No authorization", 403
+        
         T = Token()
         identity = T.check(auth_header)
 
-        #if (not identity) or (identity['role']!=0):
-        #    return "Wrong token", 403
+        if (not identity) or (identity['role'] != 0):
+           return "Wrong token", 403
 
-        start_time=int(filter_start(request.args.get("start")))
-        end_time=int(filter_end(request.args.get("end")))
-        sale_type=filter_type(request.args.get("type"))
 
+        # check the start and end time, both need to exist
+        start_str = request.args.get("start", None)
+        end_str = request.args.get("end", None)
+
+        if (not start_str) or (not end_str):
+            return "Require both start and end", 400
+
+        start_range, end_range = filter_start_and_end(start_str, end_str)
+
+        # check the start and end date
+        FIRST_DAY, _ = filter_start_and_end("2021-01-01", "2021-01-01")
+        END_DAY = datetime.now()
+
+        if start_range > end_range or start_range < FIRST_DAY or end_range > END_DAY:
+            return "Invalid time range", 400
+
+        # now convert the end time to one day after
+        end_range += timedelta(days=1) + timedelta(microseconds=1)
+
+        # check the type, default is "day"
+        graph_type = request.args.get("type", "day")
         typelist=['day','week','month']
         
-        if start_time > end_time or sale_type not in typelist or end_time > time.time() or start_time < 1609459200:
-            return "Invalid parameter", 400
+        if graph_type not in typelist:
+            return "Invalid parameter type", 400
 
-        sql="SELECT unix_time, total_price FROM orders WHERE unix_time <= ? and unix_time >= ? order by unix_time ASC"
-        values=(end_time, start_time)
         
-        dictionary={}
-        
+        sql_1 = """
+            SELECT COUNT(ord_id) AS count, SUM(total_price) as value
+            FROM orders
+            WHERE unix_time >= ? 
+            AND unix_time <= ?
+        """
+
+        sql_2 = """
+            SELECT orders.user_id,ROUND(SUM(orders.total_price), 2) AS total_price, user.first_name || ' ' || user.last_name AS name
+            FROM orders, user
+            WHERE unix_time >= ? 
+            AND unix_time <= ?
+            AND orders.user_id = user.user_id
+            GROUP BY orders.user_id 
+            ORDER BY sum(total_price) DESC
+        """
+
+        sql_3 = """
+            SELECT order_item.item_id, SUM(order_item.quantity) AS amount, item.name
+            FROM order_item, orders, item 
+            WHERE  order_item.ord_id = orders.ord_id 
+            AND orders.unix_time >= ?
+            AND orders.unix_time <= ?
+            AND order_item.item_id = item.item_id
+            GROUP BY order_item.item_id
+            ORDER BY amount DESC
+        """
+
+        values=(start_range.timestamp(), end_range.timestamp())
+        result = {}
+
+
         try:
             with sqlite3.connect(os.environ.get("DB_FILE")) as conn:
                 conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
                 cur = conn.cursor()
                 
-                cur.execute(sql, values)
-                result = cur.fetchall()
+                # all orders and each total price
+                cur.execute(sql_1, values)
+                result_1 = cur.fetchone()
 
-                print(result)
+                if not result_1:
+                    return "No Records", 204
 
-                # check if no result
-                if not result:
-                    return "No Record", 404
-                else:
-                    orders = []
-                    sales = []
+                # simple attribute
+                result["orders"] = result_1['count']
 
-                    if sale_type == 'day':
-                        duration = int((end_time - start_time) / (24 * 60 * 60)) + 1
+                turnover = 0
 
-                        for i in range(0, duration):
-                            order = 0
-                            sale = 0
-                            print("hello here {}, {}".format(duration, i))
-                            
-                            # only one day
-                            if i == 0 and duration == 1:
-                                start = start_time
-                                end = end_time
-                            
-                            # many days : first day
-                            elif i == 0 and duration > 1:
-                                start = start_time
-                                tmp = time.localtime(start)
-                                end = int(start-tmp.tm_hour * 60 * 60 - tmp.tm_min * 60 - tmp.tm_sec) + (24*60*60)
-                            
-                            # many days : last day
-                            elif i == (duration-1):
-                                start = end
-                                end = end_time
-                            
-                            # many days
-                            else:
-                                start = end
-                                end = start + (24*60*60)
+                if result['orders'] != 0:
+                    turnover = round(result_1['value'], 2)
 
-                            for j in range(0, len(result)):
-                                if result[j]["unix_time"] >= start and result[j]["unix_time"] < end:
-                                    order += 1
-                                    sale += round(result[j]["total_price"],2)
-                            
-                            print("here!!! order, sale = {}, {}".format(order, sale))
-                            print(order,sale)
+                result["turnover"] = round(turnover, 2)
+                result['gst'] = round(turnover * (1 - 1 / 1.1), 2)
+                result['revenue'] = round(turnover * 0.2, 2)
 
-                            orders.append(order)
-                            sales.append(round(sale,2))
 
-                        dictionary['orders'] = orders
-                        dictionary['sales'] = sales
-                        return dictionary, 200
-                        
-                    elif sale_type == 'week':
-                        pass
+                # customer id list, with sum of order prices
+                # first graph, plot customer shopping record bar chart
+                cur.execute(sql_2,values)
+                result_2 = cur.fetchall()
+
+                result['graphs'] = {}
+                result['graphs']['customers'] = result_2
+
+
+                # second graph, plot of items sale amount
+                cur.execute(sql_3, values)
+                result_3 = cur.fetchall()
+                result['graphs']['items'] = result_3
+                
+
+                # the third graph: sale orders & order count VS time in types
+                orders_vs_time_list = []        
+
+                # within the given time range, there are many periods
+                # deepcopy the start
+                # the end time is the start time minus 1 seconds
+                result['type'] = graph_type
+                p_start = deepcopy(start_range)
+                p_end = deepcopy(start_range) - timedelta(microseconds=1)
+                is_first_period = True
+
+                while True:
+                    p_summary = {
+                        "x": p_start.strftime("%Y-%m-%d"),
+                        "value": None,
+                        "count": None
+                    }
+
+                    if is_first_period:
+                        # first period, edit the date to the real start of range
+                        if graph_type == "week":
+                            print(p_start.weekday())
+                            p_start -= timedelta(days=p_start.weekday())
+                        elif graph_type == "month":
+                            print(p_start.day)
+                            p_start -= timedelta(days=(p_start.day-1))
+                    
+                        is_first_period = False   
+                    
+                    # for the end time
+                    p_end = deepcopy(p_start) + move_forward(graph_type)
+                    
+                    # search sum of orders, and values within this period
+                    param = (p_start.timestamp(), p_end.timestamp())
+                    cur.execute(sql_1, param)
+                    p_result = cur.fetchone()
+
+                    if p_result['count'] == 0:
+                        p_summary['value'] = 0
+                        p_summary['count'] = 0
                     else:
-                        pass
+                        p_summary['value'] = round(p_result['value'], 2)
+                        p_summary['count'] = p_result['count']
 
+                    # insert
+                    orders_vs_time_list.append(p_summary)
+
+                    if p_end > end_range:
+                        break
+                    else:
+                        # move forward p_start
+                        p_start += move_forward(graph_type)
+
+
+                # results for last graph
+                result['graphs']['orders'] = orders_vs_time_list
+                
+                return result, 200
+                
         except Exception as e:
             print(e)
             return "Internal server error", 500
 
     
-        """
-        ONLY GET method is supported here.
-        the url takes three parameters, example url as 
-            http://localhost:5000/sales/
-            http://localhost:5000/sales/?start=1609459200&end=1618190517&type=week
-            http://localhost:5000/sales/?start=1609459200&end=1618190548&type=day
-            http://localhost:5000/sales/?start=1609459200&end=1618190548&type=month 
-        
-        start = unix time, the smallest number is 1609459200 indicating 2021/01/01/00:00:00
-        end = unix time, the largest number allowed is the current time, use time.time() to obtain the current time
-        type = day / week / month
-
-        you can use this link to determine the timestamp: https://www.epochconverter.com/ 
-
-        default value:
-            start: this week monday 00:00
-            end: current time using time.time()
-            type: day
-        
-        
-        response: 
-            400 Invalid parameter (such as "start" is > "end") (type is other value than day/week/month)
-            403: Auth token issue (only admin is allowed to use this endpoint, check identity['role'] = 0 to confirm admin)
-            200: OK
-
-            For 200 response: return the following:
-
-                orders: [number of orders in that period]
-                sales: [the sum of order total, round to 2 decimal place]
-                gst: [use the above value / 1.1, round to 2 decimal place]
-                revenue: [use the sales * 0.2, round to 2 decimal place],
-            
-                graphs:{
-                    'sales': [
-                        给定的时间段里面，
-                        用type来划分每个间隔，
-                        然后每个数字表示这一间隔内的销售额， 
-                        注意此list为时间升序, 
-                        前端会制作成折线图
-                        2021-3-21-15:00 到 2021-4-1 16：00 =》 2021-3-21 00：00 到 2021-4-1 23：59 
-                    ],
-                    'orders': [
-                        给定的时间段里面，
-                        用type来划分每个间隔，
-                        然后每个数字表示这一间隔内的销售额， 
-                        注意此list为时间升序, 
-                        前端会制作成折线图 (可能用sales和orders两组数据一起做在同一张表上)
-                    ],
-                    'items': [
-                        给定的这一整个时间段，
-                        每个商品卖出去的数量，
-                        以商品的销售量的降序为顺序。
-                        每个value是一个dict，记载{item_id: xxx, name: xxx, quantity: xxx}],
-                        前端会制作成一个柱状图
-                    ]
-                    'customers': [
-                        给定的这一整个时间段，降序排列每个顾客的订单总额，
-                        每个value是一个dict，记载{user_id: xxx, name: first name + 空格 + last name, total: 订单总额},
-                        前端会制作成一个柱状图
-                    ]
-                }
-        """
-        
-
-
-
-
-
-
-
-
