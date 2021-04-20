@@ -152,10 +152,7 @@ class Order(Resource):
         
         # submit cart
         code, response = submit_order(data, identity)
-
         return response, code
-
-
 
 
 def submit_order(cart, identity):
