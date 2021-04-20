@@ -115,15 +115,28 @@ order = api.model('order', {
     'items': fields.List(fields.Nested(order_item))
 })
 
-# maybe no stock, or the order quantity is too large
-order_error_no_stock = api.model('order_error_out_of_stock', {
+# order error: invalid item
+order_error_invalid_item = api.model('order_error_invalid_item', {
+    'item_id': fields.Integer
+})
+
+# order error: removed from shelf
+order_error_removed = api.model('order_error_removed', {
     'item_id': fields.Integer,
-    'available_stock': fields.Integer
+    'name': fields.String
+})
+
+# maybe no stock, or the order quantity is too large
+order_error_not_enough_stock = api.model('order_error_not_enough_stock', {
+    'item_id': fields.Integer,
+    'available_stock': fields.Integer,
+    'name': fields.String
 })
 
 order_error_incorrect_price = api.model('order_error_incorrect_price', {
     'item_id': fields.Integer,
-    'price': fields.Float    
+    'price': fields.Float,
+    'name': fields.String    
 })
 
 order_error_wrong_total_price = api.model('order_error_wrong_total_price', {
@@ -155,7 +168,6 @@ order_history = api.model('order_history', {
     'tracking': fields.String,
     'items': fields.List(fields.Nested(order_history_item))
 })
-
 
 order_history_list = api.model('order_history_list', {
     'orders': fields.List(fields.Nested(order_history))

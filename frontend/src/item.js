@@ -44,12 +44,12 @@ async function page_set_up(){
     if (! (is_valid_0 || is_valid_1 || is_valid_2 || is_valid_3)){
         let mw = modal.create_simple_modal_with_text(
             "Website Error",
-            "Sorry. The request you made is invalid. Redirecting you back..",
+            "Sorry. The request you made is invalid. Redirecting you to the home page.",
             "OK",
         );
 
         mw['footer_btn'].addEventListener("click", function(){
-            window.history.back();
+            window.location.href = "index.html";
             return;
         })
 
@@ -91,14 +91,22 @@ async function page_set_up(){
             let response = await fetch(url, init);
 
             if (! response.ok){
-                alert("Sorry. The item may not exist or removed from the shelf. Please try again later.");
-                window.history.back();
+                let mw = modal.create_simple_modal_with_text(
+                    "Item Not Found", 
+                    "Sorry. The item may not exist or removed from the shelf. Please try again later. Redirecting you to the products page.",
+                    "OK",
+                )
+
+                mw['footer_btn'].addEventListener("click", function(){
+                    window.location.href = "products.html";
+                    return;
+                });
+
                 return;
             }
 
             let data = await response.json();
             
-            /////////////////// here consider the new product
             if (type == "edit"){
                 put_edit_item_or_new_item_on_page(data, PREVIEW);
             }

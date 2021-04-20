@@ -360,18 +360,65 @@ async function fill_payment_div(div){
                     mw2['footer_btn'].addEventListener("click", function(){
                         // order success, remove the cart detail
                         util_cart.emptyCart();
-
                         window.location.href = "account.html";
-                        ///////////// can scroll down to the related div
                         return;
                     })
+                }
+                else if (response.status == 403){
+                    modal.create_force_logout_modal();
+                }
+                else if (response.status == 410){
+                    // the item is removed from the shelf
+                    // need to alert and also remove this item
+                    let data = await response.json();
 
-                    return;
+                    let mw = modal.create_simple_modal_with_text(
+                        "Order Error",
+                        `We are sorry to inform you that the item ${data['name']} has been removed from the shelf. Please review your cart.`,
+                        "OK",
+                    );
+
+                    mw['footer_btn'].addEventListener("click", function(){
+                        util_cart.cartRemoveItem(data['item_id']);
+                        window.location.reload();
+                        return;
+                    });
+                }
+                else if (response.status == 411){
+                    // item not enough stock
+                    let data = await response.json();
+
+                    let mw = modal.create_simple_modal_with_text(
+                        "Order Error",
+                        `We are sorry to inform you that the item ${data['name']} has only ${data['available_stock']} stocks. Please review your cart.`,
+                        "OK",
+                    );
+
+                    mw['footer_btn'].addEventListener("click", function(){
+                        window.location.reload();
+                        return;
+                    });
+                }
+                else if (response.status == 414){
+                    // item price changed
+                    let data = await response.json();
+
+                    let mw = modal.create_simple_modal_with_text(
+                        "Order Error", "", "OK",
+                    );
+
+                    mw['body_text'].textContent = `We are sorry to inform you that there has been a change of price to the item ${data['name']}. `;
+                    mw['body_text'].textContent += `We have removed this item from cart and will redirect you to the item page.`;
+
+                    mw['footer_btn'].addEventListener("click", function(){
+                        util_cart.cartRemoveItem(data['item_id']);
+                        window.location.href = `item.html?item_id=${data['item_id']}`;
+                        return;
+                    });
                 }
                 else {
-                    /////////////////////////// here needs to figure out for the 204 
-                    console.log(response);
-                    throw Error(response);
+                    let text = await response.text();
+                    throw Error(text);
                 }
             }
             catch(err) {
@@ -389,16 +436,11 @@ async function fill_payment_div(div){
 
 
 function payment_form_invalid_input(part){
-    let mw = modal.create_simple_modal_with_text(
+    modal.create_simple_modal_with_text_and_close_feature(
         "Payment Form Invalid Input",
         `Dear customer. The ${part} is invalid. Please check.`,
         "OK",
     );
-
-    mw['footer_btn'].addEventListener("click", function(){
-        util.removeSelf(mw['modal']);
-        return;
-    });
 
     return;
 }

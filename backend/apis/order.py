@@ -126,10 +126,12 @@ class Order(Resource):
     @api.response(200, "OK", models.order_success)
     @api.response(403, "No authorization token / token invalid / token expired")
     @api.response(400, "Wrong format / missing parameter xxx")
-    @api.response(409, "Price not match", models.order_error_incorrect_price)
-    @api.response(410, "Item out of stock / Item deleted / Item invalid", models.order_error_no_stock)
+    @api.response(409, "Invalid item", models.order_error_invalid_item)
+    @api.response(410, "Item removed from shelf", models.order_error_removed)
+    @api.response(411, "Item not enough stock", models.order_error_not_enough_stock)
+    @api.response(414, "Item wrong price", models.order_error_incorrect_price)
     @api.response(402, "Payment issue: invalid xxx") # this may not be used unless card 4 digis is invalid
-    @api.response(411, "Wrong total price", models.order_error_wrong_total_price)
+    @api.response(413, "Wrong total price", models.order_error_wrong_total_price)
     @api.expect(models.token_header, models.order)
     @api.doc(description="Make order")
     def post(self):
@@ -213,6 +215,7 @@ def submit_order(cart, identity):
 
     except Exception as e:
         print(e)
+        return 500, "Internal Server Error"
     
 
     # variable 'notes' no need to check
@@ -269,7 +272,7 @@ def submit_order(cart, identity):
                 # now check the item_id exist, and price is the same
                 # and quantity is available
                 sql_2 = """
-                    SELECT price, stock_number, status
+                    SELECT price, stock_number, status, name
                     FROM item
                     WHERE item_id = ?
                 """
@@ -278,28 +281,38 @@ def submit_order(cart, identity):
                 cur.execute(sql_2, sql_2_param)
                 sql_2_result = cur.fetchone()
 
-                # check the item is available
+                # check the item does not exist
                 if not sql_2_result:
                     response = {
                         'item_id': item_id,
-                        'available_stock': 0
                     }
-                    return 410, response 
+                    return 409, response 
 
+                # this item is removed from shelf
+                if sql_2_result['status'] == 0:
+                    response = {
+                        'item_id': item_id,
+                        'name': sql_2_result['name'],
+                    }
+                    return 410, response
+
+                # not enough stock
                 if sql_2_result["stock_number"] < quantity:
                     response = {
                         'item_id': item_id,
-                        'available_stock': sql_2_result["stock_number"]
+                        'available_stock': sql_2_result["stock_number"], 
+                        'name': sql_2_result['name'],
                     }                
-                    return 410, response 
+                    return 411, response 
 
-                # check the price is right
+                # incorrect unit price
                 if sql_2_result['price'] != price:
                     response = {
                         "item_id": item_id,
-                        "price": sql_2_result["price"]
+                        "price": sql_2_result["price"],
+                        "name": sql_2_result['name'],
                     }
-                    return 409, response
+                    return 414, response
                 
                 # update the total order price
                 order_total_price += quantity * price
@@ -322,7 +335,7 @@ def submit_order(cart, identity):
         response = {
             'total_price': round(order_total_price, 2)
         }
-        return 411, response 
+        return 413, response 
     
     
     # submit the order
