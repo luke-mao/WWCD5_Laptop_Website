@@ -75,6 +75,12 @@ export function fill_orders(div, data, title_text, require_tracking_btn, is_admi
 
         if (is_admin_view){
             td_list[3].textContent = `${data[i]['first_name']} ${data[i]['last_name']}`;
+            td_list[3].classList.add("pointer-underline");
+            td_list[3].addEventListener("click", function(){
+                window.location.href = `account.html?user_id=${data[i]['user_id']}`;
+            });
+
+
             j = 4;
         }
 

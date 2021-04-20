@@ -5,50 +5,26 @@ import * as rec from "./recommender.js";
 import * as util_orders from "./util_orders.js";
 
 
+const CUSTOMER_VIEW_SELF = 0;
+const ADMIN_VIEW_SELF = 1;
+const ADMIN_VIEW_CUSTOMER = 2;
+
+
 util.addLoadEvent(navbar_set_up);
 util.addLoadEvent(page_set_up);
 util.addLoadEvent(recommenders_set_up);
 
 
 async function page_set_up(){
-    if (sessionStorage.getItem("role") == null){
-        let mw = modal.create_simple_modal_with_text(
-            "No Access",
-            "Sorry. You cannot access this page. Redirecting to the home page..",
-            "OK",
-        );
-
-        mw['footer_btn'].addEventListener("click", function(){
-            window.location.href = "index.html";
-            return;
-        });
-
-        return;
-    }
-
-
-    // two url, but need to determine whether they look at own profile
-    // or the admin wants to look at someone's profile
-    // init is the same
-    let url_1 = null;
-    let url_2 = null;
-
-    let init = {
-        method: 'GET',
-        headers: {
-            'Authorization': `token ${sessionStorage.getItem("token")}`,
-            'accept': 'application/json',
-        },
-    };
-
-    let is_admin_view = false;
-
+    // there are three situations available
+    // if the query string user_id exist, check it must be the admin
+    // otherwise, the token must exist
     let url_search = new URLSearchParams(window.location.search.substring(1));
-
-    if (url_search.get("user_id") && sessionStorage.getItem("role") == "0"){
-        // admin look at someone's profile
-        let user_id = url_search.get("user_id");
-
+    let user_id = url_search.get("user_id");
+    let status = null;
+    
+    if (user_id && sessionStorage.getItem("role") == "0"){
+        // check the user id is valid
         if (isNaN(user_id)){
             let mw = modal.create_simple_modal_with_text(
                 "Invalid Search",
@@ -64,42 +40,101 @@ async function page_set_up(){
             return;
         }
 
-        is_admin_view = true;
+        status = ADMIN_VIEW_CUSTOMER;
+    }
+    else if (sessionStorage.getItem("role") == "0"){
+        status = ADMIN_VIEW_SELF;
+    }
+    else if (sessionStorage.getItem("role") == "1"){
+        status = CUSTOMER_VIEW_SELF;
+    }
+    else {
+        let mw = modal.create_simple_modal_with_text(
+            "No Access",
+            "Sorry. You cannot access this page. Redirecting to the home page..",
+            "OK",
+        );
 
+        mw['footer_btn'].addEventListener("click", function(){
+            window.location.href = "index.html";
+            return;
+        });
+
+        return;
+    }
+
+
+    // three conditions, form all url
+    let url_1 = null;
+    let url_2 = null;
+
+    if (status == ADMIN_VIEW_SELF){
+        url_1 = "http://localhost:5000/user/profile";
+    }
+    else if (status == ADMIN_VIEW_CUSTOMER){
         url_1 = `http://localhost:5000/admin/user/${user_id}`;
         url_2 = `http://localhost:5000/admin/orders/${user_id}`;
     }
-    else{
+    else {
+        // customer view self
         url_1 = "http://localhost:5000/user/profile";
         url_2 = "http://localhost:5000/order";
     }
+
+
+    // init is the same for all urls. 
+    let init = {
+        method: 'GET',
+        headers: {
+            'Authorization': `token ${sessionStorage.getItem("token")}`,
+            'accept': 'application/json',
+        },
+    };
     
 
     try{
+        // fetch profile
         let response_1 = await fetch(url_1, init);
-        let response_2 = await fetch(url_2, init);
-
-        if (response_1.status == 403 || response_2.status == 403){
+        
+        if (response_1.status == 403){
             modal.create_force_logout_modal();
             return;
         }
-
-        let div_profile = document.getElementsByClassName("profile")[0];
-        let div_orders = document.getElementsByClassName("orders")[0];
-
-        let data_1 = await response_1.json();
-        fill_profile(div_profile, data_1, is_admin_view);
-
-        if (response_2.status == 204){
-            util_orders.fill_no_orders(div_orders, "Orders");
+        else if (response_1.status !== 200){
+            let text = await response.text();
+            throw Error(text);
         }
-        else{
+
+        // get the data
+        let data_1 = await response_1.json();
+
+        // fill profile
+        let div_profile = document.getElementsByClassName("profile")[0];
+        fill_profile(div_profile, data_1, status);
+
+
+        // second call: fill the orders
+        if (url_2){
+            let response_2 = await fetch(url_2, init);
+
+            if (response_2.status == 403){
+                modal.create_force_logout_modal();
+                return;
+            }
+            else if (response_2.status !== 200){
+                let text = await response.text();
+                throw Error(text);
+            }
+
             let data_2 = await response_2.json();
+
+            let div_orders = document.getElementsByClassName("orders")[0];
             util_orders.fill_orders(div_orders, data_2, "Orders");
         }
 
-        // if it is the customer, then retrieve the rating page
-        if (! is_admin_view){
+        
+        // potential third call: for the customer view self
+        if (status == CUSTOMER_VIEW_SELF){
             let div_rating = document.getElementsByClassName("rating")[0];
 
             let url_3 = "http://localhost:5000/rating/myrating";
@@ -142,7 +177,7 @@ async function recommenders_set_up(){
 }
 
 
-function fill_profile(div, data, is_admin_view){
+function fill_profile(div, data, status){
     let img = document.createElement("img");
     img.src = "../img/cartoon_profile.png";
     img.alt = "cartoon";
@@ -215,7 +250,7 @@ function fill_profile(div, data, is_admin_view){
         util.appendListChild(this_addr, [i_addr, label]);
         
         // if it is the admin view , no button required
-        if (is_admin_view){
+        if (status !== CUSTOMER_VIEW_SELF){
             continue;
         }
 
@@ -243,10 +278,6 @@ function fill_profile(div, data, is_admin_view){
         });
     }
 
-    if (is_admin_view){
-        return;
-    }
-
     
     // the last row has two buttons, edit profile, add new address
     let div_last = document.createElement("div");
@@ -268,18 +299,21 @@ function fill_profile(div, data, is_admin_view){
         return;
     });
 
-
-    // at the end of the list, add a button to add new address
-    let btn_add_addr = document.createElement("button");
-    btn_add_addr.textContent = "Add New Address"
-    btn_add_addr.addEventListener("click", function(){
-        modal_window_edit_or_create_address(null, false);
-    });
-
-
     // link
     details.appendChild(div_last);
-    util.appendListChild(div_last, [btn_profile_edit, btn_pwd, btn_add_addr]);
+    util.appendListChild(div_last, [btn_profile_edit, btn_pwd]);
+
+    if (status === CUSTOMER_VIEW_SELF){
+        // at the end of the list, add a button to add new address
+        let btn_add_addr = document.createElement("button");
+        btn_add_addr.textContent = "Add New Address"
+        btn_add_addr.addEventListener("click", function(){
+            modal_window_edit_or_create_address(null, false);
+        });
+
+        // link
+        div_last.appendChild(btn_add_addr);
+    }
 
     return;
 }

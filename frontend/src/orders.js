@@ -55,8 +55,6 @@ async function page_set_up(){
         if (response.ok){
             let data = await response.json();
 
-            console.log(data);
-
             // there are two sections: new and old
             if (data['new'].length == 0){
                 util_orders.fill_no_orders(new_orders, "New Orders");

@@ -990,14 +990,14 @@ function put_specification(data, div, status, original_data){
     let specs_data_list = arrange_data_to_specs(data);
 
     let old_specs_data_list = null;
-    if (status == PREVIEW){
+    if (status == PREVIEW || status == NEW){
         old_specs_data_list = arrange_data_to_specs(original_data);
     }
 
     for (let i = 0; i < specs_data_list.length; i++){
         let spec = null;
 
-        if (status == PREVIEW){
+        if (status == PREVIEW || status == NEW){
             spec = create_table_with_input(specs_data_list[i], status, old_specs_data_list[i]);
         }
         else {
@@ -1130,8 +1130,8 @@ function create_table_with_input(data, status, original_data){
         let td2 = tr.insertCell(-1);
         td2.textContent = value == null ? "N.A." : value;
 
-        // preview mode
-        if (status == PREVIEW){
+        // preview mode & new item mode
+        if (status == PREVIEW || status == NEW){
             let old_value = original_data['specs'][key];
             let old_text = old_value == null ? "N.A." : old_value;
 
@@ -1215,7 +1215,7 @@ function put_profile(data, div, status, original_data){
     name.classList.add("name");
     name.textContent = data['simple']['name'] ? data['simple']['name'] : "Null";
 
-    if (status == PREVIEW && data['simple']['name'] !== original_data['simple']['name']){
+    if ((status == PREVIEW || status == NEW) && data['simple']['name'] !== original_data['simple']['name']){
         name.classList.add("modified");
     }
 
@@ -1224,7 +1224,7 @@ function put_profile(data, div, status, original_data){
     price.classList.add("price");
     price.textContent = `$ ${data['simple']['price']}`;
     
-    if (status == PREVIEW && data['simple']['price'] !== original_data['simple']['price']){
+    if ((status == PREVIEW || status == NEW) && data['simple']['price'] !== original_data['simple']['price']){
         price.classList.add("modified");
     }
 
@@ -1248,7 +1248,7 @@ function put_profile(data, div, status, original_data){
     
 
     // for admin preview, add "modified" class to editted data
-    if (status == PREVIEW){
+    if (status == PREVIEW || status == NEW){
         // reconstruct all the 5 sentences, then check
         let old_texts = create_texts_for_simple_profile(original_data);
 

@@ -99,11 +99,11 @@ export async function fill_top_selling_or_top_view(div, is_top_selling){
     let div_dict = null;
 
     if (is_top_selling){
-        div_dict = create_basic_format_for_recommender(div, "Top Selling Products", true);
+        div_dict = create_basic_format_for_recommender(div, "Best Selling", true);
         url = "http://localhost:5000/recommender/topselling";
     }
     else{
-        div_dict = create_basic_format_for_recommender(div, "Top Viewing Products", true);
+        div_dict = create_basic_format_for_recommender(div, "Most Viewed", true);
         url = "http://localhost:5000/recommender/topview";
     }
 

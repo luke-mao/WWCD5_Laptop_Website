@@ -65,7 +65,7 @@ export function navbar_set_up(){
 
     let input = document.createElement("input");
     input.type = "text";
-    input.placeholder = "Keyword Search";
+    input.placeholder = "Search";
 
     util.appendListChild(search, [input_i, input]);
 

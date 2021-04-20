@@ -19,8 +19,8 @@ The project is tested upon the following platforms:
     * Ubuntu 18.04.5 LTS  
     * Debian GNU/Linux 6.0.10 (UNSW VLAB)
 
-Preferred Python version: Python 3.6, 3.7
-Preferred browser: Chrome version >= 89
+Preferred Python version: Python 3.6, 3.7, 3.8. \
+Preferred browser: Chrome version >= 89.
 
 1. Fork / clone / download this repo. Please copy the code into the command window.
 

@@ -199,9 +199,10 @@ class Item_with_id(Resource):
                 conn.row_factory = lambda C, R: {c[0]: R[i] for i, c in enumerate(C.description)}
                 cur = conn.cursor()
 
-                sql_1 = """SELECT * FROM item WHERE item_id = ?"""
-                sql_2 = """SELECT * FROM laptop WHERE item_id = ?"""
-                sql_3 = """SELECT * FROM photo WHERE item_id = ?"""
+                sql_1 = "SELECT * FROM item WHERE item_id = ?"
+                sql_2 = "SELECT * FROM laptop WHERE item_id = ?"
+                sql_3 = "SELECT * FROM photo WHERE item_id = ?"
+                sql_4 = "Update item SET view = view + 1 WHERE item_id = ?"
                 
                 sql_param = (item_id,)
 
@@ -217,6 +218,8 @@ class Item_with_id(Resource):
 
                 cur.execute(sql_3, sql_param)
                 raw_photos = cur.fetchall()
+
+                cur.execute(sql_4, sql_param)
 
                 photos = []
 
