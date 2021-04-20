@@ -15,7 +15,9 @@ This project follows the requirement and guideline of COMP9900 20T1 UNSW. Our to
 The project is tested upon the following platforms:
 
 * WIN10 1904
-* Linux: Ubuntu 20.04 & Debian 4.97 (UNSW VLAB)
+* Linux: 
+    * Ubuntu 18.04.5 LTS  
+    * Debian GNU/Linux 6.0.10 (UNSW VLAB)
 
 Preferred Python version: Python 3.6, 3.7
 Preferred browser: Chrome version >= 89
@@ -98,6 +100,24 @@ Preferred browser: Chrome version >= 89
     |Admin |admin@mail.com | 111111 | 
 
 7. If you would like to view the database file, please visit the [SQLite online studio](https://sqliteonline.com/) and select the file `backend/data.db`.
+
+
+## Highlights
+
+* Purchase snapshot
+![purchase snapshot](./frontend/img/readme_purchase_snapshot.png)
+
+* View history & Recommenders
+![view history & recommenders](./frontend/img/readme_recommender_1.png)
+![view history & recommenders](./frontend/img/readme_recommender_2.png)
+
+* Chatbot
+require a photo !!!!!!!
+
+
+* Sales report using D3.js
+![sales report screenshot](./frontend/img/readme_sales_report.png)
+
 
 ## Team Member
 
