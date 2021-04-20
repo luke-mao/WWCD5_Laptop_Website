@@ -152,7 +152,7 @@ function put_edit_item_or_new_item_on_page(original_data, status){
     fill_edit_with_data(original_data, div_edit, merged_data, specs_data_list);
 
     // assign the change event listener
-    assign_change_event_listener_to_inputs(original_data);
+    assign_change_event_listener_to_inputs(original_data, status);
 
     // display the preview first
     put_item_on_page(original_data, status, original_data);
@@ -560,7 +560,7 @@ function submit_for_edit_item(original_data){
 
 // orignal_data: the data fetched from the backend
 // when some input is changed, replace the data with the original ones
-function assign_change_event_listener_to_inputs(original_data){
+function assign_change_event_listener_to_inputs(original_data, status){
     let div_edit = document.getElementsByClassName("edit")[0];
     let inputs = div_edit.querySelectorAll("input[type=text]");
 

@@ -429,7 +429,7 @@ class Search(Resource):
                             reverse=True
                         )
 
-                    # threshold = 0.6
+                    # threshold = 0.65
                     THRESHOLD = 0.65
                     result_id_list = [d for d in item_id_name_list if d['similarity'] > THRESHOLD]
 

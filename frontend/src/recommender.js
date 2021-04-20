@@ -36,7 +36,7 @@ export async function fill_view_history_or_recommender_with_token(div, keyword){
         url = "http://localhost:5000/user/viewhistory";
     }
     else if (keyword == "byitem"){
-        div_dict = create_basic_format_for_recommender(div, "Recommend based on your purchase record", false);
+        div_dict = create_basic_format_for_recommender(div, "Guess You Like", false);
         url = "http://localhost:5000/recommender/item";
     }
     else if (keyword == "byviewhistory"){
