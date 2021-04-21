@@ -104,8 +104,11 @@ function page_set_up(){
     let div_checkout = document.getElementsByClassName("checkout")[0];
     
     btn_open_checkout.addEventListener("click", function(){
-        prepare_checkout(div_checkout);
-        div_checkout.scrollIntoView();
+        if (! div_checkout.getAttribute("is_open")){
+            prepare_checkout(div_checkout);
+            div_checkout.scrollIntoView();
+        }
+
         return;
     });
 
@@ -114,6 +117,9 @@ function page_set_up(){
 
 
 function prepare_checkout(div){
+    // record the checkout page is opened
+    div.setAttribute("is_open", true);
+
     // customer choose the delivery address, and then checkout
     let div_addr = document.createElement("div");
     div_addr.classList.add("addresses");
