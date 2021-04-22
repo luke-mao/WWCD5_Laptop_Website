@@ -15,5 +15,14 @@ In week3, start my api's part which is about user's functions and have an acknow
 week5:
 In this week, i finish the view history api function
 
-week 6:
+week 7:
 In this week, i finish the view history function which returns 20 items that user views.
+
+week 8:
+In this week, i am responsible for sales api in our group which returns the customers' money spent on our mall in the during period of time
+
+week 9:
+
+
+week 10:
+In this week, preparing for the final demo and finish four parts in function in the report, including login and signup, viewing profile and searching products and viewing and editing products.
