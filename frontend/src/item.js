@@ -754,7 +754,7 @@ function create_photo_section_in_edit(src, original_data){
 
             // update the preview
             let new_data = get_new_data_from_edit(original_data);
-            put_item_on_page(new_data, status, original_data);
+            put_item_on_page(new_data, NEW, original_data);
 
             return;
         });
@@ -810,7 +810,7 @@ function add_new_photo_input(div_parent, original_data){
                 // call the update
                 // update the preview
                 let new_data = get_new_data_from_edit(original_data);
-                put_item_on_page(new_data, status, original_data);
+                put_item_on_page(new_data, NEW, original_data);
 
             })
             .catch((err) => {

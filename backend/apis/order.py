@@ -28,7 +28,8 @@ def get_this_order_history(ord_id):
                 SELECT orders.ord_id, orders.user_id, orders.unix_time, orders.total_price,
                     orders.notes, orders.tracking, orders.card_last_four, user.first_name, user.last_name
                 FROM user, orders
-                WHERE orders.ord_id = ?
+                WHERE orders.ord_id = ? 
+                AND orders.user_id = user.user_id
             """
 
             sql_1_param = (ord_id,)

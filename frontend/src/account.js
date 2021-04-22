@@ -278,32 +278,27 @@ function fill_profile(div, data, status){
         });
     }
 
-    
-    // the last row has two buttons, edit profile, add new address
-    let div_last = document.createElement("div");
-    div_last.classList.add("row");
-
-    // profile edit
-    let btn_profile_edit = document.createElement("button");
-    btn_profile_edit.textContent = "Edit Profile";
-    btn_profile_edit.addEventListener("click", function(){
-        modal_window_edit_profile(data);
-        return;
-    });
-
-    // edit password
-    let btn_pwd = document.createElement("button");
-    btn_pwd.textContent = "Edit Password";
-    btn_pwd.addEventListener("click", function(){
-        modal_window_edit_password();
-        return;
-    });
-
-    // link
-    details.appendChild(div_last);
-    util.appendListChild(div_last, [btn_profile_edit, btn_pwd]);
-
     if (status === CUSTOMER_VIEW_SELF){
+        // the last row has two buttons, edit profile, add new address
+        let div_last = document.createElement("div");
+        div_last.classList.add("row");
+
+        // profile edit
+        let btn_profile_edit = document.createElement("button");
+        btn_profile_edit.textContent = "Edit Profile";
+        btn_profile_edit.addEventListener("click", function(){
+            modal_window_edit_profile(data);
+            return;
+        });
+
+        // edit password
+        let btn_pwd = document.createElement("button");
+        btn_pwd.textContent = "Edit Password";
+        btn_pwd.addEventListener("click", function(){
+            modal_window_edit_password();
+            return;
+        });
+
         // at the end of the list, add a button to add new address
         let btn_add_addr = document.createElement("button");
         btn_add_addr.textContent = "Add New Address"
@@ -312,7 +307,8 @@ function fill_profile(div, data, status){
         });
 
         // link
-        div_last.appendChild(btn_add_addr);
+        details.appendChild(div_last);
+        util.appendListChild(div_last, [btn_profile_edit, btn_pwd, btn_add_addr]);
     }
 
     return;
@@ -766,6 +762,10 @@ async function modal_window_edit_or_create_address(data, is_edit){
         }
         else {
             input.placeholder = label.textContent;
+
+            if (attributes[i] == "state"){
+                input.placeholder += " (e.g NSW)";
+            }
         }
         
 
