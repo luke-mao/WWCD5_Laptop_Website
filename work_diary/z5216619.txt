@@ -21,3 +21,9 @@ Finish backend recommendation system based on popularity, view history and item 
 Week8
 Start working on backend sales function
  
+Week9
+Finish sales backend function and start writing our project report.
+
+Week10
+
+Parpare our presentation and revise and finish our report.
