@@ -22,7 +22,7 @@ week 8:
 In this week, i am responsible for sales api in our group which returns the customers' money spent on our mall in the during period of time
 
 week 9:
-
+In week9, i am responsilbe for doing research on google dialogflow.
 
 week 10:
 In this week, preparing for the final demo and finish four parts in function in the report, including login and signup, viewing profile and searching products and viewing and editing products.

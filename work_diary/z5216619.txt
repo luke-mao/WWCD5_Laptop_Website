@@ -13,17 +13,16 @@ Week4
 Finish user-profile update and insert api backend function.
 
 Week5
-Start working backend recommendation part
+Start working backend recommendation part.
 
 Week7
-Finish backend recommendation system based on popularity, view history and item rating rated by users
+Finish backend recommendation system based on popularity, view history and item rating rated by users.
 
 Week8
-Start working on backend sales function
+Start working on backend sales function.
  
 Week9
-Finish sales backend function and start writing our project report.
+Finish sales backend function, start writing our project report and do some research on google dialogflow
 
 Week10
-
-Parpare our presentation and revise and finish our report.
+Fix bug, write charbot, parpare our presentation, revise and finish our report.
