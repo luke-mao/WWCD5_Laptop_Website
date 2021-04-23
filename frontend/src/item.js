@@ -157,7 +157,7 @@ function put_edit_item_or_new_item_on_page(original_data, status){
     let specs_data_list = provide_specs_list_for_edit(merged_data);
 
     let div_edit = document.getElementsByClassName("edit")[0];
-    fill_edit_with_data(original_data, div_edit, merged_data, specs_data_list);
+    fill_edit_with_data(original_data, div_edit, merged_data, specs_data_list, status);
 
     // assign the change event listener
     assign_change_event_listener_to_inputs(original_data, status);
@@ -626,7 +626,7 @@ function get_new_data_from_edit(original_data){
 }
 
 
-function fill_edit_with_data(original_data, div_edit, merged_data, specs_data_list){
+function fill_edit_with_data(original_data, div_edit, merged_data, specs_data_list, status){
     util.removeAllChild(div_edit);
 
     // add the item_id
@@ -634,8 +634,14 @@ function fill_edit_with_data(original_data, div_edit, merged_data, specs_data_li
 
     // add a header
     let edit_header = document.createElement("h1");
-    edit_header.textContent = "Edit Specification, Preview and Submit";
     div_edit.appendChild(edit_header);
+
+    if (status === NEW){
+        edit_header.textContent = "Upload New Item Specification";
+    }
+    else {
+        edit_header.textContent = "Edit Specification, Preview and Submit";
+    }
 
     // a div for specs (top div)
     let div_specs = document.createElement("div");
