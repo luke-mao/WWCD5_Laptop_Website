@@ -278,7 +278,7 @@ function fill_profile(div, data, status){
         });
     }
 
-    if (status === CUSTOMER_VIEW_SELF){
+    if (status === CUSTOMER_VIEW_SELF || status === ADMIN_VIEW_SELF){
         // the last row has two buttons, edit profile, add new address
         let div_last = document.createElement("div");
         div_last.classList.add("row");
@@ -299,16 +299,21 @@ function fill_profile(div, data, status){
             return;
         });
 
-        // at the end of the list, add a button to add new address
-        let btn_add_addr = document.createElement("button");
-        btn_add_addr.textContent = "Add New Address"
-        btn_add_addr.addEventListener("click", function(){
-            modal_window_edit_or_create_address(null, false);
-        });
-
         // link
         details.appendChild(div_last);
-        util.appendListChild(div_last, [btn_profile_edit, btn_pwd, btn_add_addr]);
+        util.appendListChild(div_last, [btn_profile_edit, btn_pwd]);
+
+        // add address button, only for customer
+        if (status === CUSTOMER_VIEW_SELF){
+            // at the end of the list, add a button to add new address
+            let btn_add_addr = document.createElement("button");
+            btn_add_addr.textContent = "Add New Address"
+            btn_add_addr.addEventListener("click", function(){
+                modal_window_edit_or_create_address(null, false);
+            });
+
+            div_last.appendChild(btn_add_addr);
+        }
     }
 
     return;
