@@ -121,8 +121,12 @@ async function page_set_up(){
                 modal.create_force_logout_modal();
                 return;
             }
+            else if (response_2.status == 204){
+                // this customer no orders, do nothing
+                return;
+            }
             else if (response_2.status !== 200){
-                let text = await response.text();
+                let text = await response_2.text();
                 throw Error(text);
             }
 
