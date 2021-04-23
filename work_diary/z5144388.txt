@@ -1,14 +1,39 @@
 Work dairy
 Week1:
 Discuss the project topics and divide up the project work with team members.
+
 Week2:
 Determine the framework to be used for the project, and start writing the project proposal.
 Design the database table structure.
+
 Week3:
 Designing the user interfaces include Sign in, Register, Cart, Check-out, Product Detail Page, and Administrator Pages.
 Draw the flow chart of the project.
 Modify the proposal according to the tutor's suggestion.
 
-Week5 15/3
-HTML and CSS of login and register pages.
+Week4:
+UI/UX design of all pages.
 
+Week5:
+HTML and CSS of login and register pages.
+Create index card element
+
+Week6:
+Build homepage page with Jinjie
+
+Week7:
+combine some common css into base css file
+input element in checkout page
+HTML of profile page
+
+
+Week8:
+fix bugs in about search bar
+
+week9:
+Rating in the account profile page
+
+Week 10:
+Prepare demo
+Write final report
+Fix bug
