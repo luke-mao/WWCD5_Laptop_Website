@@ -44,7 +44,7 @@ Preferred browser: Chrome version >= 89.
 
     # Install all packages.
     pip install -r requirements.txt     # WIN10
-    pip3 install -r requirements.txt    # Linux
+    sudo pip3 install -r requirements.txt    # Linux
 
     # start the backend 
     python app.py                       # WIN10
