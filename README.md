@@ -97,7 +97,7 @@ Preferred browser: Chrome version >= 89.
     | ------------ | ------| -------- |
     | Customer | jinjie.mao@mail.com | 111111 |
     | Customer2 | gaoxiang.ren@mail.com | 111111 |
-    |Admin |admin@mail.com | 111111 | 
+    |Admin |admin@mail.com | admin | 
 
 7. If you would like to view the database file, please visit the [SQLite online studio](https://sqliteonline.com/) and select the file `backend/data.db`.
 
